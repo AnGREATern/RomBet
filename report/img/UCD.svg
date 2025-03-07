@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    version="1.1"
-   width="560px"
+   width="243px"
    height="433px"
-   viewBox="-0.5 -0.5 560 433"
-   animation="{&quot;meta&quot;:{&quot;version&quot;:20230504,&quot;patch&quot;:1},&quot;page&quot;:{&quot;animationInfo&quot;:{}},&quot;infos&quot;:[{&quot;cell&quot;:{&quot;id&quot;:&quot;0&quot;,&quot;parentId&quot;:null,&quot;childrenIds&quot;:[&quot;1&quot;],&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:null,&quot;origin&quot;:null,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;1&quot;,&quot;parentId&quot;:&quot;0&quot;,&quot;childrenIds&quot;:[&quot;P1DbZkn2nLFt_LM7e9hS-2&quot;,&quot;P1DbZkn2nLFt_LM7e9hS-3&quot;,&quot;P1DbZkn2nLFt_LM7e9hS-5&quot;,&quot;P1DbZkn2nLFt_LM7e9hS-8&quot;,&quot;P1DbZkn2nLFt_LM7e9hS-10&quot;,&quot;P1DbZkn2nLFt_LM7e9hS-11&quot;,&quot;P1DbZkn2nLFt_LM7e9hS-14&quot;,&quot;P1DbZkn2nLFt_LM7e9hS-32&quot;,&quot;hKOpeQcW0nG0GUL6m2F3-10&quot;,&quot;hKOpeQcW0nG0GUL6m2F3-11&quot;,&quot;hKOpeQcW0nG0GUL6m2F3-12&quot;,&quot;RNCvv-xMhyRz6Mp9gXIt-1&quot;,&quot;RNCvv-xMhyRz6Mp9gXIt-2&quot;,&quot;H60jXnX0Gc37_jBXYM8d-1&quot;,&quot;H60jXnX0Gc37_jBXYM8d-2&quot;],&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:null,&quot;origin&quot;:null,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;P1DbZkn2nLFt_LM7e9hS-2&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;UseCase&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;UseCase\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;P1DbZkn2nLFt_LM7e9hS-3&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;UseCase&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;UseCase\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;P1DbZkn2nLFt_LM7e9hS-5&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;UseCase&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;UseCase\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;P1DbZkn2nLFt_LM7e9hS-8&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;UseCase&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;UseCase\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;P1DbZkn2nLFt_LM7e9hS-10&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;UseCase&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;UseCase\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;P1DbZkn2nLFt_LM7e9hS-11&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;UseCase&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;UseCase\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;P1DbZkn2nLFt_LM7e9hS-14&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;Actor&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Actor\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;P1DbZkn2nLFt_LM7e9hS-32&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:null,&quot;origin&quot;:&quot;{\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Dependency\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;hKOpeQcW0nG0GUL6m2F3-10&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;Association&quot;,&quot;origin&quot;:&quot;{\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Association\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;hKOpeQcW0nG0GUL6m2F3-11&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;Association&quot;,&quot;origin&quot;:&quot;{\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Association\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;hKOpeQcW0nG0GUL6m2F3-12&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;Association&quot;,&quot;origin&quot;:&quot;{\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Association\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;RNCvv-xMhyRz6Mp9gXIt-1&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;UseCase&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;UseCase\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;RNCvv-xMhyRz6Mp9gXIt-2&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;Association&quot;,&quot;origin&quot;:&quot;{\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Association\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;H60jXnX0Gc37_jBXYM8d-1&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;Association&quot;,&quot;origin&quot;:&quot;{\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Association\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;H60jXnX0Gc37_jBXYM8d-2&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;Association&quot;,&quot;origin&quot;:&quot;{\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Association\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null}],&quot;pageMeta&quot;:{&quot;audios&quot;:[],&quot;videos&quot;:[],&quot;assets&quot;:[],&quot;video_duration&quot;:1,&quot;page_width&quot;:1100,&quot;page_height&quot;:850,&quot;page_hash&quot;:&quot;6897fbfb-b1b5-41ae-a7dd-e0485f5f49c8&quot;}}"
+   viewBox="-0.5 -0.5 243 433"
+   animation="{&quot;meta&quot;:{&quot;version&quot;:20230504,&quot;patch&quot;:1},&quot;page&quot;:{&quot;animationInfo&quot;:{}},&quot;infos&quot;:[{&quot;cell&quot;:{&quot;id&quot;:&quot;0&quot;,&quot;parentId&quot;:null,&quot;childrenIds&quot;:[&quot;1&quot;],&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:null,&quot;origin&quot;:null,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;1&quot;,&quot;parentId&quot;:&quot;0&quot;,&quot;childrenIds&quot;:[&quot;P1DbZkn2nLFt_LM7e9hS-3&quot;,&quot;P1DbZkn2nLFt_LM7e9hS-5&quot;,&quot;P1DbZkn2nLFt_LM7e9hS-10&quot;,&quot;P1DbZkn2nLFt_LM7e9hS-11&quot;,&quot;P1DbZkn2nLFt_LM7e9hS-14&quot;,&quot;hKOpeQcW0nG0GUL6m2F3-10&quot;,&quot;hKOpeQcW0nG0GUL6m2F3-11&quot;,&quot;RNCvv-xMhyRz6Mp9gXIt-1&quot;,&quot;RNCvv-xMhyRz6Mp9gXIt-2&quot;,&quot;H60jXnX0Gc37_jBXYM8d-1&quot;,&quot;H60jXnX0Gc37_jBXYM8d-2&quot;],&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:null,&quot;origin&quot;:null,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;P1DbZkn2nLFt_LM7e9hS-3&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;UseCase&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;UseCase\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;P1DbZkn2nLFt_LM7e9hS-5&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;UseCase&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;UseCase\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;P1DbZkn2nLFt_LM7e9hS-10&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;UseCase&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;UseCase\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;P1DbZkn2nLFt_LM7e9hS-11&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;UseCase&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;UseCase\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;P1DbZkn2nLFt_LM7e9hS-14&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;Actor&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Actor\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;hKOpeQcW0nG0GUL6m2F3-10&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;Association&quot;,&quot;origin&quot;:&quot;{\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Association\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;hKOpeQcW0nG0GUL6m2F3-11&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;Association&quot;,&quot;origin&quot;:&quot;{\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Association\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;RNCvv-xMhyRz6Mp9gXIt-1&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;UseCase&quot;,&quot;origin&quot;:&quot;{\&quot;product\&quot;:\&quot;diagram\&quot;,\&quot;libraryId\&quot;:\&quot;use_case\&quot;,\&quot;libraryTitle\&quot;:\&quot;Use Case\&quot;,\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;UseCase\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:true,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;RNCvv-xMhyRz6Mp9gXIt-2&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;Association&quot;,&quot;origin&quot;:&quot;{\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Association\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;H60jXnX0Gc37_jBXYM8d-1&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;Association&quot;,&quot;origin&quot;:&quot;{\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Association\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null},{&quot;cell&quot;:{&quot;id&quot;:&quot;H60jXnX0Gc37_jBXYM8d-2&quot;,&quot;parentId&quot;:&quot;1&quot;,&quot;childrenIds&quot;:null,&quot;groupParentId&quot;:null,&quot;groupChildrenIds&quot;:null,&quot;shapeType&quot;:&quot;Association&quot;,&quot;origin&quot;:&quot;{\&quot;paletteLoadId\&quot;:\&quot;UseCaseDiagram\&quot;,\&quot;paletteUiId\&quot;:\&quot;use_case\&quot;,\&quot;paletteItemUiId\&quot;:\&quot;Association\&quot;}&quot;,&quot;fromLibraryId&quot;:null,&quot;vertex&quot;:false,&quot;maskedCell&quot;:false,&quot;textCell&quot;:false,&quot;calloutCell&quot;:false,&quot;imageShape&quot;:false,&quot;webComponentType&quot;:null},&quot;animationInfo&quot;:null}],&quot;pageMeta&quot;:{&quot;audios&quot;:[],&quot;videos&quot;:[],&quot;assets&quot;:[],&quot;video_duration&quot;:1,&quot;page_width&quot;:1100,&quot;page_height&quot;:850,&quot;page_hash&quot;:&quot;ff852625-09c3-40e4-9846-f2e15d99b86c&quot;}}"
    threeDAnimation="{&quot;pageSize&quot;:{&quot;x&quot;:0,&quot;y&quot;:0,&quot;width&quot;:1100,&quot;height&quot;:850},&quot;characters&quot;:[],&quot;assetIdInfoMap&quot;:{}}"
    style="background-color: rgb(255, 255, 255);"
-   id="svg256"
+   id="svg213"
    sodipodi:docname="UCD.svg"
    inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -17,7 +17,7 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <sodipodi:namedview
-     id="namedview258"
+     id="namedview215"
      pagecolor="#ffffff"
      bordercolor="#666666"
      borderopacity="1.0"
@@ -26,14 +26,14 @@
      inkscape:pagecheckerboard="0"
      showgrid="false"
      inkscape:zoom="1.8083141"
-     inkscape:cx="279.81865"
+     inkscape:cx="121.66028"
      inkscape:cy="216.5"
      inkscape:window-width="1920"
      inkscape:window-height="1031"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg256" />
+     inkscape:current-layer="svg213" />
   <defs
      id="defs6">
     <style
@@ -58,14 +58,14 @@ a { color: #007bff; }
 </style>
   </defs>
   <g
-     id="g244">
+     id="g201">
     <g
        shape-node=""
        id="g10">
       <ellipse
-         cell-id="P1DbZkn2nLFt_LM7e9hS-2"
-         cx="349.6"
-         cy="118.07"
+         cell-id="P1DbZkn2nLFt_LM7e9hS-3"
+         cx="191.2"
+         cy="210.07"
          rx="51.2"
          ry="26.065454545454543"
          fill="#7acff5"
@@ -76,81 +76,14 @@ a { color: #007bff; }
     <g
        shape-node=""
        text-node=""
-       id="g27">
-      <g
-         cell-id="P1DbZkn2nLFt_LM7e9hS-2"
-         transform="translate(-0.5 -0.5)scale(0.8)"
-         id="g25">
-        <switch
-           cell-id="P1DbZkn2nLFt_LM7e9hS-2"
-           id="switch23">
-          <foreignObject
-             cell-id="P1DbZkn2nLFt_LM7e9hS-2"
-             style="overflow: visible; text-align: left;"
-             pointer-events="none"
-             width="125%"
-             height="125%"
-             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
-            <xhtml:div
-               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 126px; height: 1px; padding-top: 148px; margin-left: 374px;">
-              <xhtml:div
-                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
-                <xhtml:div
-                   ani=""
-                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">Выбрать событие и сумму</xhtml:div>
-              </xhtml:div>
-            </xhtml:div>
-          </foreignObject>
-          <svg
-             width="125%"
-             height="125%"
-             version="1.1"
-             id="svg21">
-            <defs
-               id="defs13">
-              <path
-                 id="Ay3zYqmC.eSqwwBw"
-                 d="M374,146.209375 h126 M374,160.609375 h126" />
-            </defs>
-            <text
-               fill="rgb(0, 0, 0)"
-               font-size="12px"
-               font-family="Helvetica, &quot;VP Default&quot;"
-               font-weight="400"
-               id="text19"><textPath
-                 xlink:href="#Ay3zYqmC.eSqwwBw"
-                 id="textPath17"><tspan
-                   xml:space="preserve"
-                   id="tspan15">Выбрать событие и сумму</tspan></textPath></text>
-          </svg>
-        </switch>
-      </g>
-    </g>
-    <g
-       shape-node=""
-       id="g31">
-      <ellipse
-         cell-id="P1DbZkn2nLFt_LM7e9hS-3"
-         cx="191.2"
-         cy="210.07"
-         rx="51.2"
-         ry="26.065454545454543"
-         fill="#7acff5"
-         stroke="#000000"
-         pointer-events="all"
-         id="ellipse29" />
-    </g>
-    <g
-       shape-node=""
-       text-node=""
-       id="g48">
+       id="g42">
       <g
          cell-id="P1DbZkn2nLFt_LM7e9hS-3"
          transform="translate(-0.5 -0.5)scale(0.8)"
-         id="g46">
+         id="g40">
         <switch
            cell-id="P1DbZkn2nLFt_LM7e9hS-3"
-           id="switch44">
+           id="switch38">
           <foreignObject
              cell-id="P1DbZkn2nLFt_LM7e9hS-3"
              style="overflow: visible; text-align: left;"
@@ -164,7 +97,8 @@ a { color: #007bff; }
                  style="box-sizing: border-box; font-size: 0; text-align: center; ">
                 <xhtml:div
                    ani=""
-                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">Посмотреть статистику</xhtml:div>
+                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">Посмотреть статистику<xhtml:br />
+ставок</xhtml:div>
               </xhtml:div>
             </xhtml:div>
           </foreignObject>
@@ -172,30 +106,51 @@ a { color: #007bff; }
              width="125%"
              height="125%"
              version="1.1"
-             id="svg42">
+             id="svg36">
             <defs
-               id="defs34">
+               id="defs14">
               <path
-                 id="wy3zYqmC.eSqwwBx"
-                 d="M176,261.209375 h126 M176,275.609375 h126" />
+                 id="JZIQDqmCOonKAgAt"
+                 d="M176,254.021875 h126 M176,268.421875 h126 M176,282.821875 h126" />
+              <path
+                 id="pZIQDqmCOonKAgAu"
+                 d="M176,254.021875 h126 M176,268.421875 h126 M176,282.821875 h126" />
             </defs>
             <text
                fill="rgb(0, 0, 0)"
                font-size="12px"
                font-family="Helvetica, &quot;VP Default&quot;"
                font-weight="400"
-               id="text40"><textPath
-                 xlink:href="#wy3zYqmC.eSqwwBx"
-                 id="textPath38"><tspan
+               id="text24"><textPath
+                 xlink:href="#JZIQDqmCOonKAgAt"
+                 id="textPath22"><tspan
                    xml:space="preserve"
-                   id="tspan36">Посмотреть статистику</tspan></textPath></text>
+                   id="tspan16">Посмотреть статистику</tspan><tspan
+                   xml:space="preserve"
+                   id="tspan18" /><tspan
+                   xml:space="preserve"
+                   id="tspan20">ставок</tspan></textPath></text>
+            <text
+               fill="rgb(0, 0, 0)"
+               font-size="12px"
+               font-family="Helvetica, &quot;VP Default&quot;"
+               font-weight="400"
+               id="text34"><textPath
+                 xlink:href="#pZIQDqmCOonKAgAu"
+                 id="textPath32"><tspan
+                   xml:space="preserve"
+                   id="tspan26">Посмотреть статистику</tspan><tspan
+                   xml:space="preserve"
+                   id="tspan28" /><tspan
+                   xml:space="preserve"
+                   id="tspan30">ставок</tspan></textPath></text>
           </svg>
         </switch>
       </g>
     </g>
     <g
        shape-node=""
-       id="g52">
+       id="g46">
       <ellipse
          cell-id="P1DbZkn2nLFt_LM7e9hS-5"
          cx="191.2"
@@ -205,19 +160,19 @@ a { color: #007bff; }
          fill="#7acff5"
          stroke="#000000"
          pointer-events="all"
-         id="ellipse50" />
+         id="ellipse44" />
     </g>
     <g
        shape-node=""
        text-node=""
-       id="g69">
+       id="g63">
       <g
          cell-id="P1DbZkn2nLFt_LM7e9hS-5"
          transform="translate(-0.5 -0.5)scale(0.8)"
-         id="g67">
+         id="g61">
         <switch
            cell-id="P1DbZkn2nLFt_LM7e9hS-5"
-           id="switch65">
+           id="switch59">
           <foreignObject
              cell-id="P1DbZkn2nLFt_LM7e9hS-5"
              style="overflow: visible; text-align: left;"
@@ -231,7 +186,7 @@ a { color: #007bff; }
                  style="box-sizing: border-box; font-size: 0; text-align: center; ">
                 <xhtml:div
                    ani=""
-                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">Выбрать матч</xhtml:div>
+                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">Поставить на тотал</xhtml:div>
               </xhtml:div>
             </xhtml:div>
           </foreignObject>
@@ -239,101 +194,32 @@ a { color: #007bff; }
              width="125%"
              height="125%"
              version="1.1"
-             id="svg63">
+             id="svg57">
             <defs
-               id="defs55">
+               id="defs49">
               <path
-                 id="oy3zYqmC.eSqwwBy"
-                 d="M199.953125,153.4125 h78.078125" />
+                 id="5ZIQDqmCOonKAgAv"
+                 d="M184.53125,153.4125 h108.9375" />
             </defs>
             <text
                fill="rgb(0, 0, 0)"
                font-size="12px"
                font-family="Helvetica, &quot;VP Default&quot;"
                font-weight="400"
-               id="text61"><textPath
-                 xlink:href="#oy3zYqmC.eSqwwBy"
+               id="text55"><textPath
+                 xlink:href="#5ZIQDqmCOonKAgAv"
                  startOffset="50%"
                  text-anchor="middle"
-                 id="textPath59"><tspan
+                 id="textPath53"><tspan
                    xml:space="preserve"
-                   id="tspan57">Выбрать матч</tspan></textPath></text>
+                   id="tspan51">Поставить на тотал</tspan></textPath></text>
           </svg>
         </switch>
       </g>
     </g>
     <g
        shape-node=""
-       id="g73">
-      <ellipse
-         cell-id="P1DbZkn2nLFt_LM7e9hS-8"
-         cx="508"
-         cy="118.07"
-         rx="51.2"
-         ry="26.065454545454543"
-         fill="#7acff5"
-         stroke="#000000"
-         pointer-events="all"
-         id="ellipse71" />
-    </g>
-    <g
-       shape-node=""
-       text-node=""
-       id="g90">
-      <g
-         cell-id="P1DbZkn2nLFt_LM7e9hS-8"
-         transform="translate(-0.5 -0.5)scale(0.8)"
-         id="g88">
-        <switch
-           cell-id="P1DbZkn2nLFt_LM7e9hS-8"
-           id="switch86">
-          <foreignObject
-             cell-id="P1DbZkn2nLFt_LM7e9hS-8"
-             style="overflow: visible; text-align: left;"
-             pointer-events="none"
-             width="125%"
-             height="125%"
-             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
-            <xhtml:div
-               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 126px; height: 1px; padding-top: 148px; margin-left: 572px;">
-              <xhtml:div
-                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
-                <xhtml:div
-                   ani=""
-                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">Сделать ставку</xhtml:div>
-              </xhtml:div>
-            </xhtml:div>
-          </foreignObject>
-          <svg
-             width="125%"
-             height="125%"
-             version="1.1"
-             id="svg84">
-            <defs
-               id="defs76">
-              <path
-                 id="Yy3zYqmC.eSqwwBz"
-                 d="M591.875,153.4125 h86.234375" />
-            </defs>
-            <text
-               fill="rgb(0, 0, 0)"
-               font-size="12px"
-               font-family="Helvetica, &quot;VP Default&quot;"
-               font-weight="400"
-               id="text82"><textPath
-                 xlink:href="#Yy3zYqmC.eSqwwBz"
-                 startOffset="50%"
-                 text-anchor="middle"
-                 id="textPath80"><tspan
-                   xml:space="preserve"
-                   id="tspan78">Сделать ставку</tspan></textPath></text>
-          </svg>
-        </switch>
-      </g>
-    </g>
-    <g
-       shape-node=""
-       id="g94">
+       id="g67">
       <ellipse
          cell-id="P1DbZkn2nLFt_LM7e9hS-10"
          cx="191.2"
@@ -343,19 +229,19 @@ a { color: #007bff; }
          fill="#7acff5"
          stroke="#000000"
          pointer-events="all"
-         id="ellipse92" />
+         id="ellipse65" />
     </g>
     <g
        shape-node=""
        text-node=""
-       id="g111">
+       id="g84">
       <g
          cell-id="P1DbZkn2nLFt_LM7e9hS-10"
          transform="translate(-0.5 -0.5)scale(0.8)"
-         id="g109">
+         id="g82">
         <switch
            cell-id="P1DbZkn2nLFt_LM7e9hS-10"
-           id="switch107">
+           id="switch80">
           <foreignObject
              cell-id="P1DbZkn2nLFt_LM7e9hS-10"
              style="overflow: visible; text-align: left;"
@@ -377,11 +263,11 @@ a { color: #007bff; }
              width="125%"
              height="125%"
              version="1.1"
-             id="svg105">
+             id="svg78">
             <defs
-               id="defs97">
+               id="defs70">
               <path
-                 id="Ey3zYqmC.eSqwwB0"
+                 id="lZIQDqmCOonKAgAw"
                  d="M176,383.209375 h126 M176,397.609375 h126" />
             </defs>
             <text
@@ -389,18 +275,18 @@ a { color: #007bff; }
                font-size="12px"
                font-family="Helvetica, &quot;VP Default&quot;"
                font-weight="400"
-               id="text103"><textPath
-                 xlink:href="#Ey3zYqmC.eSqwwB0"
-                 id="textPath101"><tspan
+               id="text76"><textPath
+                 xlink:href="#lZIQDqmCOonKAgAw"
+                 id="textPath74"><tspan
                    xml:space="preserve"
-                   id="tspan99">Рассчитать результаты тура</tspan></textPath></text>
+                   id="tspan72">Рассчитать результаты тура</tspan></textPath></text>
           </svg>
         </switch>
       </g>
     </g>
     <g
        shape-node=""
-       id="g115">
+       id="g88">
       <ellipse
          cell-id="P1DbZkn2nLFt_LM7e9hS-11"
          cx="191.2"
@@ -410,19 +296,19 @@ a { color: #007bff; }
          fill="#7acff5"
          stroke="#000000"
          pointer-events="all"
-         id="ellipse113" />
+         id="ellipse86" />
     </g>
     <g
        shape-node=""
        text-node=""
-       id="g132">
+       id="g105">
       <g
          cell-id="P1DbZkn2nLFt_LM7e9hS-11"
          transform="translate(-0.5 -0.5)scale(0.8)"
-         id="g130">
+         id="g103">
         <switch
            cell-id="P1DbZkn2nLFt_LM7e9hS-11"
-           id="switch128">
+           id="switch101">
           <foreignObject
              cell-id="P1DbZkn2nLFt_LM7e9hS-11"
              style="overflow: visible; text-align: left;"
@@ -436,7 +322,7 @@ a { color: #007bff; }
                  style="box-sizing: border-box; font-size: 0; text-align: center; ">
                 <xhtml:div
                    ani=""
-                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">Перейти к следующему туру</xhtml:div>
+                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">Поставить на исход</xhtml:div>
               </xhtml:div>
             </xhtml:div>
           </foreignObject>
@@ -444,30 +330,32 @@ a { color: #007bff; }
              width="125%"
              height="125%"
              version="1.1"
-             id="svg126">
+             id="svg99">
             <defs
-               id="defs118">
+               id="defs91">
               <path
-                 id="ky3zYqmC.eSqwwB1"
-                 d="M176,31.209375 h126 M176,45.609375 h126" />
+                 id="1ZIQDqmCOonKAgAx"
+                 d="M183.9375,38.4125 h110.109375" />
             </defs>
             <text
                fill="rgb(0, 0, 0)"
                font-size="12px"
                font-family="Helvetica, &quot;VP Default&quot;"
                font-weight="400"
-               id="text124"><textPath
-                 xlink:href="#ky3zYqmC.eSqwwB1"
-                 id="textPath122"><tspan
+               id="text97"><textPath
+                 xlink:href="#1ZIQDqmCOonKAgAx"
+                 startOffset="50%"
+                 text-anchor="middle"
+                 id="textPath95"><tspan
                    xml:space="preserve"
-                   id="tspan120">Перейти к следующему туру</tspan></textPath></text>
+                   id="tspan93">Поставить на исход</tspan></textPath></text>
           </svg>
         </switch>
       </g>
     </g>
     <g
        shape-node=""
-       id="g148">
+       id="g121">
       <ellipse
          cell-id="P1DbZkn2nLFt_LM7e9hS-14"
          cx="31.2"
@@ -477,7 +365,7 @@ a { color: #007bff; }
          fill="#7acff5"
          stroke="none"
          pointer-events="all"
-         id="ellipse134" />
+         id="ellipse107" />
       <rect
          cell-id="P1DbZkn2nLFt_LM7e9hS-14"
          x="19.2"
@@ -488,7 +376,7 @@ a { color: #007bff; }
          fill="#7acff5"
          stroke="none"
          pointer-events="all"
-         id="rect136" />
+         id="rect109" />
       <ellipse
          cell-id="P1DbZkn2nLFt_LM7e9hS-14"
          cx="31.2"
@@ -498,7 +386,7 @@ a { color: #007bff; }
          fill="none"
          stroke="#000000"
          pointer-events="all"
-         id="ellipse138" />
+         id="ellipse111" />
       <path
          cell-id="P1DbZkn2nLFt_LM7e9hS-14"
          d="M 31.2 220 L 31.2 240"
@@ -506,7 +394,7 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="all"
-         id="path140" />
+         id="path113" />
       <path
          cell-id="P1DbZkn2nLFt_LM7e9hS-14"
          d="M 19.2 227.2 L 43.2 227.2"
@@ -514,7 +402,7 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="all"
-         id="path142" />
+         id="path115" />
       <path
          cell-id="P1DbZkn2nLFt_LM7e9hS-14"
          d="M 31.2 240 L 19.2 256"
@@ -522,7 +410,7 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="all"
-         id="path144" />
+         id="path117" />
       <path
          cell-id="P1DbZkn2nLFt_LM7e9hS-14"
          d="M 31.2 240 L 43.2 256"
@@ -530,19 +418,19 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="all"
-         id="path146" />
+         id="path119" />
     </g>
     <g
        shape-node=""
        text-node=""
-       id="g165">
+       id="g138">
       <g
          cell-id="P1DbZkn2nLFt_LM7e9hS-14"
          transform="translate(-0.5 -0.5)scale(0.8)"
-         id="g163">
+         id="g136">
         <switch
            cell-id="P1DbZkn2nLFt_LM7e9hS-14"
-           id="switch161">
+           id="switch134">
           <foreignObject
              cell-id="P1DbZkn2nLFt_LM7e9hS-14"
              style="overflow: visible; text-align: left;"
@@ -564,11 +452,11 @@ a { color: #007bff; }
              width="125%"
              height="125%"
              version="1.1"
-             id="svg159">
+             id="svg132">
             <defs
-               id="defs151">
+               id="defs124">
               <path
-                 id="0y3zYqmC.eSqwwB2"
+                 id="dZIQDqmCOonKAgAy"
                  d="M0.0625,339.6 h77.875" />
             </defs>
             <text
@@ -576,32 +464,20 @@ a { color: #007bff; }
                font-size="12px"
                font-family="Helvetica, &quot;VP Default&quot;"
                font-weight="400"
-               id="text157"><textPath
-                 xlink:href="#0y3zYqmC.eSqwwB2"
+               id="text130"><textPath
+                 xlink:href="#dZIQDqmCOonKAgAy"
                  startOffset="50%"
                  text-anchor="middle"
-                 id="textPath155"><tspan
+                 id="textPath128"><tspan
                    xml:space="preserve"
-                   id="tspan153">Пользователь</tspan></textPath></text>
+                   id="tspan126">Пользователь</tspan></textPath></text>
           </svg>
         </switch>
       </g>
     </g>
     <g
        shape-node=""
-       id="g169">
-      <path
-         cell-id="P1DbZkn2nLFt_LM7e9hS-32"
-         d="M 400.8 118.4 L 456.8 118.4"
-         fill="none"
-         stroke="#000000"
-         stroke-miterlimit="10"
-         pointer-events="stroke"
-         id="path167" />
-    </g>
-    <g
-       shape-node=""
-       id="g173">
+       id="g142">
       <path
          cell-id="hKOpeQcW0nG0GUL6m2F3-10"
          d="M 43.2 232 L 140 210.4"
@@ -609,11 +485,11 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="stroke"
-         id="path171" />
+         id="path140" />
     </g>
     <g
        shape-node=""
-       id="g177">
+       id="g146">
       <path
          cell-id="hKOpeQcW0nG0GUL6m2F3-11"
          d="M 43.2 232 L 140 118.4"
@@ -621,23 +497,11 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="stroke"
-         id="path175" />
+         id="path144" />
     </g>
     <g
        shape-node=""
-       id="g181">
-      <path
-         cell-id="hKOpeQcW0nG0GUL6m2F3-12"
-         d="M 242.4 118.4 L 298.4 118.4"
-         fill="none"
-         stroke="#000000"
-         stroke-miterlimit="10"
-         pointer-events="stroke"
-         id="path179" />
-    </g>
-    <g
-       shape-node=""
-       id="g185">
+       id="g150">
       <ellipse
          cell-id="RNCvv-xMhyRz6Mp9gXIt-1"
          cx="191.2"
@@ -647,19 +511,19 @@ a { color: #007bff; }
          fill="#7acff5"
          stroke="#000000"
          pointer-events="all"
-         id="ellipse183" />
+         id="ellipse148" />
     </g>
     <g
        shape-node=""
        text-node=""
-       id="g202">
+       id="g167">
       <g
          cell-id="RNCvv-xMhyRz6Mp9gXIt-1"
          transform="translate(-0.5 -0.5)scale(0.8)"
-         id="g200">
+         id="g165">
         <switch
            cell-id="RNCvv-xMhyRz6Mp9gXIt-1"
-           id="switch198">
+           id="switch163">
           <foreignObject
              cell-id="RNCvv-xMhyRz6Mp9gXIt-1"
              style="overflow: visible; text-align: left;"
@@ -681,11 +545,11 @@ a { color: #007bff; }
              width="125%"
              height="125%"
              version="1.1"
-             id="svg196">
+             id="svg161">
             <defs
-               id="defs188">
+               id="defs153">
               <path
-                 id="cy3zYqmC.eSqwwB3"
+                 id="jZIQDqmCOonKAgAz"
                  d="M198.390625,512.4125 h81.21875" />
             </defs>
             <text
@@ -693,20 +557,20 @@ a { color: #007bff; }
                font-size="12px"
                font-family="Helvetica, &quot;VP Default&quot;"
                font-weight="400"
-               id="text194"><textPath
-                 xlink:href="#cy3zYqmC.eSqwwB3"
+               id="text159"><textPath
+                 xlink:href="#jZIQDqmCOonKAgAz"
                  startOffset="50%"
                  text-anchor="middle"
-                 id="textPath192"><tspan
+                 id="textPath157"><tspan
                    xml:space="preserve"
-                   id="tspan190">Начать заново</tspan></textPath></text>
+                   id="tspan155">Начать заново</tspan></textPath></text>
           </svg>
         </switch>
       </g>
     </g>
     <g
        shape-node=""
-       id="g206">
+       id="g171">
       <path
          cell-id="RNCvv-xMhyRz6Mp9gXIt-2"
          d="M 140 405.6 L 43.2 232"
@@ -714,11 +578,11 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="stroke"
-         id="path204" />
+         id="path169" />
     </g>
     <g
        shape-node=""
-       id="g210">
+       id="g175">
       <path
          cell-id="H60jXnX0Gc37_jBXYM8d-1"
          d="M 43.2 232 L 140 308"
@@ -726,11 +590,11 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="stroke"
-         id="path208" />
+         id="path173" />
     </g>
     <g
        shape-node=""
-       id="g214">
+       id="g179">
       <path
          cell-id="H60jXnX0Gc37_jBXYM8d-2"
          d="M 43.2 232 L 140 26.4"
@@ -738,23 +602,11 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="stroke"
-         id="path212" />
+         id="path177" />
     </g>
     <g
        shape-node=""
-       id="g218">
-      <path
-         cell-id="P1DbZkn2nLFt_LM7e9hS-32"
-         d="M 400.8 118.4 L 456.8 118.4"
-         fill="none"
-         stroke="#000000"
-         stroke-miterlimit="10"
-         pointer-events="stroke"
-         id="path216" />
-    </g>
-    <g
-       shape-node=""
-       id="g222">
+       id="g183">
       <path
          cell-id="hKOpeQcW0nG0GUL6m2F3-10"
          d="M 43.2 232 L 140 210.4"
@@ -762,11 +614,11 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="stroke"
-         id="path220" />
+         id="path181" />
     </g>
     <g
        shape-node=""
-       id="g226">
+       id="g187">
       <path
          cell-id="hKOpeQcW0nG0GUL6m2F3-11"
          d="M 43.2 232 L 140 118.4"
@@ -774,23 +626,11 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="stroke"
-         id="path224" />
+         id="path185" />
     </g>
     <g
        shape-node=""
-       id="g230">
-      <path
-         cell-id="hKOpeQcW0nG0GUL6m2F3-12"
-         d="M 242.4 118.4 L 298.4 118.4"
-         fill="none"
-         stroke="#000000"
-         stroke-miterlimit="10"
-         pointer-events="stroke"
-         id="path228" />
-    </g>
-    <g
-       shape-node=""
-       id="g234">
+       id="g191">
       <path
          cell-id="RNCvv-xMhyRz6Mp9gXIt-2"
          d="M 140 405.6 L 43.2 232"
@@ -798,11 +638,11 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="stroke"
-         id="path232" />
+         id="path189" />
     </g>
     <g
        shape-node=""
-       id="g238">
+       id="g195">
       <path
          cell-id="H60jXnX0Gc37_jBXYM8d-1"
          d="M 43.2 232 L 140 308"
@@ -810,11 +650,11 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="stroke"
-         id="path236" />
+         id="path193" />
     </g>
     <g
        shape-node=""
-       id="g242">
+       id="g199">
       <path
          cell-id="H60jXnX0Gc37_jBXYM8d-2"
          d="M 43.2 232 L 140 26.4"
@@ -822,23 +662,23 @@ a { color: #007bff; }
          stroke="#000000"
          stroke-miterlimit="10"
          pointer-events="stroke"
-         id="path240" />
+         id="path197" />
     </g>
   </g>
   <switch
-     id="switch252">
+     id="switch209">
     <g
        requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"
-       id="g246" />
+       id="g203" />
     <a
        transform="translate(0,-5)"
-       id="a250">
+       id="a207">
       <text
          text-anchor="middle"
          font-size="10px"
          x="50%"
          y="100%"
-         id="text248" />
+         id="text205" />
     </a>
   </switch>
 </svg>
