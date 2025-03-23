@@ -1,41 +1,28 @@
 use anyhow::Result;
+
 use domain::{entity::Bet, value_object::{Id, Amount}};
-use crate::repository::{IGameRepo, IGameStatRepo, IBetRepo};
-
-pub trait IBetService<T: IBetRepo> {
-    fn new(repo: T) -> Self;
-
-    fn make_bet(&self) -> Result<()>;
-
-    fn is_success(&self, bet_id: Id<Bet>) -> Result<bool>;
-
-    fn profit(&self, bet_id: Id<Bet>) -> Result<Amount>;
-
-    fn reset(&mut self);
-}
+use crate::{repository::{IBetRepo, IGameRepo, IGameStatRepo}, usecase::bet::{IBetService, MakeBet, MakeReport}};
 
 pub struct BetService<T: IBetRepo> {
     bet_repo: T,
 }
 
-impl<T: IBetRepo> IBetService<T> for BetService<T> {
-    fn new(bet_repo: T) -> Self {
-        Self { bet_repo }
-    }
-
+impl<T: IBetRepo> MakeBet for BetService<T> {
     fn make_bet(&self) -> Result<()> {
         todo!()
     }
+}
 
-    fn is_success(&self, bet_id: Id<Bet>) -> Result<bool> {
+impl<T: IBetRepo> MakeReport for BetService<T> {
+    fn make_report(&self) -> Result<()> {
         todo!()
     }
+}
 
-    fn profit(&self, bet_id: Id<Bet>) -> Result<Amount> {
-        todo!()
-    }
+impl<T: IBetRepo> IBetService for BetService<T> { }
 
-    fn reset(&mut self) {
-        self.bet_repo.reset();
+impl<T: IBetRepo> BetService<T> {
+    fn new(bet_repo: T) -> Self {
+        Self { bet_repo }
     }
 }

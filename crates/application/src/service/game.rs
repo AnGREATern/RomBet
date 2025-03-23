@@ -4,21 +4,10 @@ use rand::{Rng, rng};
 
 use domain::entity::{GameStat, Team, Game};
 use domain::value_object::{Id, Deviation, PastResults, Winner};
+use crate::usecase::game::{CreateRound, IGameService, RandomizeRound};
 use crate::{config::CoefficientConfig, repository::{IGameRepo, IGameStatRepo, ITeamRepo}};
 
 const TEAMS_PER_GAME: usize = 2;
-
-pub trait IGameService<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> {
-    fn new(game_repo: G, team_repo: T, stat_repo: S, config: CoefficientConfig) -> Self;
-
-    fn randomize_game(&self, game_id: Id<Game>) -> Result<()>;
-
-    fn randomize_round(&self, round: u32) -> Result<()>;
-
-    fn create_round(&mut self) -> Result<()>;
-
-    fn reset(&self);
-}
 
 pub struct GameService<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> {
     game_repo: G,
@@ -28,18 +17,24 @@ pub struct GameService<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> {
     config: CoefficientConfig,
 }
 
-impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> IGameService<G, T, S> for GameService<G, T, S> {
-    fn new(game_repo: G, team_repo: T, stat_repo: S, config: CoefficientConfig) -> Self {
-        let round = 0;
-        Self {
-            game_repo,
-            team_repo,
-            stat_repo,
-            round,
-            config,
+impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> CreateRound for GameService<G, T, S> {
+    fn create_round(&mut self) -> Result<()> {
+        self.round += 1;
+        let mut teams = self.team_repo.all_teams_id();
+        teams.shuffle(&mut rng());
+        for h2h in teams.chunks_exact(TEAMS_PER_GAME) {
+            let home_team_id = h2h[0];
+            let guest_team_id = h2h[1];
+            let game_id = self.game_repo.next_id();
+            let game = Game::new(game_id, home_team_id, guest_team_id, self.round);
+            self.game_repo.add(game)?;
         }
-    }
 
+        Ok(())
+    }
+}
+
+impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> RandomizeRound for GameService<G, T, S> {
     fn randomize_game(&self, game_id: Id<Game>) -> Result<()> {
         let winner = self.randomize_winner(game_id)?;
         let (home_team_total, guest_team_total) = self.randomize_totals(game_id, winner)?;
@@ -58,29 +53,22 @@ impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> IGameService<G, T, S> for Gam
 
         Ok(())
     }
-
-    fn create_round(&mut self) -> Result<()> {
-        self.round += 1;
-        let mut teams = self.team_repo.all_teams_id();
-        teams.shuffle(&mut rng());
-        for h2h in teams.chunks_exact(TEAMS_PER_GAME) {
-            let home_team_id = h2h[0];
-            let guest_team_id = h2h[1];
-            let game_id = self.game_repo.next_id();
-            let game = Game::new(game_id, home_team_id, guest_team_id, self.round);
-            self.game_repo.add(game)?;
-        }
-
-        Ok(())
-    }
-
-    fn reset(&self) {
-        self.game_repo.reset();
-        self.stat_repo.reset();
-    }
 }
 
+impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> IGameService for GameService<G, T, S> { }
+
 impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> GameService<G, T, S> {
+    fn new(game_repo: G, team_repo: T, stat_repo: S, config: CoefficientConfig) -> Self {
+        let round = 0;
+        Self {
+            game_repo,
+            team_repo,
+            stat_repo,
+            round,
+            config,
+        }
+    }
+
     fn rand_event(probs: &[f64]) -> usize {
         let mut rand_num = rng().random_range(0.0..=probs.iter().sum());
         for (ind, &prob) in probs.iter().enumerate() {
