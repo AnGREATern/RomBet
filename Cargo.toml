@@ -1,0 +1,19 @@
+[package]
+name = "RomBet"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[workspace]
+members = [ "crates/application",
+  "crates/domain",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+[patch.crates-io]
+domain          = { path = "crates/domain"          }
