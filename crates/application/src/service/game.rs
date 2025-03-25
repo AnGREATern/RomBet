@@ -2,10 +2,13 @@ use anyhow::Result;
 use rand::seq::SliceRandom;
 use rand::{Rng, rng};
 
-use domain::entity::{GameStat, Team, Game};
-use domain::value_object::{Id, Deviation, PastResults, Winner};
 use crate::usecase::game::{CreateRound, IGameService, RandomizeRound};
-use crate::{config::CoefficientConfig, repository::{IGameRepo, IGameStatRepo, ITeamRepo}};
+use crate::{
+    config::CoefficientConfig,
+    repository::{IGameRepo, IGameStatRepo, ITeamRepo},
+};
+use domain::entity::{Game, GameStat, Team};
+use domain::value_object::{Deviation, Id, PastResults, Winner};
 
 const TEAMS_PER_GAME: usize = 2;
 
@@ -36,8 +39,9 @@ impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> CreateRound for GameService<G
 
 impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> RandomizeRound for GameService<G, T, S> {
     fn randomize_game(&self, game_id: Id<Game>) -> Result<()> {
-        let winner = self.randomize_winner(game_id)?;
-        let (home_team_total, guest_team_total) = self.randomize_totals(game_id, winner)?;
+        let game = self.game_repo.game_by_id(game_id)?;
+        let winner = self.randomize_winner(&game)?;
+        let (home_team_total, guest_team_total) = self.randomize_totals(&game, winner)?;
         let stat_id = self.stat_repo.next_id();
         let game_stat = GameStat::new(stat_id, game_id, home_team_total, guest_team_total);
         self.stat_repo.add(game_stat)?;
@@ -55,7 +59,7 @@ impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> RandomizeRound for GameServic
     }
 }
 
-impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> IGameService for GameService<G, T, S> { }
+impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> IGameService for GameService<G, T, S> {}
 
 impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> GameService<G, T, S> {
     fn new(game_repo: G, team_repo: T, stat_repo: S, config: CoefficientConfig) -> Self {
@@ -82,35 +86,65 @@ impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> GameService<G, T, S> {
     }
 
     fn past_results_by_team_id(&self, team_id: Id<Team>) -> Result<PastResults> {
-        let home_team_games_id = self
+        let games_id = self
             .game_repo
             .games_id_by_team_id(team_id, self.config.tracked_games)?;
         let mut past_results = PastResults::new();
-        for game_id in home_team_games_id {
-            let winner = self.stat_repo.winner_by_game_id(game_id)?;
+        for (game_id, is_home) in games_id {
+            let winner = self.stat_repo.winner_by_game_id(game_id, is_home)?;
             past_results.add_result(winner);
         }
 
         Ok(past_results)
     }
 
-    fn h2h_results_by_game(&self, game: Game) -> Result<PastResults> {
+    fn avg_goals_by_team_id(&self, team_id: Id<Team>) -> Result<f64> {
+        let games_id = self
+            .game_repo
+            .games_id_by_team_id(team_id, self.config.tracked_games)?;
+        let mut goals = 0;
+        for (game_id, is_home) in games_id {
+            goals += self.stat_repo.goals_by_game_id(game_id, is_home)?;
+        }
+
+        Ok(goals as f64 / self.config.tracked_games as f64)
+    }
+
+    fn h2h_results_by_game(&self, game: &Game) -> Result<PastResults> {
         let h2hs_id = self.game_repo.h2hs_id_by_team_id(
             game.home_team_id(),
             game.guest_team_id(),
             self.config.tracked_games,
         )?;
         let mut past_results = PastResults::new();
-        for game_id in h2hs_id {
-            let winner = self.stat_repo.winner_by_game_id(game_id)?;
+        for (game_id, is_home) in h2hs_id {
+            let winner = self.stat_repo.winner_by_game_id(game_id, is_home)?;
             past_results.add_result(winner);
         }
 
         Ok(past_results)
     }
 
-    fn randomize_winner(&self, game_id: Id<Game>) -> Result<Winner> {
-        let game = self.game_repo.game_by_id(game_id)?;
+    fn h2h_avg_goals_by_game(&self, game: &Game) -> Result<(f64, f64)> {
+        let h2hs_id = self.game_repo.h2hs_id_by_team_id(
+            game.home_team_id(),
+            game.guest_team_id(),
+            self.config.tracked_games,
+        )?;
+        let (mut home_team_goals, mut guest_team_goals) = (0, 0);
+        for (game_id, is_home) in h2hs_id {
+            let (ht_goals, gt_goals) = self.stat_repo.score_by_game_id(game_id, is_home)?;
+            home_team_goals += ht_goals;
+            guest_team_goals += gt_goals;
+        }
+
+        Ok((
+            home_team_goals as f64 / self.config.tracked_games as f64,
+            guest_team_goals as f64 / self.config.tracked_games as f64,
+        ))
+    }
+
+    fn randomize_winner(&self, game: &Game) -> Result<Winner> {
         let home_res = self.past_results_by_team_id(game.home_team_id())?;
         let guest_res = self.past_results_by_team_id(game.guest_team_id())?;
         let h2h_res = self.h2h_results_by_game(game)?;
@@ -140,7 +174,47 @@ impl<G: IGameRepo, T: ITeamRepo, S: IGameStatRepo> GameService<G, T, S> {
         })
     }
 
-    fn randomize_totals(&self, game_id: Id<Game>, winner: Winner) -> Result<(u8, u8)> {
-        todo!()
+    fn randomize_totals(&self, game: &Game, winner: Winner) -> Result<(u8, u8)> {
+        let h2h_avg_goals = self.h2h_avg_goals_by_game(game)?;
+        let home_team_avg_goals = self.avg_goals_by_team_id(game.home_team_id())? + h2h_avg_goals.0;
+        let guest_team_avg_goals =
+            self.avg_goals_by_team_id(game.guest_team_id())? + h2h_avg_goals.1;
+
+        let (home_team_goals, guest_team_goals) = match winner {
+            Winner::W1 => {
+                let rand_home_team_goals = rng()
+                    .random_range((home_team_avg_goals - 1.).max(0.)..=(home_team_avg_goals + 1.));
+                let home_team_goals = rand_home_team_goals.round_ties_even();
+                let rand_guest_team_goals = rng().random_range(
+                    (guest_team_avg_goals - 1.).max(0.)
+                        ..=(guest_team_avg_goals + 1.).min(home_team_goals - 1.),
+                );
+                let guest_team_goals = rand_guest_team_goals.round_ties_even() as u8;
+
+                (home_team_goals as u8, guest_team_goals)
+            }
+            Winner::X => {
+                let avg_goals = (home_team_avg_goals + guest_team_avg_goals) / 2.;
+                let rand_goals = rng().random_range((avg_goals - 1.).max(0.)..=(avg_goals + 1.));
+                let goals = rand_goals.round_ties_even() as u8;
+
+                (goals, goals)
+            }
+            Winner::W2 => {
+                let rand_guest_team_goals = rng().random_range(
+                    (guest_team_avg_goals - 1.).max(0.)..=(guest_team_avg_goals + 1.),
+                );
+                let guest_team_goals = rand_guest_team_goals.round_ties_even();
+                let rand_home_team_goals = rng().random_range(
+                    (home_team_avg_goals - 1.).max(0.)
+                        ..=(home_team_avg_goals + 1.).min(guest_team_goals - 1.),
+                );
+                let home_team_goals = rand_home_team_goals.round_ties_even() as u8;
+
+                (home_team_goals, guest_team_goals as u8)
+            }
+        };
+
+        Ok((home_team_goals, guest_team_goals))
     }
 }

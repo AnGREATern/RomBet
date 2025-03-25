@@ -12,11 +12,13 @@ pub trait IGameStatRepo {
 
     fn game_stat_by_id(&self, game_stat_id: Id<GameStat>) -> Result<GameStat>;
 
-    fn winner_by_game_id(&self, game_id: Id<Game>) -> Result<Winner>;
+    fn winner_by_game_id(&self, game_id: Id<Game>, is_home: bool) -> Result<Winner>;
 
-    fn num_of_games_with_total_x_more(&self, game_id: Id<Game>, x: f32);
+    fn score_by_game_id(&self, game_id: Id<Game>, is_home: bool) -> Result<(u8, u8)>;
 
-    fn num_of_games_with_total_x_less(&self, game_id: Id<Game>, x: f32);
+    fn goals_by_game_id(&self, game_id: Id<Game>, is_home: bool) -> Result<u8>;
+
+    fn num_of_games_with_total_x(&self, game_id: Id<Game>, x: u8);
 
     fn next_id(&self) -> Id<GameStat>;
 

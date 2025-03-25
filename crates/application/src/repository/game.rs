@@ -12,7 +12,7 @@ pub trait IGameRepo {
 
     fn game_by_id(&self, game_id: Id<Game>) -> Result<Game>;
 
-    fn games_id_by_team_id(&self, team_id: Id<Team>, cnt: u8) -> Result<Vec<Id<Game>>>;
+    fn games_id_by_team_id(&self, team_id: Id<Team>, cnt: u8) -> Result<Vec<(Id<Game>, bool)>>;
 
     fn games_id_by_round(&self, round: u32) -> Result<Vec<Id<Game>>>;
 
@@ -21,7 +21,7 @@ pub trait IGameRepo {
         home_team_id: Id<Team>,
         guest_team_id: Id<Team>,
         cnt: u8,
-    ) -> Result<Vec<Id<Game>>>;
+    ) -> Result<Vec<(Id<Game>, bool)>>;
 
     fn next_id(&self) -> Id<Game>;
 
