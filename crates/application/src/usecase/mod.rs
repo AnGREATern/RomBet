@@ -1,3 +1,3 @@
 pub mod bet;
 pub mod game;
-pub mod restart;
+pub mod session;

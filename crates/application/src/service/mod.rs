@@ -1,6 +1,6 @@
 mod game;
 mod bet;
-mod restart;
+mod session;
 
 pub use game::GameService;
 pub use bet::BetService;
