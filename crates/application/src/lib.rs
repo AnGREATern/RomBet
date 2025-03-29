@@ -1,7 +1,7 @@
-mod service;
-mod repository;
 mod config;
-mod usecase;
 mod controller;
+mod repository;
+mod service;
+mod usecase;
 
 pub use controller::Controller;

@@ -1,11 +1,11 @@
-use serde::Deserialize;
 use anyhow::{Error, Result, bail};
+use serde::Deserialize;
 
 type Float = f64;
 const MIN: f64 = 0.0;
 const MAX_EXCLUDED: f64 = 1.0;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, Copy)]
 pub struct Margin(Float);
 
 impl TryFrom<Float> for Margin {

@@ -1,9 +1,10 @@
 use anyhow::{Error, Result, bail};
 
-type Float = f32;
+type Float = f64;
 const MIN_COEFFICIENT: i32 = 1_01;
 const PENNY: i32 = 100;
 
+#[derive(Clone, Copy)]
 pub struct Coefficient(i32);
 
 impl TryFrom<Float> for Coefficient {

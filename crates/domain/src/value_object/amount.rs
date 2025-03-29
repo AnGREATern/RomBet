@@ -1,9 +1,11 @@
 use anyhow::{Error, Result, bail};
+use serde::Deserialize;
 
 type Float = f64;
 const MIN_AMOUNT: i64 = 0_10;
 const PENNY: i32 = 100;
 
+#[derive(Deserialize, Copy, Clone)]
 pub struct Amount(i64);
 
 impl TryFrom<Float> for Amount {

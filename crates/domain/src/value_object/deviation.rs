@@ -1,4 +1,4 @@
-use anyhow::{Result, Error, bail};
+use anyhow::{Error, Result, bail};
 use rand::{Rng, rng};
 
 type Float = f64;

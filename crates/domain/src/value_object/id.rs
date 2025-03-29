@@ -1,5 +1,5 @@
-use uuid::Uuid;
 use std::marker::PhantomData;
+use uuid::Uuid;
 
 pub struct Id<T> {
     value: Uuid,

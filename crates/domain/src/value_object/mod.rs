@@ -1,17 +1,19 @@
-mod id;
 mod amount;
+mod bet_statistics;
 mod coefficient;
+mod deviation;
 mod event;
-mod winner;
+mod id;
 mod margin;
 mod past_results;
-mod deviation;
+mod past_totals;
 
-pub use id::Id;
 pub use amount::Amount;
+pub use bet_statistics::BetStatistics;
 pub use coefficient::Coefficient;
-pub use event::Event;
-pub use winner::Winner;
+pub use deviation::Deviation;
+pub use event::{Event, EventTotal, Winner};
+pub use id::Id;
 pub use margin::Margin;
 pub use past_results::PastResults;
-pub use deviation::Deviation;
+pub use past_totals::PastTotals;
