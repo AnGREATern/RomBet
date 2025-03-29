@@ -1,3 +1,4 @@
+use std::net::IpAddr;
 use anyhow::{Result, bail};
 use rand::rng;
 use rand::seq::SliceRandom;
@@ -5,7 +6,7 @@ use rand::seq::SliceRandom;
 use crate::{
     config::SetupConfig,
     repository::{IGameRepo, IGameStatRepo, ISimulationRepo, ITeamRepo},
-    usecase::{CreateRound, Restart},
+    usecase::{CreateRound, Start},
 };
 use domain::{
     entity::{Game, Simulation},
@@ -22,15 +23,25 @@ pub struct SimulationService<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: I
     config: SetupConfig,
 }
 
-impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> Restart
+impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> Start
     for SimulationService<G, T, GS, S>
 {
-    fn restart(&self, simulation: Simulation) -> Simulation {
+    fn start(&self, ip: IpAddr) -> Id<Simulation> {
+        if let Some(id) = self.simulation_repo.simulation_by_ip(ip) {
+            id
+        } else {
+            let id = self.simulation_repo.next_id();
+            self.simulation_repo.add(Simulation::new(id, ip, self.config.balance));
+            
+            id
+        }
+    }
+
+    fn restart(&self, simulation: Simulation) -> Id<Simulation> {
         let ip = simulation.ip();
         self.simulation_repo.remove_by_id(simulation.id());
-        let id = self.simulation_repo.next_id();
-
-        Simulation::new(id, ip, self.config.balance)
+        
+        self.start(ip)
     }
 }
 

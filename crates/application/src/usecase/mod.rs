@@ -7,4 +7,4 @@ pub use bet::MakeBet;
 pub use bet::MakeReport;
 pub use game::RandomizeRound;
 pub use simulation::CreateRound;
-pub use simulation::Restart;
+pub use simulation::Start;

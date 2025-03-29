@@ -1,11 +1,13 @@
-use anyhow::Result;
+use std::net::IpAddr;
 
 use domain::{entity::Simulation, value_object::Id};
 
 pub trait ISimulationRepo {
     fn new() -> Self;
 
-    fn session_by_id(&self, session_id: Id<Simulation>) -> Result<Simulation>;
+    fn add(&self, simulation: Simulation);
+
+    fn simulation_by_ip(&self, ip: IpAddr) -> Option<Id<Simulation>>;
 
     fn remove_by_id(&self, simulation_id: Id<Simulation>);
 

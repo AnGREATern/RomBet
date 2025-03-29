@@ -31,6 +31,4 @@ pub trait IGameRepo {
     ) -> Result<Vec<(Id<Game>, bool)>>;
 
     fn next_id(&self) -> Id<Game>;
-
-    fn reset(&self);
 }
