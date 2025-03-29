@@ -48,18 +48,6 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         }
     }
 
-    fn rand_event(probs: &[f64]) -> usize {
-        let mut rand_num = rng().random_range(0.0..=probs.iter().sum());
-        for (ind, &prob) in probs.iter().enumerate() {
-            if prob < rand_num {
-                return ind;
-            }
-            rand_num -= prob;
-        }
-
-        probs.len()
-    }
-
     fn past_results_by_team_id(
         &self,
         team_id: Id<Team>,
@@ -138,20 +126,63 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         let guest_res = self.past_results_by_team_id(game.guest_team_id(), game.simulation_id())?;
         let h2h_res = self.h2h_results_by_game(game)?;
 
-        let prob_base = (h2h_res.pts_diff() / self.config.alpha) as f64;
+        GameRandomizer::randomize_winner(
+            home_res,
+            guest_res,
+            h2h_res,
+            self.config.alpha,
+            self.config.tracked_games,
+        )
+    }
+
+    fn randomize_totals(&self, game: &Game, winner: Winner) -> Result<(u8, u8)> {
+        let h2h_avg_goals = self.h2h_avg_goals_by_game(game)?;
+        let home_team_avg_goals =
+            self.avg_goals_by_team_id(game.home_team_id(), game.simulation_id())? + h2h_avg_goals.0;
+        let guest_team_avg_goals = self
+            .avg_goals_by_team_id(game.guest_team_id(), game.simulation_id())?
+            + h2h_avg_goals.1;
+
+        GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals)
+    }
+}
+
+struct GameRandomizer;
+
+impl GameRandomizer {
+    fn rand_event(probs: &[f64]) -> usize {
+        let mut rand_num = rng().random_range(0.0..=probs.iter().sum());
+        for (ind, &prob) in probs.iter().enumerate() {
+            if prob < rand_num {
+                return ind;
+            }
+            rand_num -= prob;
+        }
+
+        probs.len()
+    }
+
+    pub fn randomize_winner(
+        home_res: PastResults,
+        guest_res: PastResults,
+        h2h_res: PastResults,
+        alpha: i32,
+        tracked_games: u8,
+    ) -> Result<Winner> {
+        let prob_base = (h2h_res.pts_diff() / alpha) as f64;
         let win_prob = ((((home_res.wins + 1) + (guest_res.loses + 1)) as f64
             / 2.
-            / (self.config.tracked_games as u32 + 3) as f64)
+            / (tracked_games as u32 + 3) as f64)
             + prob_base)
             * f64::from(Deviation::generate());
         let draw_prob = ((((home_res.draws + 1) + (guest_res.draws + 1)) as f64
             / 2.
-            / (self.config.tracked_games as u32 + 3) as f64)
+            / (tracked_games as u32 + 3) as f64)
             + prob_base)
             * f64::from(Deviation::generate());
         let lose_prob = ((((home_res.loses + 1) + (guest_res.wins + 1)) as f64
             / 2.
-            / (self.config.tracked_games as u32 + 3) as f64)
+            / (tracked_games as u32 + 3) as f64)
             + prob_base)
             * f64::from(Deviation::generate());
         let probs = [win_prob, draw_prob, lose_prob];
@@ -163,14 +194,11 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         })
     }
 
-    fn randomize_totals(&self, game: &Game, winner: Winner) -> Result<(u8, u8)> {
-        let h2h_avg_goals = self.h2h_avg_goals_by_game(game)?;
-        let home_team_avg_goals =
-            self.avg_goals_by_team_id(game.home_team_id(), game.simulation_id())? + h2h_avg_goals.0;
-        let guest_team_avg_goals = self
-            .avg_goals_by_team_id(game.guest_team_id(), game.simulation_id())?
-            + h2h_avg_goals.1;
-
+    pub fn randomize_totals(
+        winner: Winner,
+        home_team_avg_goals: f64,
+        guest_team_avg_goals: f64,
+    ) -> Result<(u8, u8)> {
         let (home_team_goals, guest_team_goals) = match winner {
             Winner::W1 => {
                 let rand_home_team_goals = rng()

@@ -9,7 +9,8 @@ use crate::{
 use domain::{
     entity::{Bet, Game, Simulation, Team},
     value_object::{
-        Amount, BetStatistics, Coefficient, Event, EventTotal, Id, PastResults, PastTotals, Winner,
+        Amount, BetStatistics, Coefficient, Event, EventTotal, Id, Margin, PastResults, PastTotals,
+        Winner,
     },
 };
 
@@ -50,28 +51,14 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> MakeBet for BetService<B, G, 
         let guest_res = self.past_results_by_team_id(game.guest_team_id(), game.simulation_id())?;
         let h2h_res = self.h2h_results_by_game(game)?;
 
-        let prob_base = (h2h_res.pts_diff() / self.config.alpha) as f64;
-        let win_prob = (((home_res.wins + 1) + (guest_res.loses + 1)) as f64
-            / 2.
-            / (self.config.tracked_games as u32 + 3) as f64)
-            + prob_base;
-        let draw_prob = (((home_res.draws + 1) + (guest_res.draws + 1)) as f64
-            / 2.
-            / (self.config.tracked_games as u32 + 3) as f64)
-            + prob_base;
-        let lose_prob = (((home_res.loses + 1) + (guest_res.wins + 1)) as f64
-            / 2.
-            / (self.config.tracked_games as u32 + 3) as f64)
-            + prob_base;
-        let mut probs = [win_prob, draw_prob, lose_prob];
-        self.normalize(&mut probs);
-        probs.map(|p| p * (1. - f64::from(self.config.margin)));
-
-        Ok(vec![
-            (Event::WDL(Winner::W1), probs[0].try_into()?),
-            (Event::WDL(Winner::X), probs[1].try_into()?),
-            (Event::WDL(Winner::W2), probs[2].try_into()?),
-        ])
+        BetCalculator::calculate_winner_coefficients(
+            home_res,
+            guest_res,
+            h2h_res,
+            self.config.alpha,
+            self.config.tracked_games,
+            self.config.margin,
+        )
     }
 
     fn calculate_total_coefficients(&self, game: &Game) -> Result<Vec<(Event, Coefficient)>> {
@@ -82,36 +69,11 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> MakeBet for BetService<B, G, 
                 self.past_totals(game.home_team_id(), game.simulation_id(), total)?;
             let guest_team_past_totals =
                 self.past_totals(game.guest_team_id(), game.simulation_id(), total)?;
-
             let totals = ((h2h_totals + home_team_past_totals)? + guest_team_past_totals)?;
-            let n = totals.size() as f64 + 3.;
-            let tg = n / (totals.greater() as f64 + 1.);
-            let te = n / (totals.equal() as f64 + 1.);
-            let tl = n / (totals.less() as f64 + 1.);
-            let mut probs = [tg, te, tl];
-            self.normalize(&mut probs);
-            probs.map(|p| p * (1. - f64::from(self.config.margin)));
-            total_coefficients.push((
-                Event::T(EventTotal {
-                    total,
-                    ordering: Ordering::Greater,
-                }),
-                probs[0].try_into()?,
-            ));
-            total_coefficients.push((
-                Event::T(EventTotal {
-                    total,
-                    ordering: Ordering::Equal,
-                }),
-                probs[1].try_into()?,
-            ));
-            total_coefficients.push((
-                Event::T(EventTotal {
-                    total,
-                    ordering: Ordering::Less,
-                }),
-                probs[2].try_into()?,
-            ));
+
+            let mut ttl =
+                BetCalculator::calculate_total_coefficients(total, totals, self.config.margin)?;
+            total_coefficients.append(&mut ttl);
         }
 
         Ok(total_coefficients)
@@ -245,8 +207,12 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> BetService<B, G, GS> {
 
         Ok(past_totals)
     }
+}
 
-    fn normalize(&self, probs: &mut [f64]) {
+struct BetCalculator;
+
+impl BetCalculator {
+    fn normalize(probs: &mut [f64]) {
         let sum = probs.iter().sum::<f64>();
         if (sum - 1.).abs() < EPS {
             return;
@@ -254,5 +220,76 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> BetService<B, G, GS> {
         for p in probs.iter_mut() {
             *p /= sum;
         }
+    }
+
+    pub fn calculate_winner_coefficients(
+        home_res: PastResults,
+        guest_res: PastResults,
+        h2h_res: PastResults,
+        alpha: i32,
+        tracked_games: u8,
+        margin: Margin,
+    ) -> Result<Vec<(Event, Coefficient)>> {
+        let prob_base = (h2h_res.pts_diff() / alpha) as f64;
+        let win_prob = (((home_res.wins + 1) + (guest_res.loses + 1)) as f64
+            / 2.
+            / (tracked_games as u32 + 3) as f64)
+            + prob_base;
+        let draw_prob = (((home_res.draws + 1) + (guest_res.draws + 1)) as f64
+            / 2.
+            / (tracked_games as u32 + 3) as f64)
+            + prob_base;
+        let lose_prob = (((home_res.loses + 1) + (guest_res.wins + 1)) as f64
+            / 2.
+            / (tracked_games as u32 + 3) as f64)
+            + prob_base;
+        let mut probs = [win_prob, draw_prob, lose_prob];
+        Self::normalize(&mut probs);
+        probs.map(|p| p * (1. - f64::from(margin)));
+
+        Ok(vec![
+            (Event::WDL(Winner::W1), probs[0].try_into()?),
+            (Event::WDL(Winner::X), probs[1].try_into()?),
+            (Event::WDL(Winner::W2), probs[2].try_into()?),
+        ])
+    }
+
+    pub fn calculate_total_coefficients(
+        total: u8,
+        totals: PastTotals,
+        margin: Margin,
+    ) -> Result<Vec<(Event, Coefficient)>> {
+        let mut total_coefficients = vec![];
+
+        let n = totals.size() as f64 + 3.;
+        let tg = n / (totals.greater() as f64 + 1.);
+        let te = n / (totals.equal() as f64 + 1.);
+        let tl = n / (totals.less() as f64 + 1.);
+        let mut probs = [tg, te, tl];
+        Self::normalize(&mut probs);
+        probs.map(|p| p * (1. - f64::from(margin)));
+        total_coefficients.push((
+            Event::T(EventTotal {
+                total,
+                ordering: Ordering::Greater,
+            }),
+            probs[0].try_into()?,
+        ));
+        total_coefficients.push((
+            Event::T(EventTotal {
+                total,
+                ordering: Ordering::Equal,
+            }),
+            probs[1].try_into()?,
+        ));
+        total_coefficients.push((
+            Event::T(EventTotal {
+                total,
+                ordering: Ordering::Less,
+            }),
+            probs[2].try_into()?,
+        ));
+
+        Ok(total_coefficients)
     }
 }
