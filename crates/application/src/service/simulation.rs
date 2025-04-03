@@ -1,7 +1,7 @@
-use std::net::IpAddr;
 use anyhow::{Result, bail};
 use rand::rng;
 use rand::seq::SliceRandom;
+use std::net::IpAddr;
 
 use crate::{
     config::SetupConfig,
@@ -31,8 +31,9 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> Start
             id
         } else {
             let id = self.simulation_repo.next_id();
-            self.simulation_repo.add(Simulation::new(id, ip, self.config.balance));
-            
+            self.simulation_repo
+                .add(Simulation::new(id, ip, self.config.balance));
+
             id
         }
     }
@@ -40,7 +41,7 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> Start
     fn restart(&self, simulation: Simulation) -> Id<Simulation> {
         let ip = simulation.ip();
         self.simulation_repo.remove_by_id(simulation.id());
-        
+
         self.start(ip)
     }
 }

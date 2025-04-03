@@ -126,13 +126,15 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         let guest_res = self.past_results_by_team_id(game.guest_team_id(), game.simulation_id())?;
         let h2h_res = self.h2h_results_by_game(game)?;
 
-        GameRandomizer::randomize_winner(
+        Ok(GameRandomizer::randomize_winner(
             home_res,
             guest_res,
             h2h_res,
             self.config.alpha,
             self.config.tracked_games,
-        )
+            self.config.deviation_min,
+            self.config.deviation_max,
+        ))
     }
 
     fn randomize_totals(&self, game: &Game, winner: Winner) -> Result<(u8, u8)> {
@@ -143,7 +145,11 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
             .avg_goals_by_team_id(game.guest_team_id(), game.simulation_id())?
             + h2h_avg_goals.1;
 
-        GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals)
+        Ok(GameRandomizer::randomize_totals(
+            winner,
+            home_team_avg_goals,
+            guest_team_avg_goals,
+        ))
     }
 }
 
@@ -153,7 +159,7 @@ impl GameRandomizer {
     fn rand_event(probs: &[f64]) -> usize {
         let mut rand_num = rng().random_range(0.0..=probs.iter().sum());
         for (ind, &prob) in probs.iter().enumerate() {
-            if prob < rand_num {
+            if prob > rand_num {
                 return ind;
             }
             rand_num -= prob;
@@ -168,44 +174,48 @@ impl GameRandomizer {
         h2h_res: PastResults,
         alpha: i32,
         tracked_games: u8,
-    ) -> Result<Winner> {
-        let prob_base = (h2h_res.pts_diff() / alpha) as f64;
+        deviation_min: f64,
+        deviation_max: f64,
+    ) -> Winner {
+        let prob_base = h2h_res.pts_diff() as f64 / alpha as f64;
         let win_prob = ((((home_res.wins + 1) + (guest_res.loses + 1)) as f64
             / 2.
             / (tracked_games as u32 + 3) as f64)
             + prob_base)
-            * f64::from(Deviation::generate());
-        let draw_prob = ((((home_res.draws + 1) + (guest_res.draws + 1)) as f64
+            * Deviation::generate(deviation_min, deviation_max).value();
+        let draw_prob = (((home_res.draws + 1) + (guest_res.draws + 1)) as f64
             / 2.
             / (tracked_games as u32 + 3) as f64)
-            + prob_base)
-            * f64::from(Deviation::generate());
+            * Deviation::generate(deviation_min, deviation_max).value();
         let lose_prob = ((((home_res.loses + 1) + (guest_res.wins + 1)) as f64
             / 2.
             / (tracked_games as u32 + 3) as f64)
-            + prob_base)
-            * f64::from(Deviation::generate());
+            - prob_base)
+            * Deviation::generate(deviation_min, deviation_max).value();
         let probs = [win_prob, draw_prob, lose_prob];
+        println!("{:?}", probs);
 
-        Ok(match Self::rand_event(&probs) {
+        match Self::rand_event(&probs) {
             0 => Winner::W1,
             1 => Winner::X,
             _ => Winner::W2,
-        })
+        }
     }
 
     pub fn randomize_totals(
         winner: Winner,
         home_team_avg_goals: f64,
         guest_team_avg_goals: f64,
-    ) -> Result<(u8, u8)> {
+    ) -> (u8, u8) {
         let (home_team_goals, guest_team_goals) = match winner {
             Winner::W1 => {
                 let rand_home_team_goals = rng()
-                    .random_range((home_team_avg_goals - 1.).max(0.)..=(home_team_avg_goals + 1.));
+                    .random_range((home_team_avg_goals - 1.).max(1.)..=(home_team_avg_goals + 1.));
                 let home_team_goals = rand_home_team_goals.round_ties_even();
                 let rand_guest_team_goals = rng().random_range(
-                    (guest_team_avg_goals - 1.).max(0.)
+                    (guest_team_avg_goals - 1.)
+                        .max(0.)
+                        .min(home_team_goals - 1.)
                         ..=(guest_team_avg_goals + 1.).min(home_team_goals - 1.),
                 );
                 let guest_team_goals = rand_guest_team_goals.round_ties_even() as u8;
@@ -221,11 +231,13 @@ impl GameRandomizer {
             }
             Winner::W2 => {
                 let rand_guest_team_goals = rng().random_range(
-                    (guest_team_avg_goals - 1.).max(0.)..=(guest_team_avg_goals + 1.),
+                    (guest_team_avg_goals - 1.).max(1.)..=(guest_team_avg_goals + 1.),
                 );
                 let guest_team_goals = rand_guest_team_goals.round_ties_even();
                 let rand_home_team_goals = rng().random_range(
-                    (home_team_avg_goals - 1.).max(0.)
+                    (home_team_avg_goals - 1.)
+                        .max(0.)
+                        .min(guest_team_goals - 1.)
                         ..=(home_team_avg_goals + 1.).min(guest_team_goals - 1.),
                 );
                 let home_team_goals = rand_home_team_goals.round_ties_even() as u8;
@@ -234,6 +246,44 @@ impl GameRandomizer {
             }
         };
 
-        Ok((home_team_goals, guest_team_goals))
+        (home_team_goals, guest_team_goals)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn randomize_totals_winner1() {
+        let winner = Winner::W1;
+        let home_team_avg_goals = 2.8;
+        let guest_team_avg_goals = 3.1;
+        let res =
+            GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals);
+
+        assert!(res.0 > res.1)
+    }
+
+    #[test]
+    fn randomize_totals_draw() {
+        let winner = Winner::X;
+        let home_team_avg_goals = 0.1;
+        let guest_team_avg_goals = 3.3;
+        let res =
+            GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals);
+
+        assert!(res.0 == res.1)
+    }
+
+    #[test]
+    fn randomize_totals_winner2() {
+        let winner = Winner::W2;
+        let home_team_avg_goals = 0.1;
+        let guest_team_avg_goals = 3.3;
+        let res =
+            GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals);
+
+        assert!(res.0 < res.1)
     }
 }

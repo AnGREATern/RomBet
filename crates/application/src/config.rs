@@ -14,6 +14,8 @@ pub struct CoefficientConfig {
     pub margin: Margin,
     pub alpha: i32,
     pub totals: Vec<u8>,
+    pub deviation_min: f64,
+    pub deviation_max: f64,
 }
 
 #[derive(Deserialize)]

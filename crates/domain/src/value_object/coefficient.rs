@@ -4,7 +4,7 @@ type Float = f64;
 const MIN_COEFFICIENT: i32 = 1_01;
 const PENNY: i32 = 100;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Coefficient(i32);
 
 impl TryFrom<Float> for Coefficient {

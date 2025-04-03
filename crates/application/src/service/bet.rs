@@ -126,7 +126,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> MakeReport for BetService<B, 
 }
 
 impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> BetService<B, G, GS> {
-    fn new(bet_repo: B, game_repo: G, game_stat_repo: GS, config: CoefficientConfig) -> Self {
+    pub fn new(bet_repo: B, game_repo: G, game_stat_repo: GS, config: CoefficientConfig) -> Self {
         Self {
             bet_repo,
             game_repo,
@@ -230,22 +230,23 @@ impl BetCalculator {
         tracked_games: u8,
         margin: Margin,
     ) -> Result<Vec<(Event, Coefficient)>> {
-        let prob_base = (h2h_res.pts_diff() / alpha) as f64;
+        let prob_base = h2h_res.pts_diff() as f64 / alpha as f64;
         let win_prob = (((home_res.wins + 1) + (guest_res.loses + 1)) as f64
             / 2.
             / (tracked_games as u32 + 3) as f64)
             + prob_base;
-        let draw_prob = (((home_res.draws + 1) + (guest_res.draws + 1)) as f64
+        let draw_prob = ((home_res.draws + 1) + (guest_res.draws + 1)) as f64
             / 2.
-            / (tracked_games as u32 + 3) as f64)
-            + prob_base;
+            / (tracked_games as u32 + 3) as f64;
         let lose_prob = (((home_res.loses + 1) + (guest_res.wins + 1)) as f64
             / 2.
             / (tracked_games as u32 + 3) as f64)
-            + prob_base;
+            - prob_base;
         let mut probs = [win_prob, draw_prob, lose_prob];
         Self::normalize(&mut probs);
-        probs.map(|p| p * (1. - f64::from(margin)));
+        for p in probs.iter_mut() {
+            *p = (1. - f64::from(margin)) / *p;
+        }
 
         Ok(vec![
             (Event::WDL(Winner::W1), probs[0].try_into()?),
@@ -267,7 +268,9 @@ impl BetCalculator {
         let tl = n / (totals.less() as f64 + 1.);
         let mut probs = [tg, te, tl];
         Self::normalize(&mut probs);
-        probs.map(|p| p * (1. - f64::from(margin)));
+        for p in probs.iter_mut() {
+            *p = (1. - f64::from(margin)) / *p;
+        }
         total_coefficients.push((
             Event::T(EventTotal {
                 total,
@@ -291,5 +294,77 @@ impl BetCalculator {
         ));
 
         Ok(total_coefficients)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn normalize() {
+        let mut probs = [0.1, 0.1, 0.1];
+        BetCalculator::normalize(&mut probs);
+        assert!((probs.iter().sum::<f64>() - 1.).abs() < EPS);
+
+        let mut probs = [0.1];
+        BetCalculator::normalize(&mut probs);
+        assert!((probs.iter().sum::<f64>() - 1.).abs() < EPS);
+
+        let mut probs = [0.3, 120., 1.076123];
+        BetCalculator::normalize(&mut probs);
+        assert!((probs.iter().sum::<f64>() - 1.).abs() < EPS);
+    }
+
+    #[test]
+    fn calculate_total_coefficients() {
+        let total = 2;
+        let mut totals = PastTotals::new(total);
+        totals.add_total(0);
+        totals.add_total(1);
+        totals.add_total(1);
+        totals.add_total(1);
+        totals.add_total(2);
+        totals.add_total(3);
+        let margin = Margin::try_from(0.12).unwrap();
+
+        let res = BetCalculator::calculate_total_coefficients(total, totals, margin).unwrap();
+
+        let mut sum = 0.;
+        for (_, coefficient) in res {
+            sum += 1. / f64::from(coefficient);
+        }
+        assert!(sum > 1.);
+    }
+
+    #[test]
+    fn calculate_winner_coefficients() {
+        let home_res = PastResults {
+            wins: 6,
+            draws: 15,
+            loses: 4,
+        };
+        let guest_res = PastResults {
+            wins: 4,
+            draws: 9,
+            loses: 12,
+        };
+        let h2h_res = PastResults {
+            wins: 5,
+            draws: 8,
+            loses: 12,
+        };
+        let margin = Margin::try_from(0.12).unwrap();
+
+        let res = BetCalculator::calculate_winner_coefficients(
+            home_res, guest_res, h2h_res, 60, 25, margin,
+        )
+        .unwrap();
+
+        let mut sum = 0.;
+        for (_, coefficient) in res {
+            sum += 1. / f64::from(coefficient);
+        }
+        assert!(sum > 1.);
     }
 }
