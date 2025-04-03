@@ -1,0 +1,14 @@
+[package]
+name = "application"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+domain          = { path = "../domain"          }
+
+anyhow = "1.0.97"
+serde = {version = "1.0.219", default-features = false, features = ["std", "derive"]}
+rand = "0.9.0"
+
+[dev-dependencies]
+mockall = "0.13.1"
