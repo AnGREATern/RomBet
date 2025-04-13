@@ -8,15 +8,15 @@ use domain::{
 pub trait IGameStatRepo {
     fn new() -> Self;
 
-    fn add(&self, game_stat: GameStat) -> Result<Id<GameStat>>;
+    fn add(&mut self, game_stat: GameStat) -> Result<()>;
 
-    fn game_stat_by_game_id(&self, game_id: Id<Game>) -> Result<GameStat>;
+    fn game_stat_by_game_id(&mut self, game_id: Id<Game>) -> Result<GameStat>;
 
-    fn winner_by_game_id(&self, game_id: Id<Game>, is_home: bool) -> Result<Winner>;
+    fn winner_by_game_id(&mut self, game_id: Id<Game>, is_home: bool) -> Result<Winner>;
 
-    fn score_by_game_id(&self, game_id: Id<Game>, is_home: bool) -> Result<(u8, u8)>;
+    fn score_by_game_id(&mut self, game_id: Id<Game>, is_home: bool) -> Result<(u8, u8)>;
 
-    fn goals_by_game_id(&self, game_id: Id<Game>, is_home: bool) -> Result<u8>;
+    fn goals_by_game_id(&mut self, game_id: Id<Game>, is_home: bool) -> Result<u8>;
 
     fn next_id(&self) -> Id<GameStat>;
 }

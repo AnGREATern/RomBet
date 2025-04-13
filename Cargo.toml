@@ -6,7 +6,8 @@ publish = false
 
 [workspace]
 members = [ 
-  "crates/application",
+  "crates/application", 
+  "crates/db",
   "crates/domain",
 ]
 
@@ -19,3 +20,4 @@ edition = "2024"
 [patch.crates-io]
 domain          = { path = "crates/domain"          }
 application     = { path = "crates/application"     }
+db              = { path = "crates/db"              }

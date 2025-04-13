@@ -41,4 +41,8 @@ impl Game {
     pub fn guest_team_id(&self) -> Id<Team> {
         self.guest_team_id
     }
+
+    pub fn round(&self) -> u32 {
+        self.round
+    }
 }
