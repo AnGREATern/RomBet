@@ -8,7 +8,7 @@ pub trait CreateRound {
 }
 
 pub trait Start {
-    fn start(&self, ip: IpAddr) -> Id<Simulation>;
+    fn start(&mut self, ip: IpAddr) -> Result<Id<Simulation>>;
 
-    fn restart(&self, simulation: Simulation) -> Id<Simulation>;
+    fn restart(&mut self, simulation: Simulation) -> Result<Id<Simulation>>;
 }

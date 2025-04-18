@@ -32,6 +32,10 @@ impl Simulation {
         self.round
     }
 
+    pub fn balance(&self) -> Amount {
+        self.balance
+    }
+
     pub fn increment_round(&mut self) {
         self.round += 1;
     }

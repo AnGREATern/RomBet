@@ -26,19 +26,18 @@ pub struct SimulationService<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: I
 impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> Start
     for SimulationService<G, T, GS, S>
 {
-    fn start(&self, ip: IpAddr) -> Id<Simulation> {
+    fn start(&mut self, ip: IpAddr) -> Result<Id<Simulation>> {
         if let Some(id) = self.simulation_repo.simulation_by_ip(ip) {
-            id
+            Ok(id)
         } else {
             let id = self.simulation_repo.next_id();
-            self.simulation_repo
-                .add(Simulation::new(id, ip, self.config.balance));
+            self.simulation_repo.add(Simulation::new(id, ip, self.config.balance))?;
 
-            id
+            Ok(id)
         }
     }
 
-    fn restart(&self, simulation: Simulation) -> Id<Simulation> {
+    fn restart(&mut self, simulation: Simulation) -> Result<Id<Simulation>> {
         let ip = simulation.ip();
         self.simulation_repo.remove_by_id(simulation.id());
 
@@ -93,7 +92,7 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo>
         }
     }
 
-    fn check_last_round_randomized(&self, round: u32, simulation_id: Id<Simulation>) -> Result<()> {
+    fn check_last_round_randomized(&mut self, round: u32, simulation_id: Id<Simulation>) -> Result<()> {
         let games_id = self.game_repo.games_id_by_round(round, simulation_id)?;
         for game_id in games_id {
             if self

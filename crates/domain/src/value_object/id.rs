@@ -12,6 +12,10 @@ impl<T> Id<T> {
         let marker = PhantomData;
         Self { value, marker }
     }
+
+    pub fn value(&self) -> Uuid {
+        self.value
+    }
 }
 
 impl<T> Copy for Id<T> {}
@@ -29,3 +33,10 @@ impl<T> PartialEq for Id<T> {
 }
 
 impl<T> Eq for Id<T> {}
+
+impl<T> From<Uuid> for Id<T> {
+    fn from(value: Uuid) -> Self {
+        let marker = PhantomData;
+        Self { value, marker }
+    }
+}

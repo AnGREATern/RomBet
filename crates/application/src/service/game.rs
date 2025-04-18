@@ -16,7 +16,7 @@ pub struct GameService<G: IGameRepo, GS: IGameStatRepo> {
 }
 
 impl<G: IGameRepo, GS: IGameStatRepo> RandomizeRound for GameService<G, GS> {
-    fn randomize_game(&self, game: &Game) -> Result<()> {
+    fn randomize_game(&mut self, game: &Game) -> Result<()> {
         let winner = self.randomize_winner(game)?;
         let (home_team_total, guest_team_total) = self.randomize_totals(game, winner)?;
         let stat_id = self.game_stat_repo.next_id();
@@ -26,7 +26,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> RandomizeRound for GameService<G, GS> {
         Ok(())
     }
 
-    fn randomize_round(&self, simulation: &Simulation) -> Result<()> {
+    fn randomize_round(&mut self, simulation: &Simulation) -> Result<()> {
         let games_id = self
             .game_repo
             .games_id_by_round(simulation.round(), simulation.id())?;
@@ -49,7 +49,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
     }
 
     fn past_results_by_team_id(
-        &self,
+        &mut self,
         team_id: Id<Team>,
         simulation_id: Id<Simulation>,
     ) -> Result<PastResults> {
@@ -68,7 +68,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
     }
 
     fn avg_goals_by_team_id(
-        &self,
+        &mut self,
         team_id: Id<Team>,
         simulation_id: Id<Simulation>,
     ) -> Result<f64> {
@@ -85,7 +85,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         Ok(goals as f64 / self.config.tracked_games as f64)
     }
 
-    fn h2h_results_by_game(&self, game: &Game) -> Result<PastResults> {
+    fn h2h_results_by_game(&mut self, game: &Game) -> Result<PastResults> {
         let h2hs_id = self.game_repo.h2hs_id_by_team_id(
             game.home_team_id(),
             game.guest_team_id(),
@@ -101,7 +101,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         Ok(past_results)
     }
 
-    fn h2h_avg_goals_by_game(&self, game: &Game) -> Result<(f64, f64)> {
+    fn h2h_avg_goals_by_game(&mut self, game: &Game) -> Result<(f64, f64)> {
         let h2hs_id = self.game_repo.h2hs_id_by_team_id(
             game.home_team_id(),
             game.guest_team_id(),
@@ -121,7 +121,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         ))
     }
 
-    fn randomize_winner(&self, game: &Game) -> Result<Winner> {
+    fn randomize_winner(&mut self, game: &Game) -> Result<Winner> {
         let home_res = self.past_results_by_team_id(game.home_team_id(), game.simulation_id())?;
         let guest_res = self.past_results_by_team_id(game.guest_team_id(), game.simulation_id())?;
         let h2h_res = self.h2h_results_by_game(game)?;
@@ -137,7 +137,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         ))
     }
 
-    fn randomize_totals(&self, game: &Game, winner: Winner) -> Result<(u8, u8)> {
+    fn randomize_totals(&mut self, game: &Game, winner: Winner) -> Result<(u8, u8)> {
         let h2h_avg_goals = self.h2h_avg_goals_by_game(game)?;
         let home_team_avg_goals =
             self.avg_goals_by_team_id(game.home_team_id(), game.simulation_id())? + h2h_avg_goals.0;
