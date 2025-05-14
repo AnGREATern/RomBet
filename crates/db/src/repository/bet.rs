@@ -2,7 +2,7 @@ use crate::{establish_connection, models::BetPostrgres};
 use application::repository::IBetRepo;
 use domain::{
     entity::Bet,
-    value_object::{Coefficient, Id},
+    value_object::{Amount, Coefficient, Id, MIN_BET_AMOUNT},
 };
 
 use anyhow::Result;
@@ -28,7 +28,7 @@ impl From<BetPostrgres> for Bet {
         Self::new(
             b.id.into(),
             b.simulation_id.into(),
-            b.amount.try_into().unwrap(),
+            Amount::new(b.amount, Some(MIN_BET_AMOUNT)).unwrap(),
             b.coefficient.try_into().unwrap(),
             b.game_id.into(),
             rmp_serde::from_slice(&b.event).unwrap(),

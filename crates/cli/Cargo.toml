@@ -1,0 +1,14 @@
+[package]
+name = "cli"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+domain          = { path = "../domain"          }
+application     = { path = "../application"     }
+db              = { path = "../db"              }
+
+clap = {version="4.5.37", features=["derive"]}
+enum-try-from = "0.0.1"
+anyhow = "1.0.98"
+dotenv = "0.15.0"

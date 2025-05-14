@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Result, bail};
 use rand::{Rng, rng};
 
 use crate::usecase::RandomizeRound;
@@ -16,31 +16,34 @@ pub struct GameService<G: IGameRepo, GS: IGameStatRepo> {
 }
 
 impl<G: IGameRepo, GS: IGameStatRepo> RandomizeRound for GameService<G, GS> {
-    fn randomize_game(&mut self, game: &Game) -> Result<()> {
+    fn randomize_game(&mut self, game: &Game) -> Result<GameStat> {
         let winner = self.randomize_winner(game)?;
         let (home_team_total, guest_team_total) = self.randomize_totals(game, winner)?;
         let stat_id = self.game_stat_repo.next_id();
         let game_stat = GameStat::new(stat_id, game.id(), home_team_total, guest_team_total);
         self.game_stat_repo.add(game_stat)?;
 
-        Ok(())
+        Ok(game_stat)
     }
 
-    fn randomize_round(&mut self, simulation: &Simulation) -> Result<()> {
+    fn randomize_round(&mut self, simulation: &Simulation) -> Result<Vec<GameStat>> {
+        self.check_last_round_randomized(simulation.round(), simulation.id())?;
+        let mut games_stat = vec![];
         let games_id = self
             .game_repo
             .games_id_by_round(simulation.round(), simulation.id())?;
         for game_id in games_id {
             let game = self.game_repo.game_by_id(game_id)?;
-            self.randomize_game(&game)?;
+            let game_stat = self.randomize_game(&game)?;
+            games_stat.push(game_stat);
         }
 
-        Ok(())
+        Ok(games_stat)
     }
 }
 
 impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
-    fn new(game_repo: G, game_stat_repo: GS, config: CoefficientConfig) -> Self {
+    pub fn new(game_repo: G, game_stat_repo: GS, config: CoefficientConfig) -> Self {
         Self {
             game_repo,
             game_stat_repo,
@@ -60,11 +63,28 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         )?;
         let mut past_results = PastResults::new();
         for (game_id, is_home) in games_id {
-            let winner = self.game_stat_repo.winner_by_game_id(game_id, is_home)?;
-            past_results.add_result(winner);
+            if let Some(winner) = self.game_stat_repo.winner_by_game_id(game_id, is_home) {
+                past_results.add_result(winner);
+            }
         }
 
         Ok(past_results)
+    }
+
+    fn check_last_round_randomized(&mut self, round: u32, simulation_id: Id<Simulation>) -> Result<()> {
+        let games_id = self.game_repo.games_id_by_round(round, simulation_id)?;
+        for game_id in games_id {
+            if self
+                .game_stat_repo
+                .game_stat_by_game_id(game_id)
+                .ok()
+                .is_some()
+            {
+                bail!("Last round already randomized");
+            }
+        }
+
+        Ok(())
     }
 
     fn avg_goals_by_team_id(
@@ -79,7 +99,9 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         )?;
         let mut goals = 0;
         for (game_id, is_home) in games_id {
-            goals += self.game_stat_repo.goals_by_game_id(game_id, is_home)?;
+            if let Some(g) = self.game_stat_repo.goals_by_game_id(game_id, is_home) {
+                goals += g;
+            }
         }
 
         Ok(goals as f64 / self.config.tracked_games as f64)
@@ -94,8 +116,9 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         )?;
         let mut past_results = PastResults::new();
         for (game_id, is_home) in h2hs_id {
-            let winner = self.game_stat_repo.winner_by_game_id(game_id, is_home)?;
-            past_results.add_result(winner);
+            if let Some(winner) = self.game_stat_repo.winner_by_game_id(game_id, is_home) {
+                past_results.add_result(winner);
+            }
         }
 
         Ok(past_results)
@@ -110,9 +133,10 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         )?;
         let (mut home_team_goals, mut guest_team_goals) = (0, 0);
         for (game_id, is_home) in h2hs_id {
-            let (ht_goals, gt_goals) = self.game_stat_repo.score_by_game_id(game_id, is_home)?;
-            home_team_goals += ht_goals;
-            guest_team_goals += gt_goals;
+            if let Some((ht_goals, gt_goals)) = self.game_stat_repo.score_by_game_id(game_id, is_home) {
+                home_team_goals += ht_goals;
+                guest_team_goals += gt_goals;
+            }
         }
 
         Ok((
@@ -193,7 +217,6 @@ impl GameRandomizer {
             - prob_base)
             * Deviation::generate(deviation_min, deviation_max).value();
         let probs = [win_prob, draw_prob, lose_prob];
-        println!("{:?}", probs);
 
         match Self::rand_event(&probs) {
             0 => Winner::W1,

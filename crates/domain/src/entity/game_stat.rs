@@ -1,6 +1,7 @@
 use super::Game;
 use crate::value_object::Id;
 
+#[derive(Clone, Copy)]
 pub struct GameStat {
     id: Id<Self>,
     game_id: Id<Game>,
