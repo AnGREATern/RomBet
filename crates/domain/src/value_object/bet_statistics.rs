@@ -12,4 +12,12 @@ impl BetStatistics {
             start_balance,
         }
     }
+
+    pub fn min_coefficient_lose(&self) -> Option<Coefficient> {
+        self.min_coefficient_lose
+    }
+
+    pub fn start_balance(&self) -> Amount {
+        self.start_balance
+    }
 }

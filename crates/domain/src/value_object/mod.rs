@@ -8,7 +8,7 @@ mod margin;
 mod past_results;
 mod past_totals;
 
-pub use amount::Amount;
+pub use amount::{Amount, MIN_BET_AMOUNT, MIN_BALANCE_AMOUNT};
 pub use bet_statistics::BetStatistics;
 pub use coefficient::Coefficient;
 pub use deviation::Deviation;

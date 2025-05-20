@@ -2,7 +2,7 @@ use std::net::{IpAddr, Ipv4Addr};
 
 use application::repository::{IGameStatRepo, IGameRepo, ISimulationRepo, ITeamRepo};
 use db::repository::{GameStatRepo, GameRepo, SimulationRepo, TeamRepo};
-use domain::{entity::{GameStat, Game, Simulation}, value_object::Amount};
+use domain::{entity::{Game, GameStat, Simulation}, value_object::{Amount, MIN_BALANCE_AMOUNT}};
 
 #[test]
 fn insert_game_stat() {
@@ -10,7 +10,7 @@ fn insert_game_stat() {
     let mut sim_repo = SimulationRepo::new();
     let sim_id = sim_repo.next_id();
     let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
-    let balance = Amount::try_from(1000.).unwrap();
+    let balance = Amount::new(1000, Some(MIN_BALANCE_AMOUNT)).unwrap();
     let simulation = Simulation::new(sim_id, ip, balance);
     sim_repo.add(simulation).unwrap();
     let mut game_repo = GameRepo::new();
@@ -36,7 +36,7 @@ fn score_by_game_id() {
     let mut sim_repo = SimulationRepo::new();
     let sim_id = sim_repo.next_id();
     let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
-    let balance = Amount::try_from(1000.).unwrap();
+    let balance = Amount::new(1000, Some(MIN_BALANCE_AMOUNT)).unwrap();
     let simulation = Simulation::new(sim_id, ip, balance);
     sim_repo.add(simulation).unwrap();
     let mut game_repo = GameRepo::new();
@@ -65,7 +65,7 @@ fn goals_by_game_id() {
     let mut sim_repo = SimulationRepo::new();
     let sim_id = sim_repo.next_id();
     let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
-    let balance = Amount::try_from(1000.).unwrap();
+    let balance = Amount::new(1000, Some(MIN_BALANCE_AMOUNT)).unwrap();
     let simulation = Simulation::new(sim_id, ip, balance);
     sim_repo.add(simulation).unwrap();
     let mut game_repo = GameRepo::new();

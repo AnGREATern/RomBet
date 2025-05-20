@@ -8,7 +8,7 @@ pub struct AppConfig {
     pub setup: SetupConfig,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct CoefficientConfig {
     pub tracked_games: u8,
     pub margin: Margin,
@@ -18,7 +18,7 @@ pub struct CoefficientConfig {
     pub deviation_max: f64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, Copy)]
 pub struct SetupConfig {
     pub balance: Amount,
 }

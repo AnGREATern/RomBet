@@ -1,6 +1,7 @@
 use super::{Simulation, Team};
 use crate::value_object::Id;
 
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Game {
     id: Id<Game>,
     simulation_id: Id<Simulation>,

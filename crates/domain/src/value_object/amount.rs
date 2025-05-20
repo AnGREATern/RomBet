@@ -1,46 +1,42 @@
-use anyhow::{Error, Result, bail};
+use anyhow::{Result, bail};
 use serde::Deserialize;
 
 type Float = f64;
-const MIN_AMOUNT: i64 = 0_10;
-const PENNY: i32 = 100;
+pub const MIN_BET_AMOUNT: i64 = 10_00;
+pub const MIN_BALANCE_AMOUNT: i64 = 0;
+const PENNY: u8 = 100;
 
-#[derive(Deserialize, Copy, Clone, PartialEq, Eq)]
-pub struct Amount(i64);
+#[derive(Deserialize, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Amount {
+    value: i64,
+    l_bound: Option<i64>,
+}
 
 impl Amount {
     pub fn clear_value(self) -> i64 {
-        self.0
-    }
-}
-
-impl TryFrom<Float> for Amount {
-    type Error = Error;
-
-    fn try_from(value: Float) -> Result<Self> {
-        let value = (value * PENNY as Float).round() as i64;
-        if value > MIN_AMOUNT {
-            Ok(Amount(value))
-        } else {
-            bail!("Amount doesn't support this value")
-        }
-    }
-}
-
-impl TryFrom<i64> for Amount {
-    type Error = Error;
-
-    fn try_from(value: i64) -> Result<Self> {
-        if value > MIN_AMOUNT {
-            Ok(Amount(value))
-        } else {
-            bail!("Amount doesn't support this value")
-        }
+        self.value
     }
 }
 
 impl From<Amount> for Float {
-    fn from(value: Amount) -> Self {
-        value.0 as Float / PENNY as Float
+    fn from(amount: Amount) -> Self {
+        amount.value as Float / PENNY as Float
+    }
+}
+
+impl Amount {
+    pub fn new(value: i64, l_bound: Option<i64>) -> Result<Self> {
+        if l_bound.is_some_and(|b| value < b) {
+            bail!("Amount doesn't support this value")
+        }
+        Ok(Self { value, l_bound })
+    }
+
+    pub fn new_with_casting(value: f64, l_bound: Option<i64>) -> Result<Self> {
+        let value = (value * PENNY as Float).round() as i64;
+        if l_bound.is_some_and(|b| value < b) {
+            bail!("Amount doesn't support this value")
+        }
+        Ok(Self { value, l_bound })
     }
 }

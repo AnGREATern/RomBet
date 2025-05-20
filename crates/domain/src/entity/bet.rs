@@ -1,5 +1,5 @@
 use super::{Game, Simulation};
-use crate::value_object::{Amount, Coefficient, Event, Id};
+use crate::value_object::{Amount, Coefficient, Event, Id, MIN_BALANCE_AMOUNT};
 
 pub struct Bet {
     id: Id<Bet>,
@@ -19,7 +19,7 @@ impl Bet {
         coefficient: Coefficient,
         game_id: Id<Game>,
         event: Event,
-        is_won: Option<bool>
+        is_won: Option<bool>,
     ) -> Self {
         Self {
             id,
@@ -60,15 +60,19 @@ impl Bet {
         self.is_won
     }
 
-    pub fn set_win(&mut self) -> f64 {
+    pub fn set_win(&mut self) -> Amount {
         self.is_won = Some(true);
 
-        f64::from(self.amount) * f64::from(self.coefficient)
+        Amount::new(
+            (f64::from(self.amount) as i64) * (self.coefficient.clear_value() as i64),
+            Some(MIN_BALANCE_AMOUNT),
+        )
+        .unwrap()
     }
 
-    pub fn set_lose(&mut self) -> f64 {
+    pub fn set_lose(&mut self) -> Amount {
         self.is_won = Some(false);
 
-        self.amount.into()
+        Amount::new(0, Some(MIN_BALANCE_AMOUNT)).unwrap()
     }
 }

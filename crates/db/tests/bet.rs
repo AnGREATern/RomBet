@@ -2,7 +2,7 @@ use std::net::{IpAddr, Ipv4Addr};
 
 use application::repository::{IBetRepo, IGameRepo, ISimulationRepo, ITeamRepo};
 use db::repository::{BetRepo, GameRepo, SimulationRepo, TeamRepo};
-use domain::{entity::{Bet, Game, Simulation}, value_object::{Amount, Event, Winner}};
+use domain::{entity::{Bet, Game, Simulation}, value_object::{Amount, Event, Winner, MIN_BALANCE_AMOUNT, MIN_BET_AMOUNT}};
 
 #[test]
 fn insert_bet() {
@@ -11,10 +11,10 @@ fn insert_bet() {
     let mut sim_repo = SimulationRepo::new();
     let sim_id = sim_repo.next_id();
     let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
-    let balance = Amount::try_from(1000.).unwrap();
+    let balance = Amount::new(1000, Some(MIN_BALANCE_AMOUNT)).unwrap();
     let simulation = Simulation::new(sim_id, ip, balance);
     sim_repo.add(simulation).unwrap();
-    let amount = 300.try_into().unwrap();
+    let amount = Amount::new(300, Some(MIN_BET_AMOUNT)).unwrap();;
     let coefficient = (2.40).try_into().unwrap();
     let mut game_repo = GameRepo::new();
     let game_id = game_repo.next_id();
@@ -39,7 +39,7 @@ fn min_coefficient_lose() {
     let mut sim_repo = SimulationRepo::new();
     let sim_id = sim_repo.next_id();
     let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
-    let balance = Amount::try_from(1000.).unwrap();
+    let balance = Amount::new(1000, Some(MIN_BALANCE_AMOUNT)).unwrap();
     let simulation = Simulation::new(sim_id, ip, balance);
     sim_repo.add(simulation).unwrap();
     let mut game_repo = GameRepo::new();
@@ -50,7 +50,7 @@ fn min_coefficient_lose() {
     game_repo.add(game).unwrap();
 
     let bet_id = bet_repo.next_id();
-    let amount = 300.try_into().unwrap();
+    let amount = Amount::new(300, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.40).try_into().unwrap();
     let event = Event::WDL(Winner::W1);
     let is_won = Some(false);
@@ -58,7 +58,7 @@ fn min_coefficient_lose() {
     bet_repo.add(bet).unwrap();
 
     let bet_id = bet_repo.next_id();
-    let amount = 300.try_into().unwrap();
+    let amount = Amount::new(300, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.30).try_into().unwrap();
     let event = Event::WDL(Winner::W1);
     let is_won = Some(false);
@@ -66,7 +66,7 @@ fn min_coefficient_lose() {
     bet_repo.add(bet).unwrap();
 
     let bet_id = bet_repo.next_id();
-    let amount = 300.try_into().unwrap();
+    let amount = Amount::new(300, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.50).try_into().unwrap();
     let event = Event::WDL(Winner::W1);
     let is_won = Some(false);
@@ -86,7 +86,7 @@ fn not_calculated_bets() {
     let mut sim_repo = SimulationRepo::new();
     let sim_id = sim_repo.next_id();
     let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
-    let balance = Amount::try_from(1000.).unwrap();
+    let balance = Amount::new(1000, Some(MIN_BALANCE_AMOUNT)).unwrap();
     let simulation = Simulation::new(sim_id, ip, balance);
     sim_repo.add(simulation).unwrap();
     let mut game_repo = GameRepo::new();
@@ -97,7 +97,7 @@ fn not_calculated_bets() {
     game_repo.add(game).unwrap();
 
     let bet_id = bet_repo.next_id();
-    let amount = 100.try_into().unwrap();
+    let amount = Amount::new(100, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.40).try_into().unwrap();
     let event = Event::WDL(Winner::W1);
     let is_won = None;
@@ -105,7 +105,7 @@ fn not_calculated_bets() {
     bet_repo.add(bet1).unwrap();
 
     let bet_id = bet_repo.next_id();
-    let amount = 200.try_into().unwrap();
+    let amount = Amount::new(200, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.30).try_into().unwrap();
     let event = Event::WDL(Winner::W1);
     let is_won = Some(false);
@@ -113,7 +113,7 @@ fn not_calculated_bets() {
     bet_repo.add(bet2).unwrap();
 
     let bet_id = bet_repo.next_id();
-    let amount = 300.try_into().unwrap();
+    let amount = Amount::new(300, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.50).try_into().unwrap();
     let event = Event::WDL(Winner::W1);
     let is_won = None;

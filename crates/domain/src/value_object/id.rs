@@ -1,6 +1,7 @@
 use std::marker::PhantomData;
 use uuid::Uuid;
 
+#[derive(PartialOrd, Ord)]
 pub struct Id<T> {
     value: Uuid,
     marker: PhantomData<fn() -> T>,
