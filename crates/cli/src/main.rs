@@ -34,7 +34,6 @@ impl_enum_try_from!(
         CreateRound,
         RandomizeRound,
         CalculateCoefficients,
-        // MakeBet,
         MakeReport,
         CheckBalance,
         Exit,
@@ -164,7 +163,6 @@ impl App {
             "{}. Получить коэффициенты на матч",
             Command::CalculateCoefficients as u8
         );
-        // println!("{}. Сделать ставку", Command::MakeBet as u8);
         println!("{}. Статистика ставок", Command::MakeReport as u8);
         println!("{}. Посмотреть баланс", Command::CheckBalance as u8);
         println!("{}. Выход", Command::Exit as u8);
@@ -178,7 +176,6 @@ impl App {
             Command::CalculateCoefficients => self.calculate_coefficients(),
             Command::CreateRound => self.create_round(),
             Command::MakeReport => self.make_report(),
-            // Command::MakeBet => self.make_bet(),
             Command::CheckBalance => self.check_balance(),
             Command::Exit => Ok(()),
             _ => bail!("Undefined command"),

@@ -62,10 +62,11 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> Start
     }
 
     fn restart(&mut self, simulation_id: Id<Simulation>) -> Result<Simulation> {
-        let ip = self.simulation_repo.simulation_by_id(simulation_id)?.ip();
-        self.simulation_repo.remove_by_id(simulation_id);
+        let simulation = self.simulation_repo.simulation_by_id(simulation_id)?;
+        let simulation = Simulation::new(simulation.id(), simulation.ip(), self.config.balance);
+        self.simulation_repo.update_by_id(simulation)?;
 
-        self.start(ip)
+        Ok(simulation)
     }
 }
 
