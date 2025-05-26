@@ -9,7 +9,7 @@ members = [
   "crates/application", 
   "crates/cli", 
   "crates/db",
-  "crates/domain",
+  "crates/domain", "crates/infrastructure",
 ]
 
 [workspace.package]
