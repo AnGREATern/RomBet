@@ -1,21 +1,22 @@
 use anyhow::{Result, anyhow, bail};
-use application::service::{BetService, GameService};
-use application::usecase::{CalculateBet, CreateRound, MakeBet, MakeReport, RandomizeRound};
 use clap::Parser;
 use enum_try_from::impl_enum_try_from;
 use std::collections::BTreeMap;
 use std::fmt;
 use std::io;
 use std::net::{IpAddr, Ipv4Addr};
+use std::path::Path;
 use std::process::ExitCode;
 use dotenv::dotenv;
 
-use application::config::{CoefficientConfig, SetupConfig};
+use application::config::SetupConfig;
 use application::repository::{IBetRepo, IGameRepo, IGameStatRepo, ISimulationRepo, ITeamRepo};
-use application::{service::SimulationService, usecase::Start};
+use application::service::{BetService, GameService, SimulationService};
+use application::usecase::{CalculateBet, CreateRound, MakeBet, MakeReport, RandomizeRound, Start};
 use db::repository::{BetRepo, GameRepo, GameStatRepo, SimulationRepo, TeamRepo};
 use domain::entity::{Game, Simulation, Team};
 use domain::value_object::{Amount, Coefficient, Event, Id, MIN_BALANCE_AMOUNT, MIN_BET_AMOUNT};
+use infrastructure::{config, logger};
 
 #[derive(Parser)]
 #[command(version, about = "The best betting emulator!", long_about = None)]
@@ -84,24 +85,9 @@ struct App {
 
 impl App {
     pub fn new(cli_args: CliArgs) -> Result<Self> {
-        // TODO: add config reader
-        let balance = Amount::new(1000_00, Some(MIN_BALANCE_AMOUNT))?;
-        let setup_config = SetupConfig { balance };
-        // TODO: add config reader
-        let tracked_games = 10;
-        let margin = 0.1.try_into()?;
-        let alpha = 3 * tracked_games as i32;
-        let totals = vec![2, 3];
-        let deviation_min = 0.8;
-        let deviation_max = 1.2;
-        let coefficient_config = CoefficientConfig {
-            tracked_games,
-            margin,
-            alpha,
-            totals,
-            deviation_min,
-            deviation_max,
-        };
+        let config = config::load_from_file(Path::new("../../config.toml"))?;
+        let setup_config = config.setup;
+        let coefficient_config = config.coefficient;
 
         let games = BTreeMap::new();
         let game_poses = vec![];
@@ -135,8 +121,8 @@ impl App {
         );
 
         let simulation = sim_service.start(cli_args.ip)?;
-        println!(
-            "Симуляция запущена успешно, Ваш баланс: {}",
+        log::info!(
+            "Simulation started successfully, balance: {}",
             f64::from(simulation.balance())
         );
 
@@ -184,8 +170,8 @@ impl App {
 
     fn restart(&mut self) -> Result<()> {
         self.simulation = self.sim_service.restart(self.simulation.id())?;
-        println!(
-            "Рестарт проведён успешно, Ваш баланс: {}",
+        log::info!(
+            "Restart successful, balance: {}",
             f64::from(self.simulation.balance())
         );
 
@@ -320,6 +306,7 @@ impl App {
 
 fn main() -> ExitCode {
     dotenv().ok();
+    logger::init_default_logger();
     let cli = CliArgs::parse();
     let mut buffer = String::new();
     let mut cmd = Command::default();
@@ -354,7 +341,7 @@ fn main() -> ExitCode {
 
         cmd = cmd_buf.unwrap();
         if let Err(error) = app.perform(&cmd) {
-            eprintln!("{} {}", error.backtrace(), error);
+            log::error!("{} {}", error.backtrace(), error);
             // return ExitCode::FAILURE;
         }
     }

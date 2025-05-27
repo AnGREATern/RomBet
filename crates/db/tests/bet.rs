@@ -14,7 +14,7 @@ fn insert_bet() {
     let balance = Amount::new(1000, Some(MIN_BALANCE_AMOUNT)).unwrap();
     let simulation = Simulation::new(sim_id, ip, balance);
     sim_repo.add(simulation).unwrap();
-    let amount = Amount::new(300, Some(MIN_BET_AMOUNT)).unwrap();;
+    let amount = Amount::new(300, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.40).try_into().unwrap();
     let mut game_repo = GameRepo::new();
     let game_id = game_repo.next_id();
