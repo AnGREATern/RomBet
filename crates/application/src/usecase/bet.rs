@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use domain::entity::{Bet, Game};
+use domain::entity::{Bet, Game, Simulation};
 use domain::value_object::{Amount, BetStatistics, Coefficient, Event};
 
 pub trait MakeBet {
@@ -20,9 +20,9 @@ pub trait MakeBet {
 }
 
 pub trait CalculateBet {
-    fn calculate_bets(&mut self) -> Result<f64>;
+    fn calculate_bets(&mut self) -> Result<Amount>;
 
-    fn calculate_bet(&mut self, bet: Bet) -> Result<f64>;
+    fn calculate_bet(&mut self, bet: Bet, simulation: &mut Simulation) -> Result<Amount>;
 }
 
 pub trait MakeReport {

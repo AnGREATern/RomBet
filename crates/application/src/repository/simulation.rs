@@ -8,9 +8,13 @@ pub trait ISimulationRepo {
 
     fn add(&mut self, simulation: Simulation) -> Result<()>;
 
-    fn simulation_by_ip(&mut self, ip: IpAddr) -> Option<Id<Simulation>>;
+    fn simulation_by_ip(&mut self, ip: IpAddr) -> Option<Simulation>;
+
+    fn simulation_by_id(&mut self, id: Id<Simulation>) -> Result<Simulation>;
 
     fn remove_by_id(&mut self, simulation_id: Id<Simulation>);
+
+    fn update_by_id(&mut self, simulation: Simulation) -> Result<()>;
 
     fn next_id(&self) -> Id<Simulation>;
 }

@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 
 use crate::{
     config::CoefficientConfig,
-    repository::{IBetRepo, IGameRepo, IGameStatRepo},
+    repository::{IBetRepo, IGameRepo, IGameStatRepo, ISimulationRepo},
     usecase::{CalculateBet, MakeBet, MakeReport},
 };
 use domain::{
@@ -16,14 +16,17 @@ use domain::{
 
 const EPS: f64 = 1e-7;
 
-pub struct BetService<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> {
+pub struct BetService<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> {
     bet_repo: B,
     game_repo: G,
     game_stat_repo: GS,
+    simulation_repo: S,
     config: CoefficientConfig,
 }
 
-impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> MakeBet for BetService<B, G, GS> {
+impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeBet
+    for BetService<B, G, GS, S>
+{
     fn make_bet(
         &mut self,
         game: &Game,
@@ -33,8 +36,19 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> MakeBet for BetService<B, G, 
     ) -> Result<()> {
         let id = self.bet_repo.next_id();
         let simulation_id = game.simulation_id();
-        let bet = Bet::new(id, simulation_id, amount, coefficient, game.id(), event, None);
+        let bet = Bet::new(
+            id,
+            simulation_id,
+            amount,
+            coefficient,
+            game.id(),
+            event,
+            None,
+        );
         self.bet_repo.add(bet)?;
+        let mut simulation = self.simulation_repo.simulation_by_id(simulation_id)?;
+        simulation.make_bet(amount)?;
+        self.simulation_repo.update_by_id(simulation)?;
 
         Ok(())
     }
@@ -81,44 +95,61 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> MakeBet for BetService<B, G, 
     }
 }
 
-impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> CalculateBet for BetService<B, G, GS> {
-    fn calculate_bets(&mut self) -> Result<f64> {
-        let mut profit = 0.;
+impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> CalculateBet
+    for BetService<B, G, GS, S>
+{
+    fn calculate_bets(&mut self) -> Result<Amount> {
+        let mut profit = 0;
         let nc_bets = self.bet_repo.not_calculated_bets();
-        for bet in nc_bets {
-            profit += self.calculate_bet(bet)?;
+        if let Some(bet) = nc_bets.get(0) {
+            let mut simulation = self.simulation_repo.simulation_by_id(bet.simulation_id())?;
+            for bet in nc_bets {
+                profit += self.calculate_bet(bet, &mut simulation)?.clear_value();
+            }
+            self.simulation_repo.update_by_id(simulation)?;
         }
 
-        Ok(profit)
+        Ok(Amount::new(profit, None).unwrap())
     }
 
-    fn calculate_bet(&mut self, mut bet: Bet) -> Result<f64> {
+    fn calculate_bet(&mut self, mut bet: Bet, simulation: &mut Simulation) -> Result<Amount> {
         let profit = match bet.event() {
             Event::WDL(bet_winner) => {
-                let winner = self.game_stat_repo.winner_by_game_id(bet.game_id(), true)?;
-                if bet_winner == winner {
-                    bet.set_win()
+                if let Some(winner) = self.game_stat_repo.winner_by_game_id(bet.game_id(), true) {
+                    if bet_winner == winner {
+                        bet.set_win()
+                    } else {
+                        bet.set_lose()
+                    }
                 } else {
-                    bet.set_lose()
+                    Amount::new(0, None).unwrap()
                 }
             }
             Event::T(bet_total) => {
-                let score = self.game_stat_repo.score_by_game_id(bet.game_id(), true)?;
-                let total = score.0 + score.1;
-                if bet_total.total.cmp(&total) == bet_total.ordering {
-                    bet.set_win()
+                if let Some(score) = self.game_stat_repo.score_by_game_id(bet.game_id(), true) {
+                    let total = score.0 + score.1;
+                    if total.cmp(&bet_total.total) == bet_total.ordering {
+                        bet.set_win()
+                    } else {
+                        bet.set_lose()
+                    }
                 } else {
-                    bet.set_lose()
+                    Amount::new(0, None).unwrap()
                 }
             }
         };
+        if bet.is_won().unwrap() {
+            simulation.process_bet(profit)?;
+        }
         self.bet_repo.update_status(bet)?;
 
         Ok(profit)
     }
 }
 
-impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> MakeReport for BetService<B, G, GS> {
+impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeReport
+    for BetService<B, G, GS, S>
+{
     fn make_report(&mut self, start_balance: Amount) -> BetStatistics {
         let min_coefficient_lose = self.bet_repo.min_coefficient_lose();
 
@@ -126,12 +157,19 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> MakeReport for BetService<B, 
     }
 }
 
-impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> BetService<B, G, GS> {
-    pub fn new(bet_repo: B, game_repo: G, game_stat_repo: GS, config: CoefficientConfig) -> Self {
+impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> BetService<B, G, GS, S> {
+    pub fn new(
+        bet_repo: B,
+        game_repo: G,
+        game_stat_repo: GS,
+        simulation_repo: S,
+        config: CoefficientConfig,
+    ) -> Self {
         Self {
             bet_repo,
             game_repo,
             game_stat_repo,
+            simulation_repo,
             config,
         }
     }
@@ -148,8 +186,9 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> BetService<B, G, GS> {
         )?;
         let mut past_results = PastResults::new();
         for (game_id, is_home) in games_id {
-            let winner = self.game_stat_repo.winner_by_game_id(game_id, is_home)?;
-            past_results.add_result(winner);
+            if let Some(winner) = self.game_stat_repo.winner_by_game_id(game_id, is_home) {
+                past_results.add_result(winner);
+            }
         }
 
         Ok(past_results)
@@ -168,9 +207,10 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> BetService<B, G, GS> {
         )?;
         let mut past_totals = PastTotals::new(total);
         for (game_id, is_home) in games_id {
-            let score = self.game_stat_repo.score_by_game_id(game_id, is_home)?;
-            let total = score.0 + score.1;
-            past_totals.add_total(total);
+            if let Some(score) = self.game_stat_repo.score_by_game_id(game_id, is_home) {
+                let total = score.0 + score.1;
+                past_totals.add_total(total);
+            }
         }
 
         Ok(past_totals)
@@ -185,8 +225,9 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> BetService<B, G, GS> {
         )?;
         let mut past_results = PastResults::new();
         for (game_id, is_home) in h2hs_id {
-            let winner = self.game_stat_repo.winner_by_game_id(game_id, is_home)?;
-            past_results.add_result(winner);
+            if let Some(winner) = self.game_stat_repo.winner_by_game_id(game_id, is_home) {
+                past_results.add_result(winner);
+            }   
         }
 
         Ok(past_results)
@@ -201,9 +242,10 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo> BetService<B, G, GS> {
         )?;
         let mut past_totals = PastTotals::new(total);
         for (game_id, is_home) in h2hs_id {
-            let score = self.game_stat_repo.score_by_game_id(game_id, is_home)?;
-            let total = score.0 + score.1;
-            past_totals.add_total(total);
+            if let Some(score) = self.game_stat_repo.score_by_game_id(game_id, is_home) {
+                let total = score.0 + score.1;
+                past_totals.add_total(total);
+            }
         }
 
         Ok(past_totals)

@@ -1,10 +1,12 @@
 use crate::{establish_connection, models::SimulationPostrgres};
 use application::repository::ISimulationRepo;
-use domain::{entity::Simulation, value_object::Id};
+use domain::{
+    entity::Simulation,
+    value_object::{Amount, Id, MIN_BALANCE_AMOUNT},
+};
 
 use anyhow::Result;
 use diesel::prelude::*;
-use uuid::Uuid;
 use std::net::IpAddr;
 
 pub struct SimulationRepo {
@@ -27,7 +29,7 @@ impl From<SimulationPostrgres> for Simulation {
         Simulation::new(
             s.id.into(),
             s.ip.parse().unwrap(),
-            s.balance.try_into().unwrap(),
+            Amount::new(s.balance, Some(MIN_BALANCE_AMOUNT)).unwrap(),
         )
     }
 }
@@ -60,19 +62,47 @@ impl ISimulationRepo for SimulationRepo {
             .execute(&mut self.connection);
     }
 
-    fn simulation_by_ip(&mut self, ip_addr: IpAddr) -> Option<Id<Simulation>> {
+    fn simulation_by_ip(&mut self, ip_addr: IpAddr) -> Option<Simulation> {
         use crate::schema::simulation::dsl::*;
 
         let ip_addr = ip_addr.to_string();
         let rec = simulation
             .filter(ip.eq(&ip_addr))
-            .select(id)
-            .first::<Uuid>(&mut self.connection)
+            .select(SimulationPostrgres::as_select())
+            .first::<SimulationPostrgres>(&mut self.connection)
             .ok();
 
         match rec {
-            Some(s_id) => Some(s_id.into()),
+            Some(sim) => Some(sim.into()),
             None => None,
         }
+    }
+
+    fn simulation_by_id(&mut self, sim_id: Id<Simulation>) -> Result<Simulation> {
+        use crate::schema::simulation::dsl::*;
+
+        let rec = simulation
+            .filter(id.eq(&sim_id.value()))
+            .select(SimulationPostrgres::as_select())
+            .first::<SimulationPostrgres>(&mut self.connection)?;
+
+        Ok(rec.into())
+    }
+
+    fn update_by_id(&mut self, simulation: Simulation) -> Result<()> {
+        use crate::schema::simulation::{
+            self,
+            dsl::{balance, id, round},
+        };
+
+        diesel::update(simulation::table)
+            .filter(id.eq(&simulation.id().value()))
+            .set((
+                round.eq(simulation.round() as i64),
+                balance.eq(simulation.balance().clear_value()),
+            ))
+            .execute(&mut self.connection)?;
+
+        Ok(())
     }
 }

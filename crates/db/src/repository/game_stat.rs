@@ -64,36 +64,44 @@ impl IGameStatRepo for GameStatRepo {
         Ok(rec.into())
     }
 
-    fn goals_by_game_id(&mut self, game_id: Id<Game>, is_home: bool) -> Result<u8> {
-        Ok(self.score_by_game_id(game_id, is_home)?.0)
+    fn goals_by_game_id(&mut self, game_id: Id<Game>, is_home: bool) -> Option<u8> {
+        self.score_by_game_id(game_id, is_home)
+            .and_then(|score| Some(score.0))
     }
 
     fn next_id(&self) -> Id<GameStat> {
         Id::new()
     }
 
-    fn score_by_game_id(&mut self, g_id: Id<Game>, is_home: bool) -> Result<(u8, u8)> {
+    fn score_by_game_id(&mut self, g_id: Id<Game>, is_home: bool) -> Option<(u8, u8)> {
         use crate::schema::gamestat::dsl::*;
 
         let rec = gamestat
             .filter(game_id.eq(g_id.value()))
             .select(GameStatPostrgres::as_select())
-            .first(&mut self.connection)?;
-
-        Ok(if is_home {
-            (rec.home_team_total as u8, rec.guest_team_total as u8)
+            .first(&mut self.connection)
+            .ok();
+        if let Some(rec) = rec {
+            let score = if is_home {
+                (rec.home_team_total as u8, rec.guest_team_total as u8)
+            } else {
+                (rec.guest_team_total as u8, rec.home_team_total as u8)
+            };
+            Some(score)
         } else {
-            (rec.guest_team_total as u8, rec.home_team_total as u8)
-        })
+            None
+        }
     }
 
-    fn winner_by_game_id(&mut self, game_id: Id<Game>, is_home: bool) -> Result<Winner> {
-        let (home_team_total, guest_team_total) = self.score_by_game_id(game_id, is_home)?;
-
-        Ok(match home_team_total.cmp(&guest_team_total) {
-            Ordering::Greater => Winner::W1,
-            Ordering::Equal => Winner::X,
-            Ordering::Less => Winner::W2,
-        })
+    fn winner_by_game_id(&mut self, game_id: Id<Game>, is_home: bool) -> Option<Winner> {
+        if let Some((home_team_total, guest_team_total)) = self.score_by_game_id(game_id, is_home) {
+            Some(match home_team_total.cmp(&guest_team_total) {
+                Ordering::Greater => Winner::W1,
+                Ordering::Equal => Winner::X,
+                Ordering::Less => Winner::W2,
+            })
+        } else {
+            None
+        }
     }
 }
