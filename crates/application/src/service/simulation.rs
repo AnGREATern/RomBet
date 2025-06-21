@@ -3,6 +3,7 @@ use rand::rng;
 use rand::seq::SliceRandom;
 use std::net::IpAddr;
 use std::fmt;
+use tracing::{debug, info};
 
 use crate::{
     config::SetupConfig,
@@ -51,8 +52,10 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> Start
 {
     fn start(&mut self, ip: IpAddr) -> Result<Simulation> {
         if let Some(simulation) = self.simulation_repo.simulation_by_ip(ip) {
+            info!("Continue exist game");
             Ok(simulation)
         } else {
+            info!("Start new game");
             let id = self.simulation_repo.next_id();
             let simulation = Simulation::new(id, ip, self.config.balance);
             self.simulation_repo.add(simulation)?;
@@ -65,6 +68,7 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> Start
         let simulation = self.simulation_repo.simulation_by_id(simulation_id)?;
         let simulation = Simulation::new(simulation.id(), simulation.ip(), self.config.balance);
         self.simulation_repo.update_by_id(simulation)?;
+        debug!("Game restarted");
 
         Ok(simulation)
     }
@@ -76,10 +80,13 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> CreateRo
     fn create_round(&mut self, simulation: &mut Simulation) -> Result<Vec<DisplayedGame>> {
         let mut round = simulation.round();
         let simulation_id = simulation.id();
+        info!("Checking if last round was randomized");
         self.check_last_round_randomized(round, simulation_id)?;
+        info!("Last round wasn't randomized");
         round += 1;
         simulation.increment_round();
         self.simulation_repo.update_by_id(simulation.clone())?;
+        debug!("Round incremented in simulation repo");
         let mut teams = self.team_repo.all_teams_id();
         teams.shuffle(&mut rng());
         let mut displayed_games = vec![];

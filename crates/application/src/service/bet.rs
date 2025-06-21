@@ -1,5 +1,6 @@
 use anyhow::Result;
 use std::cmp::Ordering;
+use tracing::debug;
 
 use crate::{
     config::CoefficientConfig,
@@ -45,17 +46,24 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeBet
             event,
             None,
         );
+        debug!("Initialize bet");
         self.bet_repo.add(bet)?;
+        debug!("Bet added in bet_repo");
         let mut simulation = self.simulation_repo.simulation_by_id(simulation_id)?;
+        debug!("Got simulation");
         simulation.make_bet(amount)?;
+        debug!("Bet made");
         self.simulation_repo.update_by_id(simulation)?;
+        debug!("Simulation updated in simulation_repo");
 
         Ok(())
     }
 
     fn calculate_coefficients(&mut self, game: &Game) -> Result<Vec<(Event, Coefficient)>> {
         let mut coefficients = self.calculate_winner_coefficients(game)?;
+        debug!("Winner coefficients calculated");
         let mut tc = self.calculate_total_coefficients(game)?;
+        debug!("Total coefficients calculated");
         coefficients.append(&mut tc);
 
         Ok(coefficients)
@@ -63,8 +71,11 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeBet
 
     fn calculate_winner_coefficients(&mut self, game: &Game) -> Result<Vec<(Event, Coefficient)>> {
         let home_res = self.past_results_by_team_id(game.home_team_id(), game.simulation_id())?;
+        debug!("Got past results of home team");
         let guest_res = self.past_results_by_team_id(game.guest_team_id(), game.simulation_id())?;
+        debug!("Got past results of guest team");
         let h2h_res = self.h2h_results_by_game(game)?;
+        debug!("Got h2h past results");
 
         BetCalculator::calculate_winner_coefficients(
             home_res,
@@ -85,6 +96,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeBet
             let guest_team_past_totals =
                 self.past_totals(game.guest_team_id(), game.simulation_id(), total)?;
             let totals = ((h2h_totals + home_team_past_totals)? + guest_team_past_totals)?;
+            debug!(total, "Got past totals");
 
             let mut ttl =
                 BetCalculator::calculate_total_coefficients(total, totals, self.config.margin)?;
@@ -102,11 +114,13 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> Calculate
         let mut profit = 0;
         let nc_bets = self.bet_repo.not_calculated_bets();
         if let Some(bet) = nc_bets.get(0) {
+            debug!("There are unsettled bets");
             let mut simulation = self.simulation_repo.simulation_by_id(bet.simulation_id())?;
             for bet in nc_bets {
                 profit += self.calculate_bet(bet, &mut simulation)?.clear_value();
             }
             self.simulation_repo.update_by_id(simulation)?;
+            debug!("Balance updated in repo");
         }
 
         Ok(Amount::new(profit, None).unwrap())
@@ -152,6 +166,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeRepor
 {
     fn make_report(&mut self, start_balance: Amount) -> BetStatistics {
         let min_coefficient_lose = self.bet_repo.min_coefficient_lose();
+        debug!("All data for report received");
 
         BetStatistics::new(start_balance, min_coefficient_lose)
     }

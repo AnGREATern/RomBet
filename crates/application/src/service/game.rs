@@ -1,5 +1,6 @@
 use anyhow::{Result, bail};
 use rand::{Rng, rng};
+use tracing::{debug, info};
 
 use crate::usecase::RandomizeRound;
 use crate::{
@@ -18,25 +19,32 @@ pub struct GameService<G: IGameRepo, GS: IGameStatRepo> {
 impl<G: IGameRepo, GS: IGameStatRepo> RandomizeRound for GameService<G, GS> {
     fn randomize_game(&mut self, game: &Game) -> Result<GameStat> {
         let winner = self.randomize_winner(game)?;
+        debug!("Winner randomized");
         let (home_team_total, guest_team_total) = self.randomize_totals(game, winner)?;
+        debug!("Score randomized");
         let stat_id = self.game_stat_repo.next_id();
         let game_stat = GameStat::new(stat_id, game.id(), home_team_total, guest_team_total);
         self.game_stat_repo.add(game_stat)?;
+        debug!("Game stat added");
 
         Ok(game_stat)
     }
 
     fn randomize_round(&mut self, simulation: &Simulation) -> Result<Vec<GameStat>> {
+        info!("Checking if last round was randomized");
         self.check_last_round_randomized(simulation.round(), simulation.id())?;
+        info!("Last round wasn't randomized");
         let mut games_stat = vec![];
         let games_id = self
             .game_repo
             .games_id_by_round(simulation.round(), simulation.id())?;
+        debug!("Got games id");
         for game_id in games_id {
             let game = self.game_repo.game_by_id(game_id)?;
             let game_stat = self.randomize_game(&game)?;
             games_stat.push(game_stat);
         }
+        debug!("Round randomized");
 
         Ok(games_stat)
     }

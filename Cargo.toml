@@ -9,7 +9,8 @@ members = [
   "crates/application", 
   "crates/cli", 
   "crates/db",
-  "crates/domain", "crates/infrastructure",
+  "crates/domain", 
+  "crates/infrastructure",
 ]
 
 [workspace.package]
@@ -23,3 +24,4 @@ domain          = { path = "crates/domain"          }
 application     = { path = "crates/application"     }
 db              = { path = "crates/db"              }
 cli             = { path = "crates/cli"             }
+infrastructure  = { path = "crates/infrastructure"  }

@@ -1,5 +1,6 @@
 use anyhow::{Result, anyhow, bail};
 use clap::Parser;
+use dotenv::dotenv;
 use enum_try_from::impl_enum_try_from;
 use std::collections::BTreeMap;
 use std::fmt;
@@ -7,7 +8,7 @@ use std::io;
 use std::net::{IpAddr, Ipv4Addr};
 use std::path::Path;
 use std::process::ExitCode;
-use dotenv::dotenv;
+use tracing::{error, info, debug};
 
 use application::config::SetupConfig;
 use application::repository::{IBetRepo, IGameRepo, IGameStatRepo, ISimulationRepo, ITeamRepo};
@@ -85,7 +86,10 @@ struct App {
 
 impl App {
     pub fn new(cli_args: CliArgs) -> Result<Self> {
-        let config = config::load_from_file(Path::new("../../config.toml"))?;
+        dotenv().ok();
+        logger::init_default_logger();
+        let config = config::load_from_file(Path::new("config.toml"))?;
+        info!("Config applied");
         let setup_config = config.setup;
         let coefficient_config = config.coefficient;
 
@@ -103,10 +107,12 @@ impl App {
             simulation_repo,
             coefficient_config.clone(),
         );
+        debug!("Bet service started");
 
         let game_repo = GameRepo::new();
         let game_stat_repo = GameStatRepo::new();
         let game_service = GameService::new(game_repo, game_stat_repo, coefficient_config);
+        debug!("Game service started");
 
         let team_repo = TeamRepo::new();
         let game_repo = GameRepo::new();
@@ -119,11 +125,12 @@ impl App {
             simulation_repo,
             setup_config,
         );
+        debug!("Simulation service started");
 
         let simulation = sim_service.start(cli_args.ip)?;
-        log::info!(
-            "Simulation started successfully, balance: {}",
-            f64::from(simulation.balance())
+        info!(
+            balance = f64::from(simulation.balance()),
+            "Simulation started successfully"
         );
 
         Ok(Self {
@@ -138,6 +145,7 @@ impl App {
     }
 
     pub fn show_menu() {
+        debug!("Menu showed");
         println!("-----Меню-----");
         println!("{}. Начать сначала", Command::Restart as u8);
         println!("{}. Перейти к следующему туру", Command::CreateRound as u8);
@@ -169,21 +177,25 @@ impl App {
     }
 
     fn restart(&mut self) -> Result<()> {
+        debug!("Perform restart operation");
         self.simulation = self.sim_service.restart(self.simulation.id())?;
-        log::info!(
-            "Restart successful, balance: {}",
-            f64::from(self.simulation.balance())
+        info!(
+            balance = f64::from(self.simulation.balance()),
+            "Restart successful"
         );
 
         Ok(())
     }
 
     fn randomize_round(&mut self) -> Result<()> {
+        debug!("Perform randomize round operation");
         let games_stat = self.game_service.randomize_round(&self.simulation)?;
         if games_stat.is_empty() {
+            info!("All the matches have been played");
             return Ok(());
         }
 
+        info!(round = self.simulation.round(), "Show game results");
         println!("Результаты матчей {}-го тура:", self.simulation.round());
         for game_stat in games_stat {
             let game_info = self
@@ -195,6 +207,7 @@ impl App {
             println!("{}", game_info);
         }
         let profit = self.bet_service.calculate_bets()?;
+        info!(profit = f64::from(profit), "Credit to balance");
         println!(
             "Доход по итогам ставок на матчи этого тура: {}",
             f64::from(profit)
@@ -206,7 +219,9 @@ impl App {
     }
 
     fn calculate_coefficients(&mut self) -> Result<()> {
+        debug!("Perform calculate coefficients operation");
         if self.game_poses.is_empty() {
+            info!("Round didn't create");
             println!("Сначала посмотрите матчи тура!");
             return Ok(());
         }
@@ -223,10 +238,12 @@ impl App {
             game_info.guest_team.id(),
             self.simulation.round(),
         );
+        info!("Game selected");
         let offers = self.bet_service.calculate_coefficients(&game)?;
         for (i, (event, coefficient)) in offers.iter().enumerate() {
             println!("{}. {} за {}", i, event, f64::from(*coefficient));
         }
+        info!("Coefficients calculated");
         println!(
             "Введите номер события, на которое хотите сделать ставку \
             или любое другое число, чтобы вернуться в меню:"
@@ -235,18 +252,22 @@ impl App {
         io::stdin().read_line(&mut buffer)?;
         let event_pos = buffer.trim().parse::<usize>()?;
         if event_pos <= offers.len() {
+            debug!("Game selected");
             let (event, coefficient) = offers[event_pos];
             self.make_bet(&game, event, coefficient)
         } else {
+            debug!("Game didn't select");
             Ok(())
         }
     }
 
     fn create_round(&mut self) -> Result<()> {
+        debug!("Perform create round operation");
         let _ = self.randomize_round();
         self.game_poses.clear();
         let games = self.sim_service.create_round(&mut self.simulation)?;
 
+        info!(round = self.simulation.round(), "Games created");
         println!("Матчи {}-го тура:", self.simulation.round());
         for (i, game) in games.into_iter().enumerate() {
             println!("{}. {}", i, game);
@@ -266,6 +287,7 @@ impl App {
     }
 
     fn make_report(&mut self) -> Result<()> {
+        debug!("Perform make report operation");
         let stat = self.bet_service.make_report(self.setup_config.balance);
         print!(
             "Ваша статистика:\nНачальный баланс: {}\nМинимальный проигравший коэффициент: ",
@@ -281,23 +303,33 @@ impl App {
     }
 
     fn make_bet(&mut self, game: &Game, event: Event, coefficient: Coefficient) -> Result<()> {
+        debug!("Perform make bet operation");
         self.check_balance()?;
         println!("Введите сумму ставки: ");
         let mut buffer = String::new();
         io::stdin().read_line(&mut buffer)?;
         let value = buffer.trim().parse::<f64>()?;
         let value = Amount::new_with_casting(value, Some(MIN_BALANCE_AMOUNT))?;
-        if MIN_BET_AMOUNT <= value.clear_value() && value.clear_value() <= self.simulation.balance().clear_value() {
+        debug!("Sum of bet parsed");
+        if MIN_BET_AMOUNT <= value.clear_value()
+            && value.clear_value() <= self.simulation.balance().clear_value()
+        {
+            info!("All conditions to make bet passed");
             self.simulation.make_bet(value)?;
+            info!("Bet made");
             self.bet_service.make_bet(game, value, event, coefficient)
         } else if MIN_BET_AMOUNT <= value.clear_value() {
             bail!("Haven't enough money");
         } else {
-            bail!("Minimal bet is {}", f64::from(Amount::new(MIN_BET_AMOUNT, None).unwrap()));
+            bail!(
+                "Minimal bet is {}",
+                f64::from(Amount::new(MIN_BET_AMOUNT, None).unwrap())
+            );
         }
     }
 
     fn check_balance(&self) -> Result<()> {
+        debug!("Perform check balance operation");
         println!("Ваш баланс: {}", f64::from(self.simulation.balance()));
 
         Ok(())
@@ -305,18 +337,17 @@ impl App {
 }
 
 fn main() -> ExitCode {
-    dotenv().ok();
-    logger::init_default_logger();
     let cli = CliArgs::parse();
     let mut buffer = String::new();
     let mut cmd = Command::default();
     let mut app = match App::new(cli) {
         Ok(app) => app,
         Err(error) => {
-            eprintln!("{error}");
+            error!("{}", error);
             return ExitCode::FAILURE;
         }
     };
+    info!("App started");
 
     while cmd != Command::Exit {
         App::show_menu();
@@ -340,11 +371,12 @@ fn main() -> ExitCode {
         }
 
         cmd = cmd_buf.unwrap();
+        info!("Command parsed");
         if let Err(error) = app.perform(&cmd) {
-            log::error!("{} {}", error.backtrace(), error);
-            // return ExitCode::FAILURE;
+            error!("{}", error);
         }
     }
+    info!("Shutdown application");
 
     ExitCode::SUCCESS
 }
