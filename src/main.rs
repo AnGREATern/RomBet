@@ -1,3 +1,3 @@
 fn main() {
-    println!("Hello, world!");
+    let _ = web_ctl::start_server();
 }

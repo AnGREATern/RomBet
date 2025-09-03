@@ -8,12 +8,12 @@ use std::io;
 use std::net::{IpAddr, Ipv4Addr};
 use std::path::Path;
 use std::process::ExitCode;
-use tracing::{error, info, debug};
+use tracing::{debug, error, info};
 
 use application::config::SetupConfig;
-use application::repository::{IBetRepo, IGameRepo, IGameStatRepo, ISimulationRepo, ITeamRepo};
 use application::service::{BetService, GameService, SimulationService};
 use application::usecase::{CalculateBet, CreateRound, MakeBet, MakeReport, RandomizeRound, Start};
+use db::init_pool;
 use db::repository::{BetRepo, GameRepo, GameStatRepo, SimulationRepo, TeamRepo};
 use domain::entity::{Game, Simulation, Team};
 use domain::value_object::{Amount, Coefficient, Event, Id, MIN_BALANCE_AMOUNT, MIN_BET_AMOUNT};
@@ -76,7 +76,7 @@ impl fmt::Display for GameInfo {
 
 struct App {
     sim_service: SimulationService<GameRepo, TeamRepo, GameStatRepo, SimulationRepo>,
-    game_service: GameService<GameRepo, GameStatRepo>,
+    game_service: GameService<GameRepo, GameStatRepo, TeamRepo>,
     bet_service: BetService<BetRepo, GameRepo, GameStatRepo, SimulationRepo>,
     simulation: Simulation,
     games: BTreeMap<Id<Game>, GameInfo>,
@@ -96,10 +96,11 @@ impl App {
         let games = BTreeMap::new();
         let game_poses = vec![];
 
-        let game_repo = GameRepo::new();
-        let bet_repo = BetRepo::new();
-        let game_stat_repo = GameStatRepo::new();
-        let simulation_repo = SimulationRepo::new();
+        let pool = init_pool();
+        let game_repo = GameRepo::new(pool.clone());
+        let bet_repo = BetRepo::new(pool.clone());
+        let game_stat_repo = GameStatRepo::new(pool.clone());
+        let simulation_repo = SimulationRepo::new(pool.clone());
         let bet_service = BetService::new(
             bet_repo,
             game_repo,
@@ -109,16 +110,17 @@ impl App {
         );
         debug!("Bet service started");
 
-        let game_repo = GameRepo::new();
-        let game_stat_repo = GameStatRepo::new();
-        let game_service = GameService::new(game_repo, game_stat_repo, coefficient_config);
+        let game_repo = GameRepo::new(pool.clone());
+        let game_stat_repo = GameStatRepo::new(pool.clone());
+        let team_repo = TeamRepo::new(pool.clone());
+        let game_service = GameService::new(game_repo, game_stat_repo, team_repo, coefficient_config);
         debug!("Game service started");
 
-        let team_repo = TeamRepo::new();
-        let game_repo = GameRepo::new();
-        let simulation_repo = SimulationRepo::new();
-        let game_stat_repo = GameStatRepo::new();
-        let mut sim_service = SimulationService::new(
+        let team_repo = TeamRepo::new(pool.clone());
+        let game_repo = GameRepo::new(pool.clone());
+        let simulation_repo = SimulationRepo::new(pool.clone());
+        let game_stat_repo = GameStatRepo::new(pool.clone());
+        let sim_service = SimulationService::new(
             game_repo,
             team_repo,
             game_stat_repo,
@@ -198,13 +200,7 @@ impl App {
         info!(round = self.simulation.round(), "Show game results");
         println!("Результаты матчей {}-го тура:", self.simulation.round());
         for game_stat in games_stat {
-            let game_info = self
-                .games
-                .get_mut(&game_stat.game_id())
-                .ok_or(anyhow!("Didn't find this game"))?;
-            game_info.home_team_score = Some(game_stat.home_team_total());
-            game_info.guest_team_score = Some(game_stat.guest_team_total());
-            println!("{}", game_info);
+            println!("{}", game_stat);
         }
         let profit = self.bet_service.calculate_bets()?;
         info!(profit = f64::from(profit), "Credit to balance");

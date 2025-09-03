@@ -1,9 +1,10 @@
 use anyhow::Result;
 
-use domain::entity::{Game, GameStat, Simulation};
+use domain::entity::{Game, Simulation};
+use crate::service::DisplayedGameStat;
 
 pub trait RandomizeRound {
-    fn randomize_game(&mut self, game: &Game) -> Result<GameStat>;
+    fn randomize_game(&self, game: &Game) -> Result<DisplayedGameStat>;
 
-    fn randomize_round(&mut self, simulation: &Simulation) -> Result<Vec<GameStat>>;
+    fn randomize_round(&self, simulation: &Simulation) -> Result<Vec<DisplayedGameStat>>;
 }

@@ -1,7 +1,8 @@
 use std::marker::PhantomData;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(PartialOrd, Ord)]
+#[derive(PartialOrd, Ord, Serialize, Deserialize)]
 pub struct Id<T> {
     value: Uuid,
     marker: PhantomData<fn() -> T>,

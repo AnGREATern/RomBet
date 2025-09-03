@@ -12,6 +12,6 @@ pub fn init_default_logger() {
         .open(env::var("ROM_BET_LOG_NAME").expect("ROM_BET_LOG_NAME didn't setup"))
         .unwrap();
     let subscriber = Registry::default().with(fmt::layer().json().with_writer(log_file));
-    
+
     subscriber::set_global_default(subscriber).expect("Logger already exists");
 }

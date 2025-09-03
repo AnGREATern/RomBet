@@ -10,12 +10,7 @@ pub struct GameStat {
 }
 
 impl GameStat {
-    pub fn new(
-        id: Id<Self>,
-        game_id: Id<Game>,
-        home_team_total: u8,
-        guest_team_total: u8,
-    ) -> Self {
+    pub fn new(id: Id<Self>, game_id: Id<Game>, home_team_total: u8, guest_team_total: u8) -> Self {
         Self {
             id,
             game_id,

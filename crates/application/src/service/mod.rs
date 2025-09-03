@@ -3,5 +3,5 @@ mod game;
 mod simulation;
 
 pub use bet::BetService;
-pub use game::GameService;
-pub use simulation::{SimulationService, DisplayedGame};
+pub use game::{GameService, DisplayedGameStat};
+pub use simulation::{DisplayedGame, SimulationService};

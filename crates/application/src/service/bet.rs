@@ -29,7 +29,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeBet
     for BetService<B, G, GS, S>
 {
     fn make_bet(
-        &mut self,
+        &self,
         game: &Game,
         amount: Amount,
         event: Event,
@@ -59,7 +59,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeBet
         Ok(())
     }
 
-    fn calculate_coefficients(&mut self, game: &Game) -> Result<Vec<(Event, Coefficient)>> {
+    fn calculate_coefficients(&self, game: &Game) -> Result<Vec<(Event, Coefficient)>> {
         let mut coefficients = self.calculate_winner_coefficients(game)?;
         debug!("Winner coefficients calculated");
         let mut tc = self.calculate_total_coefficients(game)?;
@@ -69,7 +69,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeBet
         Ok(coefficients)
     }
 
-    fn calculate_winner_coefficients(&mut self, game: &Game) -> Result<Vec<(Event, Coefficient)>> {
+    fn calculate_winner_coefficients(&self, game: &Game) -> Result<Vec<(Event, Coefficient)>> {
         let home_res = self.past_results_by_team_id(game.home_team_id(), game.simulation_id())?;
         debug!("Got past results of home team");
         let guest_res = self.past_results_by_team_id(game.guest_team_id(), game.simulation_id())?;
@@ -87,7 +87,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeBet
         )
     }
 
-    fn calculate_total_coefficients(&mut self, game: &Game) -> Result<Vec<(Event, Coefficient)>> {
+    fn calculate_total_coefficients(&self, game: &Game) -> Result<Vec<(Event, Coefficient)>> {
         let mut total_coefficients = vec![];
         for &total in self.config.totals.clone().iter() {
             let h2h_totals = self.h2h_totals(game, total)?;
@@ -110,7 +110,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeBet
 impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> CalculateBet
     for BetService<B, G, GS, S>
 {
-    fn calculate_bets(&mut self) -> Result<Amount> {
+    fn calculate_bets(&self) -> Result<Amount> {
         let mut profit = 0;
         let nc_bets = self.bet_repo.not_calculated_bets();
         if let Some(bet) = nc_bets.get(0) {
@@ -126,7 +126,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> Calculate
         Ok(Amount::new(profit, None).unwrap())
     }
 
-    fn calculate_bet(&mut self, mut bet: Bet, simulation: &mut Simulation) -> Result<Amount> {
+    fn calculate_bet(&self, mut bet: Bet, simulation: &mut Simulation) -> Result<Amount> {
         let profit = match bet.event() {
             Event::WDL(bet_winner) => {
                 if let Some(winner) = self.game_stat_repo.winner_by_game_id(bet.game_id(), true) {
@@ -164,7 +164,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> Calculate
 impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeReport
     for BetService<B, G, GS, S>
 {
-    fn make_report(&mut self, start_balance: Amount) -> BetStatistics {
+    fn make_report(&self, start_balance: Amount) -> BetStatistics {
         let min_coefficient_lose = self.bet_repo.min_coefficient_lose();
         debug!("All data for report received");
 
@@ -190,7 +190,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> BetServic
     }
 
     fn past_results_by_team_id(
-        &mut self,
+        &self,
         team_id: Id<Team>,
         simulation_id: Id<Simulation>,
     ) -> Result<PastResults> {
@@ -210,7 +210,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> BetServic
     }
 
     fn past_totals(
-        &mut self,
+        &self,
         team_id: Id<Team>,
         simulation_id: Id<Simulation>,
         total: u8,
@@ -231,7 +231,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> BetServic
         Ok(past_totals)
     }
 
-    fn h2h_results_by_game(&mut self, game: &Game) -> Result<PastResults> {
+    fn h2h_results_by_game(&self, game: &Game) -> Result<PastResults> {
         let h2hs_id = self.game_repo.h2hs_id_by_team_id(
             game.home_team_id(),
             game.guest_team_id(),
@@ -242,13 +242,13 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> BetServic
         for (game_id, is_home) in h2hs_id {
             if let Some(winner) = self.game_stat_repo.winner_by_game_id(game_id, is_home) {
                 past_results.add_result(winner);
-            }   
+            }
         }
 
         Ok(past_results)
     }
 
-    fn h2h_totals(&mut self, game: &Game, total: u8) -> Result<PastTotals> {
+    fn h2h_totals(&self, game: &Game, total: u8) -> Result<PastTotals> {
         let h2hs_id = self.game_repo.h2hs_id_by_team_id(
             game.home_team_id(),
             game.guest_team_id(),

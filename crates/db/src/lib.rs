@@ -1,15 +1,21 @@
 pub mod models;
-pub mod schema;
 pub mod repository;
+pub mod schema;
 
-use diesel::prelude::*;
+use diesel::pg::PgConnection;
+use diesel::r2d2::{ConnectionManager, Pool};
 use dotenv::dotenv;
 use std::env;
 
-pub fn establish_connection() -> PgConnection {
-    dotenv().ok();
+pub type DBPool = Pool<ConnectionManager<PgConnection>>;
 
+pub fn init_pool() -> DBPool {
+    dotenv().ok();
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    PgConnection::establish(&database_url)
-        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
+
+    let manager = ConnectionManager::<PgConnection>::new(database_url);
+    Pool::builder()
+        .max_size(16)
+        .build(manager)
+        .expect("Failed to create DB pool")
 }
