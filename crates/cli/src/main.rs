@@ -1,4 +1,4 @@
-use anyhow::{Result, anyhow, bail};
+use anyhow::{Result, bail};
 use clap::Parser;
 use dotenv::dotenv;
 use enum_try_from::impl_enum_try_from;
@@ -113,7 +113,8 @@ impl App {
         let game_repo = GameRepo::new(pool.clone());
         let game_stat_repo = GameStatRepo::new(pool.clone());
         let team_repo = TeamRepo::new(pool.clone());
-        let game_service = GameService::new(game_repo, game_stat_repo, team_repo, coefficient_config);
+        let game_service =
+            GameService::new(game_repo, game_stat_repo, team_repo, coefficient_config);
         debug!("Game service started");
 
         let team_repo = TeamRepo::new(pool.clone());

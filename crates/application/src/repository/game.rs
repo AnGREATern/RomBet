@@ -17,11 +17,8 @@ pub trait IGameRepo {
         cnt: u8,
     ) -> Result<Vec<(Id<Game>, bool)>>;
 
-    fn games_id_by_round(
-        &self,
-        round: u32,
-        simulation_id: Id<Simulation>,
-    ) -> Result<Vec<Id<Game>>>;
+    fn games_id_by_round(&self, round: u32, simulation_id: Id<Simulation>)
+    -> Result<Vec<Id<Game>>>;
 
     fn h2hs_id_by_team_id(
         &self,

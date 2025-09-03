@@ -85,11 +85,7 @@ impl<G: IGameRepo, GS: IGameStatRepo, T: ITeamRepo> GameService<G, GS, T> {
         Ok(past_results)
     }
 
-    fn check_last_round_randomized(
-        &self,
-        round: u32,
-        simulation_id: Id<Simulation>,
-    ) -> Result<()> {
+    fn check_last_round_randomized(&self, round: u32, simulation_id: Id<Simulation>) -> Result<()> {
         let games_id = self.game_repo.games_id_by_round(round, simulation_id)?;
         for game_id in games_id {
             if self
@@ -304,7 +300,11 @@ pub struct DisplayedGameStat {
 }
 
 impl DisplayedGameStat {
-    pub fn new(gs: &GameStat, team_repo: &impl ITeamRepo, game_repo: &impl IGameRepo) -> Result<Self> {
+    pub fn new(
+        gs: &GameStat,
+        team_repo: &impl ITeamRepo,
+        game_repo: &impl IGameRepo,
+    ) -> Result<Self> {
         let game_id = gs.game_id();
         let game = game_repo.game_by_id(game_id)?;
         Ok(Self {
@@ -313,14 +313,21 @@ impl DisplayedGameStat {
             home_team: team_repo.team_by_id(game.home_team_id())?,
             guest_team: team_repo.team_by_id(game.guest_team_id())?,
             home_team_total: gs.home_team_total(),
-            guest_team_total: gs.guest_team_total()
+            guest_team_total: gs.guest_team_total(),
         })
     }
 }
 
 impl fmt::Display for DisplayedGameStat {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} ({}) - ({}) {}", self.home_team.name(), self.home_team_total, self.guest_team_total, self.guest_team.name())
+        write!(
+            f,
+            "{} ({}) - ({}) {}",
+            self.home_team.name(),
+            self.home_team_total,
+            self.guest_team_total,
+            self.guest_team.name()
+        )
     }
 }
 

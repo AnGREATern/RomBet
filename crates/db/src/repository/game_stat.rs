@@ -68,8 +68,7 @@ impl IGameStatRepo for GameStatRepo {
     }
 
     fn goals_by_game_id(&self, game_id: Id<Game>, is_home: bool) -> Option<u8> {
-        self.score_by_game_id(game_id, is_home)
-            .and_then(|score| Some(score.0))
+        self.score_by_game_id(game_id, is_home).map(|score| score.0)
     }
 
     fn next_id(&self) -> Id<GameStat> {

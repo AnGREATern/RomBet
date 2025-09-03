@@ -91,7 +91,7 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> CreateRo
         info!("Last round was randomized");
         round += 1;
         simulation.increment_round();
-        self.simulation_repo.update_by_id(simulation.clone())?;
+        self.simulation_repo.update_by_id(*simulation)?;
         debug!("Round incremented in simulation repo");
         let mut teams = self.team_repo.all_teams_id();
         teams.shuffle(&mut rng());
@@ -129,11 +129,7 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo>
         }
     }
 
-    fn check_last_round_randomized(
-        &self,
-        round: u32,
-        simulation_id: Id<Simulation>,
-    ) -> Result<()> {
+    fn check_last_round_randomized(&self, round: u32, simulation_id: Id<Simulation>) -> Result<()> {
         let games_id = self.game_repo.games_id_by_round(round, simulation_id)?;
         for game_id in games_id {
             if self

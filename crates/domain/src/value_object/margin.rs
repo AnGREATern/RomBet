@@ -12,7 +12,7 @@ impl TryFrom<Float> for Margin {
     type Error = Error;
 
     fn try_from(value: Float) -> Result<Self> {
-        if MIN <= value && value < MAX_EXCLUDED {
+        if (MIN..MAX_EXCLUDED).contains(&value) {
             Ok(Margin(value))
         } else {
             bail!("Margin doesn't support this value")

@@ -1,5 +1,5 @@
 use anyhow::{Result, bail};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 type Float = f64;
 pub const MIN_BET_AMOUNT: i64 = 10_00;

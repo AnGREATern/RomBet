@@ -1,5 +1,5 @@
-use std::marker::PhantomData;
 use serde::{Deserialize, Serialize};
+use std::marker::PhantomData;
 use uuid::Uuid;
 
 #[derive(PartialOrd, Ord, Serialize, Deserialize)]
@@ -17,6 +17,12 @@ impl<T> Id<T> {
 
     pub fn value(&self) -> Uuid {
         self.value
+    }
+}
+
+impl<T> Default for Id<T> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

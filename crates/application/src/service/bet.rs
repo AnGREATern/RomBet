@@ -113,7 +113,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> Calculate
     fn calculate_bets(&self) -> Result<Amount> {
         let mut profit = 0;
         let nc_bets = self.bet_repo.not_calculated_bets();
-        if let Some(bet) = nc_bets.get(0) {
+        if let Some(bet) = nc_bets.first() {
             debug!("There are unsettled bets");
             let mut simulation = self.simulation_repo.simulation_by_id(bet.simulation_id())?;
             for bet in nc_bets {

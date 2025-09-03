@@ -28,3 +28,9 @@ impl PastResults {
         }
     }
 }
+
+impl Default for PastResults {
+    fn default() -> Self {
+        Self::new()
+    }
+}

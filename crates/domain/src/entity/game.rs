@@ -1,6 +1,6 @@
-use serde::Deserialize;
 use super::{Simulation, Team};
 use crate::value_object::Id;
+use serde::Deserialize;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deserialize)]
 pub struct Game {

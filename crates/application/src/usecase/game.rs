@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use domain::entity::{Game, Simulation};
 use crate::service::DisplayedGameStat;
+use domain::entity::{Game, Simulation};
 
 pub trait RandomizeRound {
     fn randomize_game(&self, game: &Game) -> Result<DisplayedGameStat>;

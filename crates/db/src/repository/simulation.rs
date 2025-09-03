@@ -77,10 +77,7 @@ impl ISimulationRepo for SimulationRepo {
             .first::<SimulationPostrgres>(&mut connection)
             .ok();
 
-        match rec {
-            Some(sim) => Some(sim.into()),
-            None => None,
-        }
+        rec.map(|sim| sim.into())
     }
 
     fn simulation_by_id(&self, sim_id: Id<Simulation>) -> Result<Simulation> {
