@@ -12,8 +12,8 @@ pub struct Simulation {
 }
 
 impl Simulation {
-    pub fn new(id: Id<Simulation>, ip: IpAddr, balance: Amount) -> Self {
-        let round = 0;
+    pub fn new(id: Id<Simulation>, ip: IpAddr, balance: Amount, round: Option<u32>) -> Self {
+        let round = round.unwrap_or_default();
         Self {
             id,
             ip,

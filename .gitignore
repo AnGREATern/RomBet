@@ -1,4 +1,4 @@
 /target
 .vscode
 .env
-test.log
+*.log

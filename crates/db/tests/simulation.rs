@@ -12,11 +12,11 @@ use domain::{
 fn add_get_remove() {
     let pool = init_pool();
 
-    let mut repo = SimulationRepo::new(pool);
+    let repo = SimulationRepo::new(pool);
     let id = repo.next_id();
     let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
     let balance = Amount::new(100, Some(MIN_BALANCE_AMOUNT)).unwrap();
-    let simulation = Simulation::new(id, ip, balance);
+    let simulation = Simulation::new(id, ip, balance, None);
 
     repo.add(simulation).unwrap();
     let rec = repo.simulation_by_ip(ip);

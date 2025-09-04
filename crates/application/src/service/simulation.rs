@@ -63,7 +63,7 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> Start
         } else {
             info!("Start new game");
             let id = self.simulation_repo.next_id();
-            let simulation = Simulation::new(id, ip, self.config.balance);
+            let simulation = Simulation::new(id, ip, self.config.balance, None);
             self.simulation_repo.add(simulation)?;
 
             Ok(simulation)
@@ -72,7 +72,8 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> Start
 
     fn restart(&self, simulation_id: Id<Simulation>) -> Result<Simulation> {
         let simulation = self.simulation_repo.simulation_by_id(simulation_id)?;
-        let simulation = Simulation::new(simulation.id(), simulation.ip(), self.config.balance);
+        let simulation =
+            Simulation::new(simulation.id(), simulation.ip(), self.config.balance, None);
         self.simulation_repo.update_by_id(simulation)?;
         debug!("Game restarted");
 

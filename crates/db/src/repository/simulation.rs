@@ -27,6 +27,7 @@ impl From<SimulationPostrgres> for Simulation {
             s.id.into(),
             s.ip.parse().unwrap(),
             Amount::new(s.balance, Some(MIN_BALANCE_AMOUNT)).unwrap(),
+            Some(s.round as u32),
         )
     }
 }

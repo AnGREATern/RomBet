@@ -4,15 +4,17 @@ mod state;
 
 use anyhow::Result;
 use axum::{
-    response::IntoResponse, routing::{get, post}, Router
+    Router,
+    response::IntoResponse,
+    routing::{get, post},
 };
 use dotenv::dotenv;
 use std::net::SocketAddr;
 use std::path::Path;
 use std::{env, sync::Arc};
 use tokio::net::TcpListener;
-use tracing::info;
 use tower_http::services::ServeDir;
+use tracing::info;
 
 use crate::api::{
     balance::balance,
@@ -55,7 +57,7 @@ pub async fn start_server() -> Result<()> {
         .nest_service("/static", ServeDir::new("frontend/dist/static"))
         .fallback_service(ServeDir::new("frontend/dist").not_found_service(spa_handler()));
 
-    let addr = env::var("ROM_BET_ADDR")?;
+    let addr = env::var("ROM_BET_SOCK")?;
     let listener = TcpListener::bind(addr).await?;
     axum::serve(
         listener,

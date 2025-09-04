@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use anyhow::{Result, bail};
 use clap::Parser;
 use dotenv::dotenv;
@@ -8,6 +9,7 @@ use std::io;
 use std::net::{IpAddr, Ipv4Addr};
 use std::path::Path;
 use std::process::ExitCode;
+use tracing::warn;
 use tracing::{debug, error, info};
 
 use application::config::SetupConfig;
@@ -131,6 +133,7 @@ impl App {
         debug!("Simulation service started");
 
         let simulation = sim_service.start(cli_args.ip)?;
+        debug!("Current round: {}", simulation.round());
         info!(
             balance = f64::from(simulation.balance()),
             "Simulation started successfully"
@@ -226,10 +229,14 @@ impl App {
         println!("Введите номер матча: ");
         io::stdin().read_line(&mut buffer)?;
         let game_pos = buffer.trim().parse::<usize>()?;
-        let game_id = self.game_poses[game_pos];
+        let game_id = self.game_poses.get(game_pos).ok_or_else(|| {
+            println!("Такого матча нет");
+            warn!("Incorrect game pos");
+            anyhow!("Incorrect game pos")
+        })?;
         let game_info = self.games.get(&game_id).unwrap();
         let game = Game::new(
-            game_id,
+            *game_id,
             self.simulation.id(),
             game_info.home_team.id(),
             game_info.guest_team.id(),
