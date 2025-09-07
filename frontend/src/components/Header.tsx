@@ -1,5 +1,5 @@
 import React from 'react';
-import './Header.css';
+import '../App.css'
 
 interface HeaderProps {
   onRestart: () => void;
@@ -10,7 +10,7 @@ export const Header: React.FC<HeaderProps> = ({ onRestart, onShowReport }) => {
   return (
     <header className="header">
       <div className="header-content">
-        <h1>ROM Betting System</h1>
+        <h1>RomBet</h1>
         <div className="header-actions">
           <button onClick={onShowReport} className="btn btn-secondary">
             Отчет

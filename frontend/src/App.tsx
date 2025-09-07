@@ -7,17 +7,20 @@ import { ReportModal } from './components/ReportModal';
 import { GameResults } from './components/GameResults';
 import { useApi } from './hooks/useApi';
 import { apiClient } from './api/client';
-import { Game, Balance as BalanceType, BetStatistics, DisplayedGame, DisplayedGameStat } from './types';
+import { Balance as BalanceType, BetStatistics, DisplayedGame, DisplayedGameStat } from './types';
 import './App.css';
 
 function App() {
-  const [games, setGames] = useState<Game[]>([]);
+  const [id, setId] = useState("")
+  const [games, setGames] = useState<DisplayedGame[]>([]);
   const [currentGames, setCurrentGames] = useState<DisplayedGame[]>([]);
   const [gameStats, setGameStats] = useState<DisplayedGameStat[]>([]);
   const [balance, setBalance] = useState<BalanceType>({ amount: 0 });
   const [report, setReport] = useState<BetStatistics | null>(null);
   const [showReport, setShowReport] = useState(false);
   const [currentRound, setCurrentRound] = useState(0);
+  const [lastRound, setLastRound] = useState(0);
+  const [createState, setCurrentState] = useState(true);
   
   const { loading, error, callApi, clearError } = useApi();
 
@@ -29,7 +32,7 @@ function App() {
     await callApi(async () => {
       const startData = await apiClient.start();
       setBalance({ amount: startData.balance });
-      await loadBalance();
+      setId(startData.id);
     });
   };
 
@@ -40,40 +43,50 @@ function App() {
 
   const handleRestart = async () => {
     await callApi(async () => {
-      await apiClient.restart();
-      await loadBalance();
+      const resp = await apiClient.restart();
+      setBalance({ amount: resp.balance });
       setGames([]);
       setCurrentGames([]);
       setGameStats([]);
       setCurrentRound(0);
+      setLastRound(0);
+      setId(resp.id);
+      setCurrentState(true);
     });
   };
 
   const handleCreateRound = async () => {
+    if (!createState) {
+      alert("Раунд ещё не закончен. Он будет рандомизирован");
+    }
     await callApi(async () => {
       const roundData = await apiClient.createRound();
-      setCurrentGames(roundData.games);
-      setCurrentRound(roundData.round);
-      
-      // Конвертируем DisplayedGame в Game для формы ставок
-      const newGames: Game[] = roundData.games.map(game => ({
-        id: game.id,
-        simulation_id: '', // будет заполнено сервером
-        home_team_id: game.home_team,
-        guest_team_id: game.guest_team,
-        round: roundData.round
-      }));
-      
-      setGames(prev => [...prev, ...newGames]);
+      if (roundData === null) {
+        await handleRandomizeRound();
+      } else {
+        setCurrentGames(roundData.games);
+        setCurrentRound(roundData.round);
+        setGames(prev => [...prev, ...roundData.games]);
+        setCurrentState(false);
+      }
     });
   };
 
   const handleRandomizeRound = async () => {
+    if (createState) {
+      alert("Раунд уже закончен. Будет создан новый раунд");
+    } 
     await callApi(async () => {
       const result = await apiClient.randomizeRound();
-      setGameStats(result.games_stat);
-      setCurrentRound(result.round);
-      await loadBalance();
+      if (result === null) {
+        await handleCreateRound();
+      } else {
+        setGameStats(result.games_stat);
+        setCurrentRound(result.round);
+        setLastRound(result.round);
+        await loadBalance();
+        setCurrentState(true);
+      }
     });
   };
 
@@ -104,8 +117,8 @@ function App() {
         <div className="sidebar">
           <Balance balance={balance} />
           <CreateRoundButton onRoundCreated={handleCreateRound} />
-          {currentGames.length > 0 && (
-            <BetForm games={games} onBetPlaced={loadBalance} />
+          {currentGames.length > 0 && currentRound > lastRound && (
+            <BetForm games={currentGames} round={currentRound} simulation_id={id} onBetPlaced={loadBalance} />
           )}
         </div>
 
@@ -128,16 +141,15 @@ function App() {
               {currentGames.map(game => (
                 <div key={game.id} className="game-card">
                   <div className="teams">
-                    {game.home_team} vs {game.guest_team}
+                    {game.home_team.name} vs {game.guest_team.name}
                   </div>
-                  <div className="round">Раунд {game.round}</div>
                 </div>
               ))}
             </div>
           )}
 
           {gameStats.length > 0 && (
-            <GameResults stats={gameStats} />
+            <GameResults stats={gameStats} round={lastRound} />
           )}
         </div>
       </div>

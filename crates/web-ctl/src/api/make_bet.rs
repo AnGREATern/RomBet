@@ -14,7 +14,8 @@ use crate::state::AppState;
 
 #[derive(Serialize)]
 pub struct CalculateCoefficientsSuccessResponse {
-    pub offers: Vec<(Event, Coefficient)>,
+    pub events: Vec<Event>,
+    pub coefficients: Vec<Coefficient>,
 }
 
 #[derive(Deserialize)]
@@ -40,9 +41,16 @@ pub async fn calculate_coefficients(
     );
     info!("Game selected");
     let bet_service = state.bet_service();
-    let offers = bet_service.calculate_coefficients(&game)?;
+    let (events, coefficients) = bet_service
+        .calculate_coefficients(&game)?
+        .into_iter()
+        .unzip();
 
-    Ok(CalculateCoefficientsSuccessResponse { offers }.into())
+    Ok(CalculateCoefficientsSuccessResponse {
+        events,
+        coefficients,
+    }
+    .into())
 }
 
 #[derive(Deserialize)]

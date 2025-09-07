@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Bet, Game, Event } from '../types';
+import { Bet, Event, DisplayedGame, EventHelpers } from '../types';
 import { apiClient } from '../api/client';
 import { useApi } from '../hooks/useApi';
-import './BetForm.css';
+import '../App.css';
 
 interface BetFormProps {
-  games: Game[];
+  games: DisplayedGame[];
+  round: number;
+  simulation_id: string;
   onBetPlaced: () => void;
 }
 
-export const BetForm: React.FC<BetFormProps> = ({ games, onBetPlaced }) => {
-  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<Event>('home_win');
+export const BetForm: React.FC<BetFormProps> = ({ games, round, simulation_id, onBetPlaced }) => {
+  const [selectedGame, setSelectedGame] = useState<DisplayedGame | null>(null);
+  const [selectedEventIndex, setSelectedEventIndex] = useState<number>(0);
   const [coefficient, setCoefficient] = useState(1.0);
   const [amount, setAmount] = useState('');
   const [availableEvents, setAvailableEvents] = useState<{event: Event, coefficient: number}[]>([]);
@@ -28,16 +30,29 @@ export const BetForm: React.FC<BetFormProps> = ({ games, onBetPlaced }) => {
     if (!selectedGame) return;
 
     await callApi(async () => {
-      const coefficients = await apiClient.calculateCoefficients({
-        game_id: selectedGame.id,
-        home_team_id: selectedGame.home_team_id,
-        guest_team_id: selectedGame.guest_team_id
-      });
-      
-      setAvailableEvents(coefficients);
-      if (coefficients.length > 0) {
-        setSelectedEvent(coefficients[0].event);
-        setCoefficient(coefficients[0].coefficient);
+      try {
+        const coefficients = await apiClient.calculateCoefficients({
+          game_id: selectedGame.id,
+          home_team_id: selectedGame.home_team.id,
+          guest_team_id: selectedGame.guest_team.id
+        });
+        
+                const validCoefficients = coefficients
+          .filter(offer => offer.coefficient !== undefined && offer.coefficient !== null)
+          .map(offer => ({
+            event: offer.event || 'W1',
+            coefficient: offer.coefficient || 1.0
+          }));
+        
+        setAvailableEvents(validCoefficients);
+        
+        if (validCoefficients.length > 0) {
+          setSelectedEventIndex(0);
+          setCoefficient(validCoefficients[0].coefficient);
+        }
+      } catch (error) {
+        console.error('Error loading coefficients:', error);
+                setAvailableEvents([]);
       }
     });
   };
@@ -45,26 +60,43 @@ export const BetForm: React.FC<BetFormProps> = ({ games, onBetPlaced }) => {
   const handleGameChange = (gameId: string) => {
     const game = games.find(g => g.id === gameId);
     setSelectedGame(game || null);
+    setAvailableEvents([]);
+    setSelectedEventIndex(0);
+    setCoefficient(1.0);
   };
 
-  const handleEventChange = (event: Event) => {
-    const selected = availableEvents.find(ae => ae.event === event);
+  const handleEventChange = (eventIndex: number) => {
+    if (eventIndex < 0 || eventIndex >= availableEvents.length) return;
+    
+    const selected = availableEvents[eventIndex];
     if (selected) {
-      setSelectedEvent(event);
-      setCoefficient(selected.coefficient);
+      setSelectedEventIndex(eventIndex);
+      setCoefficient(selected.coefficient || 1.0);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedGame || !amount) return;
+    if (!selectedGame || !amount || availableEvents.length === 0) return;
+
+    const selectedEventData = availableEvents[selectedEventIndex];
+    if (!selectedEventData) return;
+
+    const selectedEvent = selectedEventData.event || 'W1';
+    const selectedCoefficient = selectedEventData.coefficient || 1.0;
 
     const bet: Bet = {
-      game: selectedGame,
+      game: {
+        id: selectedGame.id,
+        simulation_id,
+        home_team_id: selectedGame.home_team.id,
+        guest_team_id: selectedGame.guest_team.id,
+        round
+      },
       event: selectedEvent,
-      coefficient: coefficient,
-      value: parseFloat(amount)
+      coefficient: selectedCoefficient,
+      value: parseFloat(amount) || 0
     };
 
     await callApi(async () => {
@@ -88,7 +120,7 @@ export const BetForm: React.FC<BetFormProps> = ({ games, onBetPlaced }) => {
             <option value="">Выберите игру</option>
             {games.map(game => (
               <option key={game.id} value={game.id}>
-                Игра {game.id} (Раунд {game.round})
+                {game.home_team.name} vs {game.guest_team.name}
               </option>
             ))}
           </select>
@@ -99,24 +131,33 @@ export const BetForm: React.FC<BetFormProps> = ({ games, onBetPlaced }) => {
             <div className="form-group">
               <label>Событие:</label>
               <select 
-                value={selectedEvent}
-                onChange={(e) => handleEventChange(e.target.value as Event)}
+                value={selectedEventIndex}
+                onChange={(e) => handleEventChange(parseInt(e.target.value))}
                 required
               >
-                {availableEvents.map(({ event, coefficient }) => (
-                  <option key={event} value={event}>
-                    {event === 'home_win' ? 'Победа дома' : 
-                     event === 'guest_win' ? 'Победа гостей' : 'Ничья'} 
-                    (коэф. {coefficient.toFixed(2)})
-                  </option>
-                ))}
+                {availableEvents.map(({ event, coefficient }, index) => {
+                  const safeCoefficient = coefficient || 1.0;
+                  const safeEvent = event || 'W1';
+                  
+                  return (
+                    <option key={index} value={index}>
+                      {EventHelpers.formatEvent(safeEvent)} (коэф. {safeCoefficient.toFixed(2)})
+                    </option>
+                  );
+                })}
               </select>
             </div>
 
             <div className="coefficient-info">
-              Текущий коэффициент: {coefficient.toFixed(2)}
+              Текущий коэффициент: {(coefficient || 1.0).toFixed(2)}
             </div>
           </>
+        )}
+
+        {selectedGame && availableEvents.length === 0 && !loading && (
+          <div className="no-events">
+            Нет доступных событий для ставок
+          </div>
         )}
 
         <div className="form-group">
@@ -133,7 +174,7 @@ export const BetForm: React.FC<BetFormProps> = ({ games, onBetPlaced }) => {
 
         <button 
           type="submit" 
-          disabled={loading || !selectedGame}
+          disabled={loading || !selectedGame || availableEvents.length === 0}
           className="btn btn-primary"
         >
           {loading ? 'Размещение...' : 'Сделать ставку'}

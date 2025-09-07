@@ -11,8 +11,7 @@ export const CreateRoundButton: React.FC<CreateRoundButtonProps> = ({ onRoundCre
 
   const handleCreateRound = async () => {
     await callApi(async () => {
-      await apiClient.createRound();
-      onRoundCreated();
+            onRoundCreated();
     });
   };
 

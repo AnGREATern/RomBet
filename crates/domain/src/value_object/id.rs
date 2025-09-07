@@ -5,6 +5,7 @@ use uuid::Uuid;
 #[derive(PartialOrd, Ord, Serialize, Deserialize)]
 pub struct Id<T> {
     value: Uuid,
+    #[serde(skip)]
     marker: PhantomData<fn() -> T>,
 }
 

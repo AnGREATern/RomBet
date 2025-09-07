@@ -1,7 +1,6 @@
 use anyhow::Result;
 use axum::Json;
 use axum::extract::{ConnectInfo, State};
-use domain::value_object::Amount;
 use serde::Serialize;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -12,7 +11,7 @@ use crate::state::AppState;
 
 #[derive(Serialize)]
 pub struct BalanceSuccessResponse {
-    pub amount: Amount,
+    pub amount: f64,
 }
 
 pub async fn balance(
@@ -21,7 +20,7 @@ pub async fn balance(
 ) -> Result<Json<BalanceSuccessResponse>, FailureResponse> {
     debug!("Perform balance operation");
     let simulation = state.simulation(addr.ip())?;
-    let amount = simulation.balance();
+    let amount = simulation.balance().into();
 
     Ok(BalanceSuccessResponse { amount }.into())
 }

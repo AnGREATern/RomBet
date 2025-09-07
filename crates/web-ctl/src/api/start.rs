@@ -11,6 +11,7 @@ use application::usecase::Start;
 
 #[derive(Serialize)]
 pub struct StartSuccessResponse {
+    pub id: String,
     pub balance: f64,
 }
 
@@ -21,9 +22,10 @@ pub async fn start(
     let sim_service = state.simulation_service();
     let simulation = sim_service.start(addr.ip())?;
     let balance = f64::from(simulation.balance());
+    let id = simulation.id().value().to_string();
     info!(balance, "Simulation started successfully");
 
-    Ok(StartSuccessResponse { balance }.into())
+    Ok(StartSuccessResponse { id, balance }.into())
 }
 
 pub async fn restart(
@@ -35,7 +37,8 @@ pub async fn restart(
     let simulation = state.simulation(addr.ip())?;
     sim_service.restart(simulation.id())?;
     let balance = f64::from(simulation.balance());
+    let id = simulation.id().value().to_string();
     info!(balance, "Restart successful");
 
-    Ok(StartSuccessResponse { balance }.into())
+    Ok(StartSuccessResponse { id, balance }.into())
 }

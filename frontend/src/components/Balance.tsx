@@ -1,9 +1,9 @@
 import React from 'react';
-import { Balance } from '../types';
-import './Balance.css';
+import { Balance as BalanceType } from '../types';
+import '../App.css'
 
 interface BalanceProps {
-  balance: Balance;
+  balance: BalanceType;
 }
 
 export const Balance: React.FC<BalanceProps> = ({ balance }) => {
@@ -11,7 +11,7 @@ export const Balance: React.FC<BalanceProps> = ({ balance }) => {
     <div className="balance">
       <h2>Баланс</h2>
       <div className="balance-amount">
-        {balance.amount.toFixed(2)} {balance.currency}
+        {balance.amount.toFixed(2)} руб.
       </div>
     </div>
   );
