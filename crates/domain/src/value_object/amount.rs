@@ -1,12 +1,12 @@
 use anyhow::{Result, bail};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 type Float = f64;
 pub const MIN_BET_AMOUNT: i64 = 10_00;
 pub const MIN_BALANCE_AMOUNT: i64 = 0;
 const PENNY: u8 = 100;
 
-#[derive(Deserialize, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Amount {
     value: i64,
     l_bound: Option<i64>,

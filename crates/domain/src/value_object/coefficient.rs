@@ -1,10 +1,11 @@
 use anyhow::{Error, Result, bail};
+use serde::{Deserialize, Serialize};
 
 type Float = f64;
 const MIN_COEFFICIENT: i32 = 1_01;
 const PENNY: i32 = 100;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Coefficient(i32);
 
 impl Coefficient {

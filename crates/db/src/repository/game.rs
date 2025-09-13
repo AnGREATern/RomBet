@@ -1,13 +1,14 @@
-use crate::{establish_connection, models::GamePostrgres};
+use anyhow::Result;
+use diesel::prelude::*;
+use uuid::Uuid;
+
+use crate::DBPool;
+use crate::models::GamePostrgres;
 use application::repository::IGameRepo;
 use domain::{
     entity::{Game, Simulation, Team},
     value_object::Id,
 };
-
-use anyhow::Result;
-use diesel::prelude::*;
-use uuid::Uuid;
 
 impl From<Game> for GamePostrgres {
     fn from(g: Game) -> Self {
@@ -34,45 +35,49 @@ impl From<GamePostrgres> for Game {
 }
 
 pub struct GameRepo {
-    connection: PgConnection,
+    pool: DBPool,
+}
+
+impl GameRepo {
+    pub fn new(pool: DBPool) -> Self {
+        Self { pool }
+    }
 }
 
 impl IGameRepo for GameRepo {
-    fn new() -> Self {
-        let connection = establish_connection();
-        Self { connection }
-    }
-
-    fn add(&mut self, game: Game) -> Result<()> {
+    fn add(&self, game: Game) -> Result<()> {
         use crate::schema::game;
 
+        let mut connection = self.pool.get()?;
         let game = GamePostrgres::from(game);
         diesel::insert_into(game::table)
             .values(&game)
-            .execute(&mut self.connection)?;
+            .execute(&mut connection)?;
 
         Ok(())
     }
 
-    fn game_by_id(&mut self, game_id: Id<Game>) -> Result<Game> {
+    fn game_by_id(&self, game_id: Id<Game>) -> Result<Game> {
         use crate::schema::game::dsl::*;
 
+        let mut connection = self.pool.get()?;
         let rec = game
             .filter(id.eq(game_id.value()))
             .select(GamePostrgres::as_select())
-            .first(&mut self.connection)?;
+            .first(&mut connection)?;
 
         Ok(rec.into())
     }
 
-    fn games_id_by_round(&mut self, rnd: u32, sim_id: Id<Simulation>) -> Result<Vec<Id<Game>>> {
+    fn games_id_by_round(&self, rnd: u32, sim_id: Id<Simulation>) -> Result<Vec<Id<Game>>> {
         use crate::schema::game::dsl::*;
 
+        let mut connection = self.pool.get()?;
         let recs = game
             .filter(simulation_id.eq(sim_id.value()))
             .filter(round.eq(rnd as i64))
             .select(id)
-            .load(&mut self.connection)?
+            .load(&mut connection)?
             .into_iter()
             .map(|elem: Uuid| elem.into())
             .collect();
@@ -81,20 +86,21 @@ impl IGameRepo for GameRepo {
     }
 
     fn games_id_by_team_id(
-        &mut self,
+        &self,
         team_id: Id<Team>,
         sim_id: Id<Simulation>,
         cnt: u8,
     ) -> Result<Vec<(Id<Game>, bool)>> {
         use crate::schema::game::dsl::*;
 
+        let mut connection = self.pool.get()?;
         let mut games = game
             .filter(simulation_id.eq(sim_id.value()))
             .filter(home_team_id.eq(team_id.value()))
             .select(id)
             .order(round.desc())
             .limit(cnt as i64)
-            .load(&mut self.connection)?
+            .load(&mut connection)?
             .into_iter()
             .map(|elem: Uuid| (elem.into(), true))
             .collect::<Vec<(Id<Game>, bool)>>();
@@ -104,7 +110,7 @@ impl IGameRepo for GameRepo {
             .select(id)
             .order(round.desc())
             .limit(cnt as i64)
-            .load(&mut self.connection)?
+            .load(&mut connection)?
             .into_iter()
             .map(|elem: Uuid| (elem.into(), false))
             .collect();
@@ -115,7 +121,7 @@ impl IGameRepo for GameRepo {
     }
 
     fn h2hs_id_by_team_id(
-        &mut self,
+        &self,
         ht_id: Id<Team>,
         gt_id: Id<Team>,
         sim_id: Id<Simulation>,
@@ -123,6 +129,7 @@ impl IGameRepo for GameRepo {
     ) -> Result<Vec<(Id<Game>, bool)>> {
         use crate::schema::game::dsl::*;
 
+        let mut connection = self.pool.get()?;
         let mut games = game
             .filter(simulation_id.eq(sim_id.value()))
             .filter(home_team_id.eq(ht_id.value()))
@@ -130,7 +137,7 @@ impl IGameRepo for GameRepo {
             .select(id)
             .order(round.desc())
             .limit(cnt as i64)
-            .load(&mut self.connection)?
+            .load(&mut connection)?
             .into_iter()
             .map(|elem: Uuid| (elem.into(), true))
             .collect::<Vec<(Id<Game>, bool)>>();
@@ -141,7 +148,7 @@ impl IGameRepo for GameRepo {
             .select(id)
             .order(round.desc())
             .limit(cnt as i64)
-            .load(&mut self.connection)?
+            .load(&mut connection)?
             .into_iter()
             .map(|elem: Uuid| (elem.into(), false))
             .collect();

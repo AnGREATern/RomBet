@@ -1,13 +1,14 @@
-use crate::{establish_connection, models::BetPostrgres};
+use anyhow::Result;
+use diesel::{dsl::min, prelude::*};
+use rmp_serde;
+
+use crate::DBPool;
+use crate::models::BetPostrgres;
 use application::repository::IBetRepo;
 use domain::{
     entity::Bet,
     value_object::{Amount, Coefficient, Id, MIN_BET_AMOUNT},
 };
-
-use anyhow::Result;
-use diesel::{dsl::min, prelude::*};
-use rmp_serde;
 
 impl From<Bet> for BetPostrgres {
     fn from(b: Bet) -> Self {
@@ -38,33 +39,36 @@ impl From<BetPostrgres> for Bet {
 }
 
 pub struct BetRepo {
-    connection: PgConnection,
+    pool: DBPool,
+}
+
+impl BetRepo {
+    pub fn new(pool: DBPool) -> Self {
+        Self { pool }
+    }
 }
 
 impl IBetRepo for BetRepo {
-    fn new() -> Self {
-        let connection = establish_connection();
-        Self { connection }
-    }
-
-    fn add(&mut self, bet: Bet) -> Result<()> {
+    fn add(&self, bet: Bet) -> Result<()> {
         use crate::schema::bet;
 
+        let mut connection = self.pool.get()?;
         let bet = BetPostrgres::from(bet);
         diesel::insert_into(bet::table)
             .values(&bet)
-            .execute(&mut self.connection)?;
+            .execute(&mut connection)?;
 
         Ok(())
     }
 
-    fn min_coefficient_lose(&mut self) -> Option<Coefficient> {
+    fn min_coefficient_lose(&self) -> Option<Coefficient> {
         use crate::schema::bet::dsl::*;
 
+        let mut connection = self.pool.get().unwrap();
         let value = bet
             .filter(is_won.eq(Some(false)))
             .select(min(coefficient))
-            .first::<Option<i32>>(&mut self.connection)
+            .first::<Option<i32>>(&mut connection)
             .ok()
             .flatten();
 
@@ -78,12 +82,13 @@ impl IBetRepo for BetRepo {
         Id::new()
     }
 
-    fn not_calculated_bets(&mut self) -> Vec<Bet> {
+    fn not_calculated_bets(&self) -> Vec<Bet> {
         use crate::schema::bet::dsl::*;
 
+        let mut connection = self.pool.get().unwrap();
         bet.filter(is_won.is_null())
             .select(BetPostrgres::as_select())
-            .load(&mut self.connection)
+            .load(&mut connection)
             .ok()
             .unwrap_or_default()
             .into_iter()
@@ -91,17 +96,18 @@ impl IBetRepo for BetRepo {
             .collect()
     }
 
-    fn update_status(&mut self, bet: Bet) -> Result<()> {
+    fn update_status(&self, bet: Bet) -> Result<()> {
         use crate::schema::bet::{
             self,
             dsl::{id, is_won},
         };
 
+        let mut connection = self.pool.get()?;
         let bet = BetPostrgres::from(bet);
         diesel::update(bet::table)
             .filter(id.eq(&bet.id))
             .set(is_won.eq(bet.is_won))
-            .execute(&mut self.connection)?;
+            .execute(&mut connection)?;
 
         Ok(())
     }

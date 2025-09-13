@@ -1,50 +1,64 @@
+use std::fmt;
+
 use anyhow::{Result, bail};
 use rand::{Rng, rng};
+use serde::Serialize;
+use tracing::{debug, info};
 
 use crate::usecase::RandomizeRound;
 use crate::{
     config::CoefficientConfig,
-    repository::{IGameRepo, IGameStatRepo},
+    repository::{IGameRepo, IGameStatRepo, ITeamRepo},
 };
 use domain::entity::{Game, GameStat, Simulation, Team};
 use domain::value_object::{Deviation, Id, PastResults, Winner};
 
-pub struct GameService<G: IGameRepo, GS: IGameStatRepo> {
+pub struct GameService<G: IGameRepo, GS: IGameStatRepo, T: ITeamRepo> {
+    team_repo: T,
     game_repo: G,
     game_stat_repo: GS,
     config: CoefficientConfig,
 }
 
-impl<G: IGameRepo, GS: IGameStatRepo> RandomizeRound for GameService<G, GS> {
-    fn randomize_game(&mut self, game: &Game) -> Result<GameStat> {
+impl<G: IGameRepo, GS: IGameStatRepo, T: ITeamRepo> RandomizeRound for GameService<G, GS, T> {
+    fn randomize_game(&self, game: &Game) -> Result<DisplayedGameStat> {
         let winner = self.randomize_winner(game)?;
+        debug!("Winner randomized");
         let (home_team_total, guest_team_total) = self.randomize_totals(game, winner)?;
+        debug!("Score randomized");
         let stat_id = self.game_stat_repo.next_id();
         let game_stat = GameStat::new(stat_id, game.id(), home_team_total, guest_team_total);
+        let dgs = DisplayedGameStat::new(&game_stat, &self.team_repo, &self.game_repo)?;
         self.game_stat_repo.add(game_stat)?;
+        debug!("Game stat added");
 
-        Ok(game_stat)
+        Ok(dgs)
     }
 
-    fn randomize_round(&mut self, simulation: &Simulation) -> Result<Vec<GameStat>> {
+    fn randomize_round(&self, simulation: &Simulation) -> Result<Vec<DisplayedGameStat>> {
+        info!("Checking if last round was randomized");
         self.check_last_round_randomized(simulation.round(), simulation.id())?;
-        let mut games_stat = vec![];
+        info!("Last round wasn't randomized");
+        let mut dgs = vec![];
         let games_id = self
             .game_repo
             .games_id_by_round(simulation.round(), simulation.id())?;
+        debug!("Got games id");
         for game_id in games_id {
             let game = self.game_repo.game_by_id(game_id)?;
             let game_stat = self.randomize_game(&game)?;
-            games_stat.push(game_stat);
+            dgs.push(game_stat);
         }
+        debug!("Round randomized");
 
-        Ok(games_stat)
+        Ok(dgs)
     }
 }
 
-impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
-    pub fn new(game_repo: G, game_stat_repo: GS, config: CoefficientConfig) -> Self {
+impl<G: IGameRepo, GS: IGameStatRepo, T: ITeamRepo> GameService<G, GS, T> {
+    pub fn new(game_repo: G, game_stat_repo: GS, team_repo: T, config: CoefficientConfig) -> Self {
         Self {
+            team_repo,
             game_repo,
             game_stat_repo,
             config,
@@ -52,7 +66,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
     }
 
     fn past_results_by_team_id(
-        &mut self,
+        &self,
         team_id: Id<Team>,
         simulation_id: Id<Simulation>,
     ) -> Result<PastResults> {
@@ -71,7 +85,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         Ok(past_results)
     }
 
-    fn check_last_round_randomized(&mut self, round: u32, simulation_id: Id<Simulation>) -> Result<()> {
+    fn check_last_round_randomized(&self, round: u32, simulation_id: Id<Simulation>) -> Result<()> {
         let games_id = self.game_repo.games_id_by_round(round, simulation_id)?;
         for game_id in games_id {
             if self
@@ -88,7 +102,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
     }
 
     fn avg_goals_by_team_id(
-        &mut self,
+        &self,
         team_id: Id<Team>,
         simulation_id: Id<Simulation>,
     ) -> Result<f64> {
@@ -107,7 +121,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         Ok(goals as f64 / self.config.tracked_games as f64)
     }
 
-    fn h2h_results_by_game(&mut self, game: &Game) -> Result<PastResults> {
+    fn h2h_results_by_game(&self, game: &Game) -> Result<PastResults> {
         let h2hs_id = self.game_repo.h2hs_id_by_team_id(
             game.home_team_id(),
             game.guest_team_id(),
@@ -124,7 +138,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         Ok(past_results)
     }
 
-    fn h2h_avg_goals_by_game(&mut self, game: &Game) -> Result<(f64, f64)> {
+    fn h2h_avg_goals_by_game(&self, game: &Game) -> Result<(f64, f64)> {
         let h2hs_id = self.game_repo.h2hs_id_by_team_id(
             game.home_team_id(),
             game.guest_team_id(),
@@ -133,7 +147,9 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         )?;
         let (mut home_team_goals, mut guest_team_goals) = (0, 0);
         for (game_id, is_home) in h2hs_id {
-            if let Some((ht_goals, gt_goals)) = self.game_stat_repo.score_by_game_id(game_id, is_home) {
+            if let Some((ht_goals, gt_goals)) =
+                self.game_stat_repo.score_by_game_id(game_id, is_home)
+            {
                 home_team_goals += ht_goals;
                 guest_team_goals += gt_goals;
             }
@@ -145,7 +161,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         ))
     }
 
-    fn randomize_winner(&mut self, game: &Game) -> Result<Winner> {
+    fn randomize_winner(&self, game: &Game) -> Result<Winner> {
         let home_res = self.past_results_by_team_id(game.home_team_id(), game.simulation_id())?;
         let guest_res = self.past_results_by_team_id(game.guest_team_id(), game.simulation_id())?;
         let h2h_res = self.h2h_results_by_game(game)?;
@@ -161,7 +177,7 @@ impl<G: IGameRepo, GS: IGameStatRepo> GameService<G, GS> {
         ))
     }
 
-    fn randomize_totals(&mut self, game: &Game, winner: Winner) -> Result<(u8, u8)> {
+    fn randomize_totals(&self, game: &Game, winner: Winner) -> Result<(u8, u8)> {
         let h2h_avg_goals = self.h2h_avg_goals_by_game(game)?;
         let home_team_avg_goals =
             self.avg_goals_by_team_id(game.home_team_id(), game.simulation_id())? + h2h_avg_goals.0;
@@ -273,40 +289,47 @@ impl GameRandomizer {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[derive(Serialize)]
+pub struct DisplayedGameStat {
+    id: Id<GameStat>,
+    game_id: Id<Game>,
+    home_team: Team,
+    guest_team: Team,
+    home_team_total: u8,
+    guest_team_total: u8,
+}
 
-    #[test]
-    fn randomize_totals_winner1() {
-        let winner = Winner::W1;
-        let home_team_avg_goals = 2.8;
-        let guest_team_avg_goals = 3.1;
-        let res =
-            GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals);
-
-        assert!(res.0 > res.1)
-    }
-
-    #[test]
-    fn randomize_totals_draw() {
-        let winner = Winner::X;
-        let home_team_avg_goals = 0.1;
-        let guest_team_avg_goals = 3.3;
-        let res =
-            GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals);
-
-        assert!(res.0 == res.1)
-    }
-
-    #[test]
-    fn randomize_totals_winner2() {
-        let winner = Winner::W2;
-        let home_team_avg_goals = 0.1;
-        let guest_team_avg_goals = 3.3;
-        let res =
-            GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals);
-
-        assert!(res.0 < res.1)
+impl DisplayedGameStat {
+    pub fn new(
+        gs: &GameStat,
+        team_repo: &impl ITeamRepo,
+        game_repo: &impl IGameRepo,
+    ) -> Result<Self> {
+        let game_id = gs.game_id();
+        let game = game_repo.game_by_id(game_id)?;
+        Ok(Self {
+            id: gs.id(),
+            game_id,
+            home_team: team_repo.team_by_id(game.home_team_id())?,
+            guest_team: team_repo.team_by_id(game.guest_team_id())?,
+            home_team_total: gs.home_team_total(),
+            guest_team_total: gs.guest_team_total(),
+        })
     }
 }
+
+impl fmt::Display for DisplayedGameStat {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{} ({}) - ({}) {}",
+            self.home_team.name(),
+            self.home_team_total,
+            self.guest_team_total,
+            self.guest_team.name()
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests;

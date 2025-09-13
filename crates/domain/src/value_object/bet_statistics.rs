@@ -1,5 +1,8 @@
+use serde::Serialize;
+
 use super::{Amount, Coefficient};
 
+#[derive(Serialize)]
 pub struct BetStatistics {
     min_coefficient_lose: Option<Coefficient>,
     start_balance: Amount,

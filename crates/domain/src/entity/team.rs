@@ -1,6 +1,8 @@
+use serde::Serialize;
+
 use crate::value_object::Id;
 
-#[derive(PartialEq, PartialOrd, Eq, Ord)]
+#[derive(PartialEq, PartialOrd, Eq, Ord, Serialize)]
 pub struct Team {
     id: Id<Team>,
     name: String,
@@ -8,7 +10,7 @@ pub struct Team {
 
 impl Team {
     pub fn new(id: Id<Self>, name: String) -> Self {
-        Team {id, name}
+        Team { id, name }
     }
 
     pub fn name(&self) -> &str {

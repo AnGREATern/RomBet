@@ -9,7 +9,9 @@ members = [
   "crates/application", 
   "crates/cli", 
   "crates/db",
-  "crates/domain",
+  "crates/domain", 
+  "crates/infrastructure", 
+  "crates/web-ctl",
 ]
 
 [workspace.package]
@@ -17,9 +19,4 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-
-[patch.crates-io]
-domain          = { path = "crates/domain"          }
-application     = { path = "crates/application"     }
-db              = { path = "crates/db"              }
-cli             = { path = "crates/cli"             }
+web-ctl = { path = "crates/web-ctl" }

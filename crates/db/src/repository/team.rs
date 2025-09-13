@@ -1,14 +1,11 @@
-use crate::{establish_connection, models::TeamPostrgres};
-use application::repository::ITeamRepo;
-use domain::{entity::Team, value_object::Id};
-
 use anyhow::Result;
 use diesel::prelude::*;
 use uuid::Uuid;
 
-pub struct TeamRepo {
-    connection: PgConnection,
-}
+use crate::DBPool;
+use crate::models::TeamPostrgres;
+use application::repository::ITeamRepo;
+use domain::{entity::Team, value_object::Id};
 
 impl From<TeamPostrgres> for Team {
     fn from(t: TeamPostrgres) -> Self {
@@ -16,17 +13,23 @@ impl From<TeamPostrgres> for Team {
     }
 }
 
-impl ITeamRepo for TeamRepo {
-    fn new() -> Self {
-        let connection = establish_connection();
-        Self { connection }
-    }
+pub struct TeamRepo {
+    pool: DBPool,
+}
 
-    fn all_teams_id(&mut self) -> Vec<Id<Team>> {
+impl TeamRepo {
+    pub fn new(pool: DBPool) -> Self {
+        Self { pool }
+    }
+}
+
+impl ITeamRepo for TeamRepo {
+    fn all_teams_id(&self) -> Vec<Id<Team>> {
         use crate::schema::team::dsl::*;
 
+        let mut connection = self.pool.get().unwrap();
         team.select(id)
-            .load(&mut self.connection)
+            .load(&mut connection)
             .ok()
             .unwrap_or_default()
             .into_iter()
@@ -34,13 +37,14 @@ impl ITeamRepo for TeamRepo {
             .collect()
     }
 
-    fn team_by_id(&mut self, q_id: Id<Team>) -> Result<Team> {
+    fn team_by_id(&self, q_id: Id<Team>) -> Result<Team> {
         use crate::schema::team::dsl::*;
 
+        let mut connection = self.pool.get()?;
         let t = team
             .filter(id.eq(&q_id.value()))
             .select(TeamPostrgres::as_select())
-            .first(&mut self.connection)?
+            .first(&mut connection)?
             .into();
 
         Ok(t)

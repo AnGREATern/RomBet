@@ -2,6 +2,7 @@ use super::Winner;
 
 const POINTS_PER_WIN: i32 = 3;
 
+#[derive(Clone)]
 pub struct PastResults {
     pub wins: u32,
     pub draws: u32,
@@ -26,5 +27,11 @@ impl PastResults {
             Winner::X => self.draws += 1,
             Winner::W2 => self.loses += 1,
         }
+    }
+}
+
+impl Default for PastResults {
+    fn default() -> Self {
+        Self::new()
     }
 }

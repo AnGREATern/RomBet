@@ -7,8 +7,10 @@ edition.workspace = true
 domain          = { path = "../domain"          }
 application     = { path = "../application"     }
 db              = { path = "../db"              }
+infrastructure  = { path = "../infrastructure"  }
 
 clap = {version="4.5.37", features=["derive"]}
 enum-try-from = "0.0.1"
 anyhow = "1.0.98"
 dotenv = "0.15.0"
+tracing = "0.1.41"

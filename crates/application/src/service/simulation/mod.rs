@@ -1,8 +1,10 @@
 use anyhow::{Result, bail};
 use rand::rng;
 use rand::seq::SliceRandom;
-use std::net::IpAddr;
+use serde::Serialize;
 use std::fmt;
+use std::net::IpAddr;
+use tracing::{debug, info};
 
 use crate::{
     config::SetupConfig,
@@ -10,12 +12,13 @@ use crate::{
     usecase::{CreateRound, Start},
 };
 use domain::{
-    entity::{Game, Team, Simulation},
+    entity::{Game, Simulation, Team},
     value_object::Id,
 };
 
 const TEAMS_PER_GAME: usize = 2;
 
+#[derive(Serialize)]
 pub struct DisplayedGame {
     pub id: Id<Game>,
     pub home_team: Team,
@@ -23,12 +26,16 @@ pub struct DisplayedGame {
 }
 
 impl DisplayedGame {
-    fn new(game: Game, team_repo: &mut impl ITeamRepo) -> Result<Self> {
+    fn new(game: Game, team_repo: &impl ITeamRepo) -> Result<Self> {
         let id = game.id();
         let home_team = team_repo.team_by_id(game.home_team_id())?;
         let guest_team = team_repo.team_by_id(game.guest_team_id())?;
 
-        Ok(Self { id, home_team, guest_team })
+        Ok(Self {
+            id,
+            home_team,
+            guest_team,
+        })
     }
 }
 
@@ -49,22 +56,26 @@ pub struct SimulationService<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: I
 impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> Start
     for SimulationService<G, T, GS, S>
 {
-    fn start(&mut self, ip: IpAddr) -> Result<Simulation> {
+    fn start(&self, ip: IpAddr) -> Result<Simulation> {
         if let Some(simulation) = self.simulation_repo.simulation_by_ip(ip) {
+            info!("Continue exist game");
             Ok(simulation)
         } else {
+            info!("Start new game");
             let id = self.simulation_repo.next_id();
-            let simulation = Simulation::new(id, ip, self.config.balance);
+            let simulation = Simulation::new(id, ip, self.config.balance, None);
             self.simulation_repo.add(simulation)?;
 
             Ok(simulation)
         }
     }
 
-    fn restart(&mut self, simulation_id: Id<Simulation>) -> Result<Simulation> {
+    fn restart(&self, simulation_id: Id<Simulation>) -> Result<Simulation> {
         let simulation = self.simulation_repo.simulation_by_id(simulation_id)?;
-        let simulation = Simulation::new(simulation.id(), simulation.ip(), self.config.balance);
+        let simulation =
+            Simulation::new(simulation.id(), simulation.ip(), self.config.balance, None);
         self.simulation_repo.update_by_id(simulation)?;
+        debug!("Game restarted");
 
         Ok(simulation)
     }
@@ -73,13 +84,16 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> Start
 impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> CreateRound
     for SimulationService<G, T, GS, S>
 {
-    fn create_round(&mut self, simulation: &mut Simulation) -> Result<Vec<DisplayedGame>> {
+    fn create_round(&self, simulation: &mut Simulation) -> Result<Vec<DisplayedGame>> {
         let mut round = simulation.round();
         let simulation_id = simulation.id();
+        info!("Checking if last round was randomized");
         self.check_last_round_randomized(round, simulation_id)?;
+        info!("Last round was randomized");
         round += 1;
         simulation.increment_round();
-        self.simulation_repo.update_by_id(simulation.clone())?;
+        self.simulation_repo.update_by_id(*simulation)?;
+        debug!("Round incremented in simulation repo");
         let mut teams = self.team_repo.all_teams_id();
         teams.shuffle(&mut rng());
         let mut displayed_games = vec![];
@@ -87,15 +101,9 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo> CreateRo
             let home_team_id = h2h[0];
             let guest_team_id = h2h[1];
             let game_id = self.game_repo.next_id();
-            let game = Game::new(
-                game_id,
-                simulation_id,
-                home_team_id,
-                guest_team_id,
-                round,
-            );
+            let game = Game::new(game_id, simulation_id, home_team_id, guest_team_id, round);
             self.game_repo.add(game)?;
-            let displayed_game = DisplayedGame::new(game, &mut self.team_repo)?;
+            let displayed_game = DisplayedGame::new(game, &self.team_repo)?;
             displayed_games.push(displayed_game);
         }
 
@@ -122,7 +130,7 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo>
         }
     }
 
-    fn check_last_round_randomized(&mut self, round: u32, simulation_id: Id<Simulation>) -> Result<()> {
+    fn check_last_round_randomized(&self, round: u32, simulation_id: Id<Simulation>) -> Result<()> {
         let games_id = self.game_repo.games_id_by_round(round, simulation_id)?;
         for game_id in games_id {
             if self
@@ -138,3 +146,6 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo>
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests;

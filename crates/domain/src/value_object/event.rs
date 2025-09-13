@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum Event {
@@ -78,7 +78,10 @@ impl<'de> Deserialize<'de> for OrderingWrapper {
             -1 => Ok(OrderingWrapper(Ordering::Less)),
             0 => Ok(OrderingWrapper(Ordering::Equal)),
             1 => Ok(OrderingWrapper(Ordering::Greater)),
-            _ => Err(serde::de::Error::custom(format!("invalid value: {}", value))),
+            _ => Err(serde::de::Error::custom(format!(
+                "invalid value: {}",
+                value
+            ))),
         }
     }
 }

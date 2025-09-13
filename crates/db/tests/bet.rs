@@ -1,24 +1,30 @@
 use std::net::{IpAddr, Ipv4Addr};
 
 use application::repository::{IBetRepo, IGameRepo, ISimulationRepo, ITeamRepo};
+use db::init_pool;
 use db::repository::{BetRepo, GameRepo, SimulationRepo, TeamRepo};
-use domain::{entity::{Bet, Game, Simulation}, value_object::{Amount, Event, Winner, MIN_BALANCE_AMOUNT, MIN_BET_AMOUNT}};
+use domain::{
+    entity::{Bet, Game, Simulation},
+    value_object::{Amount, Event, MIN_BALANCE_AMOUNT, MIN_BET_AMOUNT, Winner},
+};
 
 #[test]
 fn insert_bet() {
-    let mut bet_repo = BetRepo::new();
+    let pool = init_pool();
+
+    let bet_repo = BetRepo::new(pool.clone());
     let bet_id = bet_repo.next_id();
-    let mut sim_repo = SimulationRepo::new();
+    let sim_repo = SimulationRepo::new(pool.clone());
     let sim_id = sim_repo.next_id();
-    let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
+    let ip = IpAddr::V4(Ipv4Addr::new(127, 100, 0, 1));
     let balance = Amount::new(1000, Some(MIN_BALANCE_AMOUNT)).unwrap();
-    let simulation = Simulation::new(sim_id, ip, balance);
+    let simulation = Simulation::new(sim_id, ip, balance, None);
     sim_repo.add(simulation).unwrap();
-    let amount = Amount::new(300, Some(MIN_BET_AMOUNT)).unwrap();;
+    let amount = Amount::new(3000, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.40).try_into().unwrap();
-    let mut game_repo = GameRepo::new();
+    let game_repo = GameRepo::new(pool.clone());
     let game_id = game_repo.next_id();
-    let mut team_repo = TeamRepo::new();
+    let team_repo = TeamRepo::new(pool.clone());
     let team_ids = team_repo.all_teams_id();
     let game = Game::new(game_id, sim_id, team_ids[0], team_ids[1], 1);
     game_repo.add(game).unwrap();
@@ -35,16 +41,18 @@ fn insert_bet() {
 
 #[test]
 fn min_coefficient_lose() {
-    let mut bet_repo = BetRepo::new();
-    let mut sim_repo = SimulationRepo::new();
+    let pool = init_pool();
+
+    let bet_repo = BetRepo::new(pool.clone());
+    let sim_repo = SimulationRepo::new(pool.clone());
     let sim_id = sim_repo.next_id();
     let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
     let balance = Amount::new(1000, Some(MIN_BALANCE_AMOUNT)).unwrap();
-    let simulation = Simulation::new(sim_id, ip, balance);
+    let simulation = Simulation::new(sim_id, ip, balance, None);
     sim_repo.add(simulation).unwrap();
-    let mut game_repo = GameRepo::new();
+    let game_repo = GameRepo::new(pool.clone());
     let game_id = game_repo.next_id();
-    let mut team_repo = TeamRepo::new();
+    let team_repo = TeamRepo::new(pool);
     let team_ids = team_repo.all_teams_id();
     let game = Game::new(game_id, sim_id, team_ids[0], team_ids[1], 1);
     game_repo.add(game).unwrap();
@@ -82,16 +90,18 @@ fn min_coefficient_lose() {
 
 #[test]
 fn not_calculated_bets() {
-    let mut bet_repo = BetRepo::new();
-    let mut sim_repo = SimulationRepo::new();
+    let pool = init_pool();
+
+    let bet_repo = BetRepo::new(pool.clone());
+    let sim_repo = SimulationRepo::new(pool.clone());
     let sim_id = sim_repo.next_id();
     let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
     let balance = Amount::new(1000, Some(MIN_BALANCE_AMOUNT)).unwrap();
-    let simulation = Simulation::new(sim_id, ip, balance);
+    let simulation = Simulation::new(sim_id, ip, balance, None);
     sim_repo.add(simulation).unwrap();
-    let mut game_repo = GameRepo::new();
+    let game_repo = GameRepo::new(pool.clone());
     let game_id = game_repo.next_id();
-    let mut team_repo = TeamRepo::new();
+    let team_repo = TeamRepo::new(pool);
     let team_ids = team_repo.all_teams_id();
     let game = Game::new(game_id, sim_id, team_ids[0], team_ids[1], 1);
     game_repo.add(game).unwrap();
