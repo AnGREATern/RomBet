@@ -255,7 +255,7 @@ impl App {
         buffer.clear();
         io::stdin().read_line(&mut buffer)?;
         let event_pos = buffer.trim().parse::<usize>()?;
-        if event_pos <= offers.len() {
+        if event_pos < offers.len() {
             debug!("Game selected");
             let (event, coefficient) = offers[event_pos];
             self.make_bet(&game, event, coefficient)

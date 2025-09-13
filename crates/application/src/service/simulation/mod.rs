@@ -146,3 +146,6 @@ impl<G: IGameRepo, T: ITeamRepo, GS: IGameStatRepo, S: ISimulationRepo>
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests;

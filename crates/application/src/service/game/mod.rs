@@ -332,39 +332,4 @@ impl fmt::Display for DisplayedGameStat {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn randomize_totals_winner1() {
-        let winner = Winner::W1;
-        let home_team_avg_goals = 2.8;
-        let guest_team_avg_goals = 3.1;
-        let res =
-            GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals);
-
-        assert!(res.0 > res.1)
-    }
-
-    #[test]
-    fn randomize_totals_draw() {
-        let winner = Winner::X;
-        let home_team_avg_goals = 0.1;
-        let guest_team_avg_goals = 3.3;
-        let res =
-            GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals);
-
-        assert!(res.0 == res.1)
-    }
-
-    #[test]
-    fn randomize_totals_winner2() {
-        let winner = Winner::W2;
-        let home_team_avg_goals = 0.1;
-        let guest_team_avg_goals = 3.3;
-        let res =
-            GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals);
-
-        assert!(res.0 < res.1)
-    }
-}
+mod tests;

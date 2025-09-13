@@ -89,7 +89,7 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeBet
 
     fn calculate_total_coefficients(&self, game: &Game) -> Result<Vec<(Event, Coefficient)>> {
         let mut total_coefficients = vec![];
-        for &total in self.config.totals.clone().iter() {
+        for &total in self.config.totals.iter() {
             let h2h_totals = self.h2h_totals(game, total)?;
             let home_team_past_totals =
                 self.past_totals(game.home_team_id(), game.simulation_id(), total)?;
@@ -356,73 +356,4 @@ impl BetCalculator {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn normalize() {
-        let mut probs = [0.1, 0.1, 0.1];
-        BetCalculator::normalize(&mut probs);
-        assert!((probs.iter().sum::<f64>() - 1.).abs() < EPS);
-
-        let mut probs = [0.1];
-        BetCalculator::normalize(&mut probs);
-        assert!((probs.iter().sum::<f64>() - 1.).abs() < EPS);
-
-        let mut probs = [0.3, 120., 1.076123];
-        BetCalculator::normalize(&mut probs);
-        assert!((probs.iter().sum::<f64>() - 1.).abs() < EPS);
-    }
-
-    #[test]
-    fn calculate_total_coefficients() {
-        let total = 2;
-        let mut totals = PastTotals::new(total);
-        totals.add_total(0);
-        totals.add_total(1);
-        totals.add_total(1);
-        totals.add_total(1);
-        totals.add_total(2);
-        totals.add_total(3);
-        let margin = Margin::try_from(0.12).unwrap();
-
-        let res = BetCalculator::calculate_total_coefficients(total, totals, margin).unwrap();
-
-        let mut sum = 0.;
-        for (_, coefficient) in res {
-            sum += 1. / f64::from(coefficient);
-        }
-        assert!(sum > 1.);
-    }
-
-    #[test]
-    fn calculate_winner_coefficients() {
-        let home_res = PastResults {
-            wins: 6,
-            draws: 15,
-            loses: 4,
-        };
-        let guest_res = PastResults {
-            wins: 4,
-            draws: 9,
-            loses: 12,
-        };
-        let h2h_res = PastResults {
-            wins: 5,
-            draws: 8,
-            loses: 12,
-        };
-        let margin = Margin::try_from(0.12).unwrap();
-
-        let res = BetCalculator::calculate_winner_coefficients(
-            home_res, guest_res, h2h_res, 60, 25, margin,
-        )
-        .unwrap();
-
-        let mut sum = 0.;
-        for (_, coefficient) in res {
-            sum += 1. / f64::from(coefficient);
-        }
-        assert!(sum > 1.);
-    }
-}
+mod tests;

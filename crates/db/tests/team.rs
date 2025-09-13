@@ -6,7 +6,7 @@ use db::repository::TeamRepo;
 fn select_all_teams() {
     let pool = init_pool();
 
-    let mut repo = TeamRepo::new(pool.clone());
+    let repo = TeamRepo::new(pool.clone());
 
     let ids = repo.all_teams_id();
 

@@ -13,3 +13,4 @@ tracing = "0.1.41"
 
 [dev-dependencies]
 mockall = "0.13.1"
+uuid = {version="1.16.0", features = ["v7"]}

@@ -2,6 +2,7 @@ use super::Winner;
 
 const POINTS_PER_WIN: i32 = 3;
 
+#[derive(Clone)]
 pub struct PastResults {
     pub wins: u32,
     pub draws: u32,

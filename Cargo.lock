@@ -90,6 +90,7 @@ dependencies = [
  "rand",
  "serde",
  "tracing",
+ "uuid",
 ]
 
 [[package]]
@@ -308,6 +309,7 @@ dependencies = [
  "diesel",
  "domain",
  "dotenv",
+ "mockall",
  "rmp-serde",
  "serde",
  "uuid",

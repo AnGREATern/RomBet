@@ -4,7 +4,10 @@ use domain::{
     entity::Bet,
     value_object::{Coefficient, Id},
 };
+#[cfg(test)]
+use mockall::automock;
 
+#[cfg_attr(test, automock)]
 pub trait IBetRepo {
     fn add(&self, bet: Bet) -> Result<()>;
 

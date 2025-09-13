@@ -4,7 +4,10 @@ use domain::{
     entity::{Game, Simulation, Team},
     value_object::Id,
 };
+#[cfg(test)]
+use mockall::automock;
 
+#[cfg_attr(test, automock)]
 pub trait IGameRepo {
     fn add(&self, game: Game) -> Result<()>;
 

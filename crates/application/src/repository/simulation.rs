@@ -2,7 +2,10 @@ use anyhow::Result;
 use std::net::IpAddr;
 
 use domain::{entity::Simulation, value_object::Id};
+#[cfg(test)]
+use mockall::automock;
 
+#[cfg_attr(test, automock)]
 pub trait ISimulationRepo {
     fn add(&self, simulation: Simulation) -> Result<()>;
 

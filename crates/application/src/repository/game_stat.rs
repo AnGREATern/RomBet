@@ -4,7 +4,10 @@ use domain::{
     entity::{Game, GameStat},
     value_object::{Id, Winner},
 };
+#[cfg(test)]
+use mockall::automock;
 
+#[cfg_attr(test, automock)]
 pub trait IGameStatRepo {
     fn add(&self, game_stat: GameStat) -> Result<()>;
 
