@@ -46,7 +46,7 @@ fn min_coefficient_lose() {
     let bet_repo = BetRepo::new(pool.clone());
     let sim_repo = SimulationRepo::new(pool.clone());
     let sim_id = sim_repo.next_id();
-    let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
+    let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 2));
     let balance = Amount::new(1000, Some(MIN_BALANCE_AMOUNT)).unwrap();
     let simulation = Simulation::new(sim_id, ip, balance, None);
     sim_repo.add(simulation).unwrap();
@@ -58,7 +58,7 @@ fn min_coefficient_lose() {
     game_repo.add(game).unwrap();
 
     let bet_id = bet_repo.next_id();
-    let amount = Amount::new(300, Some(MIN_BET_AMOUNT)).unwrap();
+    let amount = Amount::new(3000, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.40).try_into().unwrap();
     let event = Event::WDL(Winner::W1);
     let is_won = Some(false);
@@ -66,7 +66,7 @@ fn min_coefficient_lose() {
     bet_repo.add(bet).unwrap();
 
     let bet_id = bet_repo.next_id();
-    let amount = Amount::new(300, Some(MIN_BET_AMOUNT)).unwrap();
+    let amount = Amount::new(2000, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.30).try_into().unwrap();
     let event = Event::WDL(Winner::W1);
     let is_won = Some(false);
@@ -74,7 +74,7 @@ fn min_coefficient_lose() {
     bet_repo.add(bet).unwrap();
 
     let bet_id = bet_repo.next_id();
-    let amount = Amount::new(300, Some(MIN_BET_AMOUNT)).unwrap();
+    let amount = Amount::new(2000, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.50).try_into().unwrap();
     let event = Event::WDL(Winner::W1);
     let is_won = Some(false);
@@ -95,7 +95,7 @@ fn not_calculated_bets() {
     let bet_repo = BetRepo::new(pool.clone());
     let sim_repo = SimulationRepo::new(pool.clone());
     let sim_id = sim_repo.next_id();
-    let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
+    let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 3));
     let balance = Amount::new(1000, Some(MIN_BALANCE_AMOUNT)).unwrap();
     let simulation = Simulation::new(sim_id, ip, balance, None);
     sim_repo.add(simulation).unwrap();
@@ -107,7 +107,7 @@ fn not_calculated_bets() {
     game_repo.add(game).unwrap();
 
     let bet_id = bet_repo.next_id();
-    let amount = Amount::new(100, Some(MIN_BET_AMOUNT)).unwrap();
+    let amount = Amount::new(3000, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.40).try_into().unwrap();
     let event = Event::WDL(Winner::W1);
     let is_won = None;
@@ -115,7 +115,7 @@ fn not_calculated_bets() {
     bet_repo.add(bet1).unwrap();
 
     let bet_id = bet_repo.next_id();
-    let amount = Amount::new(200, Some(MIN_BET_AMOUNT)).unwrap();
+    let amount = Amount::new(2000, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.30).try_into().unwrap();
     let event = Event::WDL(Winner::W1);
     let is_won = Some(false);
@@ -123,7 +123,7 @@ fn not_calculated_bets() {
     bet_repo.add(bet2).unwrap();
 
     let bet_id = bet_repo.next_id();
-    let amount = Amount::new(300, Some(MIN_BET_AMOUNT)).unwrap();
+    let amount = Amount::new(2000, Some(MIN_BET_AMOUNT)).unwrap();
     let coefficient = (2.50).try_into().unwrap();
     let event = Event::WDL(Winner::W1);
     let is_won = None;
