@@ -39,7 +39,7 @@ fn game_by_id_did_not_found() {
     let game_repo = GameRepo::new(pool.clone());
     let sim_repo = SimulationRepo::new(pool.clone());
     let sim_id = sim_repo.next_id();
-    let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
+    let ip = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 2));
     let balance = Amount::new(1000, Some(MIN_BALANCE_AMOUNT)).unwrap();
     let simulation = Simulation::new(sim_id, ip, balance, None);
     sim_repo.add(simulation).unwrap();
