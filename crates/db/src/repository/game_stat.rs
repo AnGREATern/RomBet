@@ -3,14 +3,14 @@ use diesel::prelude::*;
 use std::cmp::Ordering;
 
 use crate::DBPool;
-use crate::models::GameStatPostrgres;
+use crate::models::GameStatPostgres;
 use application::repository::IGameStatRepo;
 use domain::{
     entity::{Game, GameStat},
     value_object::{Id, Winner},
 };
 
-impl From<GameStat> for GameStatPostrgres {
+impl From<GameStat> for GameStatPostgres {
     fn from(g: GameStat) -> Self {
         Self {
             id: g.id().value(),
@@ -21,8 +21,8 @@ impl From<GameStat> for GameStatPostrgres {
     }
 }
 
-impl From<GameStatPostrgres> for GameStat {
-    fn from(g: GameStatPostrgres) -> Self {
+impl From<GameStatPostgres> for GameStat {
+    fn from(g: GameStatPostgres) -> Self {
         Self::new(
             g.id.into(),
             g.game_id.into(),
@@ -47,7 +47,7 @@ impl IGameStatRepo for GameStatRepo {
         use crate::schema::gamestat;
 
         let mut connection = self.pool.get()?;
-        let game_stat = GameStatPostrgres::from(game_stat);
+        let game_stat = GameStatPostgres::from(game_stat);
         diesel::insert_into(gamestat::table)
             .values(&game_stat)
             .execute(&mut connection)?;
@@ -61,7 +61,7 @@ impl IGameStatRepo for GameStatRepo {
         let mut connection = self.pool.get()?;
         let rec = gamestat
             .filter(game_id.eq(g_id.value()))
-            .select(GameStatPostrgres::as_select())
+            .select(GameStatPostgres::as_select())
             .first(&mut connection)?;
 
         Ok(rec.into())
@@ -81,7 +81,7 @@ impl IGameStatRepo for GameStatRepo {
         let mut connection = self.pool.get().unwrap();
         let rec = gamestat
             .filter(game_id.eq(g_id.value()))
-            .select(GameStatPostrgres::as_select())
+            .select(GameStatPostgres::as_select())
             .first(&mut connection)
             .ok();
         if let Some(rec) = rec {

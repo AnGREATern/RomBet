@@ -3,12 +3,12 @@ use diesel::prelude::*;
 use uuid::Uuid;
 
 use crate::DBPool;
-use crate::models::TeamPostrgres;
+use crate::models::TeamPostgres;
 use application::repository::ITeamRepo;
 use domain::{entity::Team, value_object::Id};
 
-impl From<TeamPostrgres> for Team {
-    fn from(t: TeamPostrgres) -> Self {
+impl From<TeamPostgres> for Team {
+    fn from(t: TeamPostgres) -> Self {
         Self::new(t.id.into(), t.name)
     }
 }
@@ -43,7 +43,7 @@ impl ITeamRepo for TeamRepo {
         let mut connection = self.pool.get()?;
         let t = team
             .filter(id.eq(&q_id.value()))
-            .select(TeamPostrgres::as_select())
+            .select(TeamPostgres::as_select())
             .first(&mut connection)?
             .into();
 
