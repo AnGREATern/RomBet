@@ -4,7 +4,7 @@ use uuid::Uuid;
 #[derive(Queryable, Selectable)]
 #[diesel(table_name = crate::schema::team)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct TeamPostrgres {
+pub struct TeamPostgres {
     pub id: Uuid,
     pub name: String,
 }
@@ -12,7 +12,7 @@ pub struct TeamPostrgres {
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::bet)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct BetPostrgres {
+pub struct BetPostgres {
     pub id: Uuid,
     pub simulation_id: Uuid,
     pub amount: i64,
@@ -25,7 +25,7 @@ pub struct BetPostrgres {
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::gamestat)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct GameStatPostrgres {
+pub struct GameStatPostgres {
     pub id: Uuid,
     pub game_id: Uuid,
     pub home_team_total: i16,
@@ -35,7 +35,7 @@ pub struct GameStatPostrgres {
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::game)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct GamePostrgres {
+pub struct GamePostgres {
     pub id: Uuid,
     pub simulation_id: Uuid,
     pub home_team_id: Uuid,
@@ -46,7 +46,7 @@ pub struct GamePostrgres {
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::simulation)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct SimulationPostrgres {
+pub struct SimulationPostgres {
     pub id: Uuid,
     pub ip: String,
     pub round: i64,

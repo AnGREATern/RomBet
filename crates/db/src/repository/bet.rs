@@ -3,14 +3,14 @@ use diesel::{dsl::min, prelude::*};
 use rmp_serde;
 
 use crate::DBPool;
-use crate::models::BetPostrgres;
+use crate::models::BetPostgres;
 use application::repository::IBetRepo;
 use domain::{
     entity::Bet,
     value_object::{Amount, Coefficient, Id, MIN_BET_AMOUNT},
 };
 
-impl From<Bet> for BetPostrgres {
+impl From<Bet> for BetPostgres {
     fn from(b: Bet) -> Self {
         Self {
             id: b.id().value(),
@@ -24,8 +24,8 @@ impl From<Bet> for BetPostrgres {
     }
 }
 
-impl From<BetPostrgres> for Bet {
-    fn from(b: BetPostrgres) -> Self {
+impl From<BetPostgres> for Bet {
+    fn from(b: BetPostgres) -> Self {
         Self::new(
             b.id.into(),
             b.simulation_id.into(),
@@ -53,7 +53,7 @@ impl IBetRepo for BetRepo {
         use crate::schema::bet;
 
         let mut connection = self.pool.get()?;
-        let bet = BetPostrgres::from(bet);
+        let bet = BetPostgres::from(bet);
         diesel::insert_into(bet::table)
             .values(&bet)
             .execute(&mut connection)?;
@@ -87,12 +87,12 @@ impl IBetRepo for BetRepo {
 
         let mut connection = self.pool.get().unwrap();
         bet.filter(is_won.is_null())
-            .select(BetPostrgres::as_select())
+            .select(BetPostgres::as_select())
             .load(&mut connection)
             .ok()
             .unwrap_or_default()
             .into_iter()
-            .map(|b: BetPostrgres| b.into())
+            .map(|b: BetPostgres| b.into())
             .collect()
     }
 
@@ -103,7 +103,7 @@ impl IBetRepo for BetRepo {
         };
 
         let mut connection = self.pool.get()?;
-        let bet = BetPostrgres::from(bet);
+        let bet = BetPostgres::from(bet);
         diesel::update(bet::table)
             .filter(id.eq(&bet.id))
             .set(is_won.eq(bet.is_won))

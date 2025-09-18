@@ -3,14 +3,14 @@ use diesel::prelude::*;
 use uuid::Uuid;
 
 use crate::DBPool;
-use crate::models::GamePostrgres;
+use crate::models::GamePostgres;
 use application::repository::IGameRepo;
 use domain::{
     entity::{Game, Simulation, Team},
     value_object::Id,
 };
 
-impl From<Game> for GamePostrgres {
+impl From<Game> for GamePostgres {
     fn from(g: Game) -> Self {
         Self {
             id: g.id().value(),
@@ -22,8 +22,8 @@ impl From<Game> for GamePostrgres {
     }
 }
 
-impl From<GamePostrgres> for Game {
-    fn from(g: GamePostrgres) -> Self {
+impl From<GamePostgres> for Game {
+    fn from(g: GamePostgres) -> Self {
         Game::new(
             g.id.into(),
             g.simulation_id.into(),
@@ -49,7 +49,7 @@ impl IGameRepo for GameRepo {
         use crate::schema::game;
 
         let mut connection = self.pool.get()?;
-        let game = GamePostrgres::from(game);
+        let game = GamePostgres::from(game);
         diesel::insert_into(game::table)
             .values(&game)
             .execute(&mut connection)?;
@@ -63,7 +63,7 @@ impl IGameRepo for GameRepo {
         let mut connection = self.pool.get()?;
         let rec = game
             .filter(id.eq(game_id.value()))
-            .select(GamePostrgres::as_select())
+            .select(GamePostgres::as_select())
             .first(&mut connection)?;
 
         Ok(rec.into())

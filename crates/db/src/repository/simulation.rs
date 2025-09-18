@@ -3,14 +3,14 @@ use diesel::prelude::*;
 use std::net::IpAddr;
 
 use crate::DBPool;
-use crate::models::SimulationPostrgres;
+use crate::models::SimulationPostgres;
 use application::repository::ISimulationRepo;
 use domain::{
     entity::Simulation,
     value_object::{Amount, Id, MIN_BALANCE_AMOUNT},
 };
 
-impl From<Simulation> for SimulationPostrgres {
+impl From<Simulation> for SimulationPostgres {
     fn from(s: Simulation) -> Self {
         Self {
             id: s.id().value(),
@@ -21,8 +21,8 @@ impl From<Simulation> for SimulationPostrgres {
     }
 }
 
-impl From<SimulationPostrgres> for Simulation {
-    fn from(s: SimulationPostrgres) -> Self {
+impl From<SimulationPostgres> for Simulation {
+    fn from(s: SimulationPostgres) -> Self {
         Simulation::new(
             s.id.into(),
             s.ip.parse().unwrap(),
@@ -47,7 +47,7 @@ impl ISimulationRepo for SimulationRepo {
         use crate::schema::simulation;
 
         let mut connection = self.pool.get()?;
-        let simulation = SimulationPostrgres::from(simulation);
+        let simulation = SimulationPostgres::from(simulation);
         diesel::insert_into(simulation::table)
             .values(&simulation)
             .execute(&mut connection)?;
@@ -74,8 +74,8 @@ impl ISimulationRepo for SimulationRepo {
         let ip_addr = ip_addr.to_string();
         let rec = simulation
             .filter(ip.eq(&ip_addr))
-            .select(SimulationPostrgres::as_select())
-            .first::<SimulationPostrgres>(&mut connection)
+            .select(SimulationPostgres::as_select())
+            .first::<SimulationPostgres>(&mut connection)
             .ok();
 
         rec.map(|sim| sim.into())
@@ -87,8 +87,8 @@ impl ISimulationRepo for SimulationRepo {
         let mut connection = self.pool.get()?;
         let rec = simulation
             .filter(id.eq(&sim_id.value()))
-            .select(SimulationPostrgres::as_select())
-            .first::<SimulationPostrgres>(&mut connection)?;
+            .select(SimulationPostgres::as_select())
+            .first::<SimulationPostgres>(&mut connection)?;
 
         Ok(rec.into())
     }
