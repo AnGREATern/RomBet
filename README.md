@@ -99,7 +99,7 @@ Web SPA
 Rust, TypeScript, React, PostgreSQL
 
 ## Верхнеуровневое разбиение на компоненты
-![CD](report/img/cd.svg)
+![CD](report/img/cd_2.svg)
 
 ## UML-диаграмма классов для компонента доступа к данным и компонента с бизнес-логикой
 ![UML](report/img/UML.svg)
