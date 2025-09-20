@@ -4,3 +4,7 @@
 *.log
 node_modules
 package-lock.json
+test-report.html
+test-results
+*.db
+*.DS_Store
