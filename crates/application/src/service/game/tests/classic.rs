@@ -1,36 +1,27 @@
 use super::super::*;
+use rstest::rstest;
 
-#[test]
-fn randomize_totals_winner1() {
-    let winner = Winner::W1;
-    let home_team_avg_goals = 2.8;
-    let guest_team_avg_goals = 3.1;
+#[rstest]
+#[case(Winner::W1, 2.8, 3.1)]
+#[case(Winner::W1, 3.8, 3.1)]
+#[case(Winner::W1, 5.8, 0.1)]
+#[case(Winner::W1, 0.1, 0.1)]
+#[case(Winner::X, 2.8, 3.1)]
+#[case(Winner::X, 3.8, 3.1)]
+#[case(Winner::X, 5.8, 0.1)]
+#[case(Winner::X, 0.1, 0.1)]
+#[case(Winner::W2, 2.8, 3.1)]
+#[case(Winner::W2, 3.8, 3.1)]
+#[case(Winner::W2, 5.8, 0.1)]
+#[case(Winner::W2, 0.1, 0.1)]
+fn randomize_totals(#[case] winner: Winner, #[case] home: f64, #[case] guest: f64) {
+    let res = GameRandomizer::randomize_totals(winner, home, guest);
 
-    let res = GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals);
-
-    assert!(res.0 > res.1)
-}
-
-#[test]
-fn randomize_totals_draw() {
-    let winner = Winner::X;
-    let home_team_avg_goals = 0.1;
-    let guest_team_avg_goals = 3.3;
-
-    let res = GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals);
-
-    assert!(res.0 == res.1)
-}
-
-#[test]
-fn randomize_totals_winner2() {
-    let winner = Winner::W2;
-    let home_team_avg_goals = 0.1;
-    let guest_team_avg_goals = 3.3;
-
-    let res = GameRandomizer::randomize_totals(winner, home_team_avg_goals, guest_team_avg_goals);
-
-    assert!(res.0 < res.1)
+    match winner {
+        Winner::W1 => assert!(res.0 > res.1),
+        Winner::X => assert_eq!(res.0, res.1),
+        Winner::W2 => assert!(res.0 < res.1),
+    }
 }
 
 #[test]

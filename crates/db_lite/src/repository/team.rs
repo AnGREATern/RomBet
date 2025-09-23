@@ -53,16 +53,14 @@ impl ITeamRepo for TeamRepo {
 
 #[cfg(test)]
 mod tests {
-    use crate::init_pool;
+    use diesel::SqliteConnection;
+    use rstest::*;
     use crate::repository::TeamRepo;
-    use crate::repository::common::run_migrations;
+    use crate::repository::common::pool;
     use application::repository::ITeamRepo;
 
-    #[test]
-    fn select_all_teams() {
-        let pool = init_pool();
-        run_migrations(&mut pool.get().unwrap());
-
+    #[rstest]
+    fn select_all_teams(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
         let repo = TeamRepo::new(pool.clone());
 
         let ids = repo.all_teams_id();

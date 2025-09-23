@@ -12,6 +12,7 @@ pub use team::TeamRepo;
 
 #[cfg(test)]
 mod common {
+    use rstest::*;
     use std::net::{IpAddr, Ipv4Addr};
 
     use diesel::{RunQueryDsl, SqliteConnection};
@@ -20,8 +21,12 @@ mod common {
         value_object::{Amount, Id, MIN_BALANCE_AMOUNT},
     };
     use uuid::Uuid;
+    use crate::init_pool;
 
-    pub fn run_migrations(connection: &mut SqliteConnection) {
+    #[fixture]
+    pub fn pool() -> diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>> {
+        let pool = init_pool();
+        let connection = &mut pool.get().unwrap();
         diesel::sql_query(include_str!(
             "../../migrations/2025-04-08-152635_create_team/up.sql"
         ))
@@ -67,6 +72,8 @@ mod common {
         ))
         .execute(connection)
         .unwrap();
+        
+        pool
     }
 
     pub struct SimulationBuilder {
