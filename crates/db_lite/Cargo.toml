@@ -15,4 +15,3 @@ uuid = {version="1.16.0", features = ["v7"]}
 
 [dev-dependencies]
 rstest = "0.26.1"
-once_cell = "1.8"

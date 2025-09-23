@@ -345,7 +345,6 @@ dependencies = [
  "diesel",
  "domain",
  "dotenv",
- "once_cell",
  "rmp-serde",
  "rstest",
  "serde",
