@@ -332,16 +332,8 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        '204':
           description: Team deleted successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Team deleted"
         '404':
           description: Team not found
           content:
@@ -370,7 +362,7 @@ paths:
                     example: 500
 
   /api/start:
-    get:
+    post:
       summary: Start the system
       description: Initializes a new simulation or returns the existing one associated with the requester's IP address
       operationId: startSimulation
