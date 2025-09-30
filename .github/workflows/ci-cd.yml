@@ -1,0 +1,242 @@
+name: RomBet CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache Cargo index
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache target directory
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run unit tests
+        run: |
+          cargo test --lib --bins
+
+  integration-tests:
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: rombet_test
+          POSTGRES_USER: rombet_user
+          POSTGRES_PASSWORD: rombet_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache Cargo index
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache target directory
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Set up test database
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          # Create database schema
+          echo "Setting up test database..."
+          
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgres://rombet_user:rombet_password@localhost:5432/rombet_test
+        run: |
+          # Run database migrations
+          cargo run --bin db migrate
+          # Run integration tests
+          cargo test --package db
+          cargo test --package application
+
+      - name: Cleanup test database
+        if: always()
+        run: |
+          echo "Cleaning up test database..."
+
+  e2e-tests:
+    needs: integration-tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: rombet_e2e
+          POSTGRES_USER: rombet_user
+          POSTGRES_PASSWORD: rombet_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache Cargo index
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache target directory
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Set up database
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Build application
+        run: |
+          cargo build --release
+
+      - name: Run application in background
+        env:
+          DATABASE_URL: postgres://rombet_user:rombet_password@localhost:5432/rombet_e2e
+        run: |
+          # Run database migrations
+          cargo run --bin db migrate
+          # Start the application in background
+          nohup ./target/release/web-ctl > app.log 2>&1 &
+          # Wait for application to start
+          sleep 10
+
+      - name: Install Newman (Postman CLI)
+        run: |
+          sudo apt-get install -y nodejs npm
+          npm install -g newman
+
+      - name: Run E2E tests with Newman
+        run: |
+          # Run the Postman collection we created
+          newman run rombet_e2e_demo.postman_collection.json -e rombet-env.json
+
+      - name: Stop application
+        if: always()
+        run: |
+          pkill -f web-ctl || true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-test-results
+          path: |
+            newman/
+            app.log
+
+  # Docker build and push job
+  docker-build:
+    needs: e2e-tests
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: rombet/app
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
