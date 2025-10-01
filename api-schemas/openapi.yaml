@@ -696,7 +696,7 @@ paths:
 
 
   /api/game/{id}/coefficients:
-    post:
+    get:
       summary: Calculate betting coefficients
       description: Calculates and returns the current betting coefficients for a specific game
       operationId: calculateBettingCoefficients
