@@ -12,6 +12,14 @@ paths:
       summary: Get all teams
       description: Returns a list of all teams
       operationId: getAllTeams
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
       tags:
         - Team
       responses:
@@ -48,6 +56,14 @@ paths:
       summary: Create a new team
       description: Creates a new team with the provided data
       operationId: createTeam
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
       tags:
         - Team
       requestBody:
@@ -117,6 +133,13 @@ paths:
           required: true
           schema:
             type: string
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
       responses:
         '200':
           description: Team retrieved successfully
@@ -171,6 +194,13 @@ paths:
           required: true
           schema:
             type: string
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
       requestBody:
         description: Team data
         required: true
@@ -237,87 +267,6 @@ paths:
                     type: integer
                     example: 500
 
-    patch:
-      summary: Partially update team by ID
-      description: Updates only specified fields of the team
-      operationId: partialUpdateTeam
-      tags:
-        - Team
-      parameters:
-        - name: id
-          in: path
-          description: Team ID
-          required: true
-          schema:
-            type: string
-      requestBody:
-        description: Partial team data
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  example: "Team A"
-              additionalProperties: false
-            example:
-              name: "Team A Partially Updated"
-      responses:
-        '200':
-          description: Team updated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: "team_123"
-                  name:
-                    type: string
-                    example: "Team A Partially Updated"
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Invalid fields provided"
-                  code:
-                    type: integer
-                    example: 400
-        '404':
-          description: Team not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Team not found"
-                  code:
-                    type: integer
-                    example: 404
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Failed to update team"
-                  code:
-                    type: integer
-                    example: 500
-
     delete:
       summary: Delete team by ID
       description: Deletes the team with the specified ID
@@ -331,6 +280,13 @@ paths:
           required: true
           schema:
             type: string
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
       responses:
         '204':
           description: Team deleted successfully
@@ -361,7 +317,7 @@ paths:
                     type: integer
                     example: 500
 
-  /api/start:
+  /api/simulation:
     post:
       summary: Start the system
       description: Initializes a new simulation or returns the existing one associated with the requester's IP address
@@ -391,19 +347,6 @@ paths:
                     type: number
                     format: float
                     example: 100.50
-        '404':
-          description: Simulation not found for the given IP address
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Simulation not found"
-                  code:
-                    type: integer
-                    example: 404
         '500':
           description: Internal server error
           content:
@@ -418,9 +361,7 @@ paths:
                     type: integer
                     example: 500
 
-
-  /api/restart:
-    post:
+    patch:
       summary: Restart the system
       description: Forces a system restart for the simulation associated with the requester's IP address
       operationId: restartSimulation
@@ -476,14 +417,129 @@ paths:
                     type: integer
                     example: 500
 
+  /api/simulation/balance:
+    get:
+      summary: Get current balance
+      description: Returns the current balance of the simulation associated with the requester's IP address
+      operationId: getBalance
+      tags:
+        - Simulation
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      responses:
+        '200':
+          description: Balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  amount:
+                    type: number
+                    format: float
+                    example: 5000.0
+        '404':
+          description: Simulation not found for the given IP address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Simulation not found"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to retrieve balance"
+                  code:
+                    type: integer
+                    example: 500
+                
+  /api/simulation/report:
+    get:
+      summary: Generate a report
+      description: Returns a detailed report of betting statistics
+      operationId: generateBettingReport
+      tags:
+        - Simulation
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      responses:
+        '200':
+          description: Report generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat:
+                    type: object
+                    properties:
+                      min_coefficient_lose:
+                        type: object
+                        format: integer
+                        example: 150
+                        description: To get real coefficient divide it by 100
+                      start_balance:
+                        type: integer
+                        example: 50000
+                        description: Initial balance at the start of the simulation, to get real value divide by 100
+        '404':
+          description: Simulation not found for the given IP address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Simulation not found"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to generate report"
+                  code:
+                    type: integer
+                    example: 500
 
-  /api/create_round:
+  /api/round:
     post:
       summary: Create a new round
       description: Initiates a new betting round for the simulation associated with the requester's IP address
       operationId: createBettingRound
       tags:
-        - Betting
+        - Round
       parameters:
         - name: X-Forwarded-For
           in: header
@@ -545,13 +601,13 @@ paths:
                     example: 500
 
 
-  /api/randomize_round:
+  /api/round/results:
     post:
       summary: Randomize the current round
       description: Applies randomization logic to the current round and returns game statistics
       operationId: randomizeCurrentRound
       tags:
-        - Betting
+        - Round
       parameters:
         - name: X-Forwarded-For
           in: header
@@ -639,14 +695,20 @@ paths:
                     example: 500
 
 
-  /api/calculate_coefficients:
+  /api/game/{id}/coefficients:
     post:
       summary: Calculate betting coefficients
       description: Calculates and returns the current betting coefficients for a specific game
       operationId: calculateBettingCoefficients
       tags:
-        - Betting
+        - Game
       parameters:
+        - name: id
+          in: path
+          description: Game ID
+          required: true
+          schema:
+            type: string
         - name: X-Forwarded-For
           in: header
           description: IP address of the client (optional for testing, may be automatically detected)
@@ -654,31 +716,6 @@ paths:
           schema:
             type: string
             format: ipv4
-      requestBody:
-        description: Game details for coefficient calculation
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                game_id:
-                  type: string
-                  description: Game ID (UUID format)
-                  example: "Uuid"
-                home_team_id:
-                  type: string
-                  description: Home team ID (UUID format)
-                  example: "Uuid"
-                guest_team_id:
-                  type: string
-                  description: Guest team ID (UUID format)
-                  example: "Uuid"
-              required: [game_id, home_team_id, guest_team_id]
-            example:
-              game_id: "Uuid"
-              home_team_id: "Uuid"
-              guest_team_id: "Uuid"
       responses:
         '200':
           description: Coefficients calculated successfully
@@ -720,6 +757,7 @@ paths:
                       format: integer
                       example: 150
                       description: To get real coefficient divide it by 100
+                    example: [150, 200]
         '404':
           description: Simulation not found for the given IP address
           content:
@@ -748,14 +786,20 @@ paths:
                     example: 500
 
 
-  /api/make_bet:
+  /api/game/{id}/bet:
     post:
       summary: Place a bet
       description: Allows placing a bet on a specific game event with chosen coefficient
       operationId: placeBet
       tags:
-        - Betting
+        - Game
       parameters:
+        - name: id
+          in: path
+          description: Game ID
+          required: true
+          schema:
+            type: string
         - name: X-Forwarded-For
           in: header
           description: IP address of the client (optional for testing, may be automatically detected)
@@ -771,29 +815,6 @@ paths:
             schema:
               type: object
               properties:
-                game:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      description: Game ID (UUID format)
-                      example: "Uuid"
-                    simulation_id:
-                      type: string
-                      description: Simulation ID (UUID format)
-                      example: "Uuid"
-                    home_team_id:
-                      type: string
-                      description: Home team ID (UUID format)
-                      example: "Uuid"
-                    guest_team_id:
-                      type: string
-                      description: Guest team ID (UUID format)
-                      example: "Uuid"
-                    round:
-                      type: integer
-                      format: uint32
-                      example: 1
                 event:
                   oneOf:
                     - type: object
@@ -827,18 +848,10 @@ paths:
                   type: number
                   format: float
                   example: 100.0
-              required: [game, event, coefficient, value]
+              required: [event, coefficient, value]
       responses:
-        '200':
+        '201':
           description: Bet placed successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Bet placed"
         '400':
           description: Invalid input
           content:
@@ -862,103 +875,6 @@ paths:
                   error:
                     type: string
                     example: "Failed to place bet"
-                  code:
-                    type: integer
-                    example: 500
-
-
-  /api/make_report:
-    get:
-      summary: Generate a report
-      description: Returns a detailed report of betting statistics
-      operationId: generateBettingReport
-      tags:
-        - Reporting
-      responses:
-        '200':
-          description: Report generated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  stat:
-                    type: object
-                    properties:
-                      min_coefficient_lose:
-                        type: object
-                        format: integer
-                        example: 150
-                        description: To get real coefficient divide it by 100
-                      start_balance:
-                        type: integer
-                        example: 50000
-                        description: Initial balance at the start of the simulation, to get real value divide by 100
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Failed to generate report"
-                  code:
-                    type: integer
-                    example: 500
-
-
-  /api/balance:
-    get:
-      summary: Get current balance
-      description: Returns the current balance of the simulation associated with the requester's IP address
-      operationId: getBalance
-      tags:
-        - Simulation
-      parameters:
-        - name: X-Forwarded-For
-          in: header
-          description: IP address of the client (optional for testing, may be automatically detected)
-          required: false
-          schema:
-            type: string
-            format: ipv4
-      responses:
-        '200':
-          description: Balance retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  amount:
-                    type: number
-                    format: float
-                    example: 5000.0
-        '404':
-          description: Simulation not found for the given IP address
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Simulation not found"
-                  code:
-                    type: integer
-                    example: 404
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Failed to retrieve balance"
                   code:
                     type: integer
                     example: 500
