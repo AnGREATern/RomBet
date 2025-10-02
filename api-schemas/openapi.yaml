@@ -7,7 +7,7 @@ servers:
     description: Local development server
 
 paths:
-  /api/teams:
+  /api/v1/teams:
     get:
       summary: Get all teams
       description: Returns a list of all teams
@@ -119,7 +119,7 @@ paths:
                     type: integer
                     example: 500
 
-  /api/teams/{id}:
+  /api/v1/teams/{id}:
     get:
       summary: Get team by ID
       description: Returns a team with the specified ID
@@ -317,7 +317,7 @@ paths:
                     type: integer
                     example: 500
 
-  /api/simulation:
+  /api/v1/simulation:
     post:
       summary: Start the system
       description: Initializes a new simulation or returns the existing one associated with the requester's IP address
@@ -417,7 +417,7 @@ paths:
                     type: integer
                     example: 500
 
-  /api/simulation/balance:
+  /api/v1/simulation/balance:
     get:
       summary: Get current balance
       description: Returns the current balance of the simulation associated with the requester's IP address
@@ -471,7 +471,7 @@ paths:
                     type: integer
                     example: 500
                 
-  /api/simulation/report:
+  /api/v1/simulation/report:
     get:
       summary: Generate a report
       description: Returns a detailed report of betting statistics
@@ -533,7 +533,7 @@ paths:
                     type: integer
                     example: 500
 
-  /api/round:
+  /api/v1/round:
     post:
       summary: Create a new round
       description: Initiates a new betting round for the simulation associated with the requester's IP address
@@ -601,7 +601,7 @@ paths:
                     example: 500
 
 
-  /api/round/results:
+  /api/v1/round/results:
     post:
       summary: Randomize the current round
       description: Applies randomization logic to the current round and returns game statistics
@@ -695,7 +695,7 @@ paths:
                     example: 500
 
 
-  /api/game/{id}/coefficients:
+  /api/v1/game/{id}/coefficients:
     get:
       summary: Calculate betting coefficients
       description: Calculates and returns the current betting coefficients for a specific game
@@ -786,7 +786,7 @@ paths:
                     example: 500
 
 
-  /api/game/{id}/bet:
+  /api/v1/game/{id}/bet:
     post:
       summary: Place a bet
       description: Allows placing a bet on a specific game event with chosen coefficient
@@ -865,6 +865,19 @@ paths:
                   code:
                     type: integer
                     example: 400
+        '404':
+          description: Simulation not found for the given IP address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Simulation not found"
+                  code:
+                    type: integer
+                    example: 404
         '500':
           description: Internal server error
           content:
