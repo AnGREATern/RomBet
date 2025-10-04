@@ -11,4 +11,5 @@ test_results
 *.DS_Store
 allure-report
 allure-history
+allure-results
 .git

@@ -3,6 +3,7 @@
 ALLURE_RESULTS_DIR="test-results"
 ALLURE_REPORT_DIR="allure-report"
 ALLURE_HISTORY_DIR="allure-history"
+ALLURE_E2E_DIR="allure-results"
 
 run_migrations() {
     cd crates/db && diesel migration redo --all && cd ../..
@@ -15,6 +16,15 @@ run_units() {
 run_integrations() {
     run_migrations
     (cargo +nightly test --all --no-fail-fast --test '*' -- --format=json -Z unstable-options --report-time | junitify -o "$ALLURE_RESULTS_DIR/") || run_migrations
+}
+
+run_e2e() {
+    run_migrations
+    setsid ./start.sh &
+    START_PID=$!
+    sleep 5
+    (newman run --verbose e2e_demo.postman_collection.json -r allure,cli && cp "$ALLURE_E2E_DIR"/* "$ALLURE_RESULTS_DIR" && rm -rf "$ALLURE_E2E_DIR") || run_migrations
+    kill -9 -$START_PID 2>/dev/null
 }
 
 generate_report() {
@@ -30,7 +40,7 @@ generate_report() {
 }
 
 clear() {
-    rm -rf "$ALLURE_RESULTS_DIR" "$ALLURE_REPORT_DIR" "$ALLURE_HISTORY_DIR"
+    rm -rf "$ALLURE_RESULTS_DIR" "$ALLURE_REPORT_DIR" "$ALLURE_HISTORY_DIR" "$ALLURE_E2E_DIR"
 }
 
 open_report() {
@@ -40,9 +50,9 @@ open_report() {
 while [[ $# -gt 0 ]]; do
     case $1 in
         -a|--all)
-            clear
             run_units
             run_integrations
+            run_e2e
             generate_report
             open_report
             shift
@@ -50,6 +60,7 @@ while [[ $# -gt 0 ]]; do
         -t|--tests)
             run_units
             run_integrations
+            run_e2e
             generate_report
             shift
             ;;
@@ -60,6 +71,11 @@ while [[ $# -gt 0 ]]; do
             ;;
         -i|--integrations)
             run_integrations
+            generate_report
+            shift
+            ;;
+        -e|--e2e)
+            run_e2e
             generate_report
             shift
             ;;
