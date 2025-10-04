@@ -20,7 +20,7 @@ run_integrations() {
 
 run_e2e() {
     run_migrations
-    setsid ./start.sh &
+    setsid ./start.sh -r &
     START_PID=$!
     sleep 5
     (newman run --verbose e2e_demo.postman_collection.json -r allure,cli && cp "$ALLURE_E2E_DIR"/* "$ALLURE_RESULTS_DIR" && rm -rf "$ALLURE_E2E_DIR") || run_migrations
