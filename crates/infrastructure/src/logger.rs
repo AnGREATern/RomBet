@@ -4,8 +4,6 @@ use tracing::{Level, level_filters::LevelFilter, subscriber};
 use tracing_subscriber::{Layer, Registry, fmt, layer::SubscriberExt};
 
 pub fn init_default_logger() {
-    // let subscriber = tracing_subscriber::FmtSubscriber::new();
-
     let log_file = OpenOptions::new()
         .append(true)
         .create(true)

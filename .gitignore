@@ -6,7 +6,9 @@ node_modules
 package-lock.json
 test-report.html
 test-results
+test_results
 *.db
 *.DS_Store
 allure-report
+allure-history
 .git

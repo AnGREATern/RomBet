@@ -3,7 +3,7 @@
 cleanup() {
     echo "Останавливаем процессы..."
     kill $RUST_PID 2>/dev/null
-    cp ../test.log ../start-"$(date +%s)".log
+    cp ../test.log ../start-"$(date +%Y%m%d-%H%M%S)".log
     rm ../test.log
     exit 0
 }
