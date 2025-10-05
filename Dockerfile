@@ -6,27 +6,27 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libsqlite3-dev \
     curl \
-    unzip \
     openjdk-17-jre \
     && rm -rf /var/lib/apt/lists/*
 
-RUN rustup toolchain install nightly --component rust-src
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
 
+RUN rustup toolchain install nightly --component rust-src
+RUN cargo install diesel_cli --no-default-features --features postgres,sqlite
 RUN cargo install junitify
 
-RUN curl -Lo allure-2.27.0.tgz https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz \
-    && tar -xzf allure-2.27.0.tgz -C /opt/ \
-    && ln -s /opt/allure-2.27.0/bin/allure /usr/local/bin/allure \
-    && rm allure-2.27.0.tgz
-
-RUN cargo install diesel_cli --no-default-features --features postgres,sqlite
+RUN npm install -g allure-commandline newman newman-reporter-allure
 
 WORKDIR /app
 
 COPY Cargo.toml ./
 COPY Cargo.lock ./
 COPY src ./src
+COPY config.toml ./config.toml
 COPY crates ./crates
+COPY e2e_demo.postman_collection.json ./
 COPY make_report.sh ./
+COPY start.sh ./
 
 RUN chmod +x make_report.sh
