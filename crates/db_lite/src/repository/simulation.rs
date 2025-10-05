@@ -116,18 +116,17 @@ impl ISimulationRepo for SimulationRepo {
 #[cfg(test)]
 mod tests {
     use std::net::{IpAddr, Ipv4Addr};
+    use diesel::SqliteConnection;
+    use rstest::*;
 
     use crate::repository::SimulationRepo;
-    use crate::repository::common::run_migrations;
-    use crate::{init_pool, repository::common::SimulationBuilder};
+    use crate::repository::common::pool;
+    use crate::repository::common::SimulationBuilder;
     use application::repository::ISimulationRepo;
 
-    #[test]
-    fn add_get_remove() {
-        let pool = init_pool();
-        run_migrations(&mut pool.get().unwrap());
-
-        let repo = SimulationRepo::new(pool);
+    #[rstest]
+    fn add_get_remove(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
+        let repo = SimulationRepo::new(pool.clone());
         let id = repo.next_id();
         let ip = IpAddr::V4(Ipv4Addr::LOCALHOST);
         let simulation = SimulationBuilder::new().id(id).ip(ip).build();

@@ -1,0 +1,893 @@
+openapi: 3.1.1
+info:
+  title: RomBet
+  version: 1.0.0
+servers:
+  - url: //dummy.com/
+    description: Local development server
+
+paths:
+  /api/v1/teams:
+    get:
+      summary: Get all teams
+      description: Returns a list of all teams
+      operationId: getAllTeams
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      tags:
+        - Team
+      responses:
+        '200':
+          description: List of teams
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: "team_123"
+                    name:
+                      type: string
+                      example: "Team A"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to fetch teams"
+                  code:
+                    type: integer
+                    example: 500
+
+    post:
+      summary: Create a new team
+      description: Creates a new team with the provided data
+      operationId: createTeam
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      tags:
+        - Team
+      requestBody:
+        description: Team data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Team A"
+              required: [name]
+      responses:
+        '201':
+          description: Team created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "team_123"
+                  name:
+                    type: string
+                    example: "Team A"
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Name is required"
+                  code:
+                    type: integer
+                    example: 400
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to create team"
+                  code:
+                    type: integer
+                    example: 500
+
+  /api/v1/teams/{id}:
+    get:
+      summary: Get team by ID
+      description: Returns a team with the specified ID
+      operationId: getTeamById
+      tags:
+        - Team
+      parameters:
+        - name: id
+          in: path
+          description: Team ID
+          required: true
+          schema:
+            type: string
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      responses:
+        '200':
+          description: Team retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "team_123"
+                  name:
+                    type: string
+                    example: "Team A"
+        '404':
+          description: Team not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Team not found"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to fetch team"
+                  code:
+                    type: integer
+                    example: 500
+
+    put:
+      summary: Update team by ID
+      description: Updates a team with the specified ID with full data
+      operationId: updateTeam
+      tags:
+        - Team
+      parameters:
+        - name: id
+          in: path
+          description: Team ID
+          required: true
+          schema:
+            type: string
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      requestBody:
+        description: Team data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Team A"
+              required: [name]
+      responses:
+        '200':
+          description: Team updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "team_123"
+                  name:
+                    type: string
+                    example: "Team A Updated"
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Name and rating are required"
+                  code:
+                    type: integer
+                    example: 400
+        '404':
+          description: Team not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Team not found"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to update team"
+                  code:
+                    type: integer
+                    example: 500
+
+    delete:
+      summary: Delete team by ID
+      description: Deletes the team with the specified ID
+      operationId: deleteTeam
+      tags:
+        - Team
+      parameters:
+        - name: id
+          in: path
+          description: Team ID
+          required: true
+          schema:
+            type: string
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      responses:
+        '204':
+          description: Team deleted successfully
+        '404':
+          description: Team not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Team not found"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to delete team"
+                  code:
+                    type: integer
+                    example: 500
+
+  /api/v1/simulation:
+    post:
+      summary: Start the system
+      description: Initializes a new simulation or returns the existing one associated with the requester's IP address
+      operationId: startSimulation
+      tags:
+        - Simulation
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      responses:
+        '200':
+          description: Simulation started or retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "sim-12345"
+                  balance:
+                    type: number
+                    format: float
+                    example: 100.50
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to start simulation"
+                  code:
+                    type: integer
+                    example: 500
+
+    patch:
+      summary: Restart the system
+      description: Forces a system restart for the simulation associated with the requester's IP address
+      operationId: restartSimulation
+      tags:
+        - Simulation
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      responses:
+        '200':
+          description: Simulation restarted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "sim-12345"
+                  balance:
+                    type: number
+                    format: float
+                    example: 100.50
+        '404':
+          description: Simulation not found for the given IP address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Simulation not found"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to restart simulation"
+                  code:
+                    type: integer
+                    example: 500
+
+  /api/v1/simulation/balance:
+    get:
+      summary: Get current balance
+      description: Returns the current balance of the simulation associated with the requester's IP address
+      operationId: getBalance
+      tags:
+        - Simulation
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      responses:
+        '200':
+          description: Balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  amount:
+                    type: number
+                    format: float
+                    example: 5000.0
+        '404':
+          description: Simulation not found for the given IP address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Simulation not found"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to retrieve balance"
+                  code:
+                    type: integer
+                    example: 500
+                
+  /api/v1/simulation/report:
+    get:
+      summary: Generate a report
+      description: Returns a detailed report of betting statistics
+      operationId: generateBettingReport
+      tags:
+        - Simulation
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      responses:
+        '200':
+          description: Report generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stat:
+                    type: object
+                    properties:
+                      min_coefficient_lose:
+                        type: object
+                        format: integer
+                        example: 150
+                        description: To get real coefficient divide it by 100
+                      start_balance:
+                        type: integer
+                        example: 50000
+                        description: Initial balance at the start of the simulation, to get real value divide by 100
+        '404':
+          description: Simulation not found for the given IP address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Simulation not found"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to generate report"
+                  code:
+                    type: integer
+                    example: 500
+
+  /api/v1/round:
+    post:
+      summary: Create a new round
+      description: Initiates a new betting round for the simulation associated with the requester's IP address
+      operationId: createBettingRound
+      tags:
+        - Round
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      responses:
+        '200':
+          description: Betting round created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  round:
+                    type: integer
+                    example: 1
+                  games:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "Uuid"
+                        home_team:
+                          type: string
+                          example: "Team A"
+                        guest_team:
+                          type: string
+                          example: "Team B"
+        '404':
+          description: Simulation not found for the given IP address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Simulation not found"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to create round"
+                  code:
+                    type: integer
+                    example: 500
+
+
+  /api/v1/round/results:
+    post:
+      summary: Randomize the current round
+      description: Applies randomization logic to the current round and returns game statistics
+      operationId: randomizeCurrentRound
+      tags:
+        - Round
+      parameters:
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      responses:
+        '200':
+          description: Round randomized successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  round:
+                    type: integer
+                    format: uint32
+                    example: 1
+                  games_stat:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "Uuid"
+                        game_id:
+                          type: string
+                          example: "Uuid"
+                        home_team:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: "Uuid"
+                            name:
+                              type: string
+                              example: "Team A"
+                        guest_team:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: "Uuid"
+                            name:
+                              type: string
+                              example: "Team B"
+                        home_team_total:
+                          type: integer
+                          example: 3
+                        guest_team_total:
+                          type: integer
+                          example: 1
+                  profit:
+                    type: number
+                    format: float
+                    example: 250.0
+        '404':
+          description: Simulation not found for the given IP address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Simulation not found"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to randomize round"
+                  code:
+                    type: integer
+                    example: 500
+
+
+  /api/v1/game/{id}/coefficients:
+    get:
+      summary: Calculate betting coefficients
+      description: Calculates and returns the current betting coefficients for a specific game
+      operationId: calculateBettingCoefficients
+      tags:
+        - Game
+      parameters:
+        - name: id
+          in: path
+          description: Game ID
+          required: true
+          schema:
+            type: string
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      responses:
+        '200':
+          description: Coefficients calculated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            WDL:
+                              type: string
+                              enum:
+                                - W1
+                                - X
+                                - W2
+                          description: Win/Draw/Loss event type
+                        - type: object
+                          properties:
+                            T:
+                              type: object
+                              properties:
+                                total:
+                                  type: integer
+                                  example: 2
+                                ordering:
+                                  type: integer
+                                  enum: [ -1, 0, 1 ]
+                                  description: -1 = Less, 0 = Equal, 1 = Greater
+                          description: Total goals event
+                  coefficients:
+                    type: array
+                    items:
+                      type: object
+                      format: integer
+                      example: 150
+                      description: To get real coefficient divide it by 100
+                    example: [150, 200]
+        '404':
+          description: Simulation not found for the given IP address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Simulation not found"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to calculate coefficients"
+                  code:
+                    type: integer
+                    example: 500
+
+
+  /api/v1/game/{id}/bet:
+    post:
+      summary: Place a bet
+      description: Allows placing a bet on a specific game event with chosen coefficient
+      operationId: placeBet
+      tags:
+        - Game
+      parameters:
+        - name: id
+          in: path
+          description: Game ID
+          required: true
+          schema:
+            type: string
+        - name: X-Forwarded-For
+          in: header
+          description: IP address of the client (optional for testing, may be automatically detected)
+          required: false
+          schema:
+            type: string
+            format: ipv4
+      requestBody:
+        description: Bet details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  oneOf:
+                    - type: object
+                      properties:
+                        WDL:
+                          type: string
+                          enum:
+                            - W1
+                            - X
+                            - W2
+                      description: Win/Draw/Loss event type
+                    - type: object
+                      properties:
+                        T:
+                          type: object
+                          properties:
+                            total:
+                              type: integer
+                              example: 2
+                            ordering:
+                              type: integer
+                              enum: [ -1, 0, 1 ]
+                              description: -1 = Less, 0 = Equal, 1 = Greater
+                      description: Total goals event
+                coefficient:
+                  type: object
+                  format: integer
+                  example: 150
+                  description: To get real coefficient divide it by 100
+                value:
+                  type: number
+                  format: float
+                  example: 100.0
+              required: [event, coefficient, value]
+      responses:
+        '201':
+          description: Bet placed successfully
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid coefficient value"
+                  code:
+                    type: integer
+                    example: 400
+        '404':
+          description: Simulation not found for the given IP address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Simulation not found"
+                  code:
+                    type: integer
+                    example: 404
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to place bet"
+                  code:
+                    type: integer
+                    example: 500

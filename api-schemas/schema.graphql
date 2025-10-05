@@ -1,0 +1,117 @@
+type Team {
+  id: ID!
+  name: String!
+}
+
+type Game {
+  id: ID!
+  homeTeam: Team!
+  guestTeam: Team!
+}
+
+type Simulation {
+  id: ID!
+  balance: Float!
+}
+
+type Report {
+  stat: ReportStat!
+}
+
+type ReportStat {
+  minCoefficientLose: Int!
+  startBalance: Int!
+}
+
+type GameEvent {
+  id: ID!
+  game: Game!
+  homeTeamTotal: Int!
+  guestTeamTotal: Int!
+}
+
+type Bet {
+  id: ID!
+  event: GameEvent!
+  coefficient: Int!
+  value: Float!
+}
+
+type Round {
+  number: Int!
+  games: [Game!]!
+}
+
+type GameCoefficients {
+  events: [GameEventInput!]!
+  coefficients: [Int!]!
+}
+
+type Error {
+  message: String!
+  code: Int!
+}
+
+enum WDL {
+    W1
+    X
+    W2
+}
+
+enum Order {
+    Less
+    Equal
+    Greater
+}
+
+type GameEventInput {
+  WDL: WDL!
+  T: TotalInput!
+}
+
+type TotalInput {
+  total: Int!
+  ordering: Order!
+}
+
+type Query {
+  teams: [Team!]!
+
+  team(id: ID!): Team! | Error!
+
+  simulation(ip: String): Simulation! | Error!
+
+  balance(ip: String): Float! | Error!
+
+  generateReport(ip: String): Report! | Error!
+
+  currentRound(ip: String): Round! | Error!
+
+  coefficients(gameId: ID!, ip: String): GameCoefficients! | Error!
+}
+
+type Mutation {
+  createTeam(name: String!): Error
+
+  updateTeam(id: ID!, name: String!): Team! | Error!
+
+  deleteTeam(id: ID!): Error
+
+  startSimulation(ip: String): Simulation! | Error!
+
+  restartSimulation(ip: String): Simulation! | Error!
+
+  createBettingRound(ip: String): Round! | Error!
+
+  randomizeCurrentRound(ip: String): GameEvent! | Error!
+
+  calculateBettingCoefficients(gameId: ID!, ip: String): GameCoefficients! | Error!
+
+  placeBet(
+    gameId: ID!
+    ip: String
+    event: GameEventInput!
+    coefficient: Int!
+    value: Float!
+  ): Bet | Error
+}

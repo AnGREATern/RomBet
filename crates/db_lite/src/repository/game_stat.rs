@@ -113,9 +113,10 @@ impl IGameStatRepo for GameStatRepo {
 #[cfg(test)]
 mod tests {
     use std::net::{IpAddr, Ipv4Addr};
+    use diesel::SqliteConnection;
+    use rstest::*;
 
-    use crate::init_pool;
-    use crate::repository::common::{GameFactory, SimulationBuilder, run_migrations};
+    use crate::repository::common::{GameFactory, SimulationBuilder, pool};
     use crate::repository::{GameRepo, GameStatRepo, SimulationRepo};
     use application::repository::{IGameRepo, IGameStatRepo, ISimulationRepo};
     use domain::{
@@ -123,11 +124,8 @@ mod tests {
         value_object::{Amount, MIN_BALANCE_AMOUNT},
     };
 
-    #[test]
-    fn insert_game_stat() {
-        let pool = init_pool();
-        run_migrations(&mut pool.get().unwrap());
-
+    #[rstest]
+    fn insert_game_stat(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
         let game_stat_repo = GameStatRepo::new(pool.clone());
         let sim_repo = SimulationRepo::new(pool.clone());
         let sim_id = sim_repo.next_id();
@@ -147,11 +145,8 @@ mod tests {
         assert!(res.is_ok());
     }
 
-    #[test]
-    fn score_by_game_id() {
-        let pool = init_pool();
-        run_migrations(&mut pool.get().unwrap());
-
+    #[rstest]
+    fn score_by_game_id(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
         let game_stat_repo = GameStatRepo::new(pool.clone());
         let sim_repo = SimulationRepo::new(pool.clone());
         let simulation = SimulationBuilder::new().build();
@@ -171,11 +166,8 @@ mod tests {
         assert_eq!(score_guest, (0, 2));
     }
 
-    #[test]
-    fn goals_by_game_id() {
-        let pool = init_pool();
-        run_migrations(&mut pool.get().unwrap());
-
+    #[rstest]
+    fn goals_by_game_id(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
         let game_stat_repo = GameStatRepo::new(pool.clone());
         let sim_repo = SimulationRepo::new(pool.clone());
         let simulation = SimulationBuilder::new().build();

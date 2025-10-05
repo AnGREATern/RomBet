@@ -117,9 +117,10 @@ impl IBetRepo for BetRepo {
 #[cfg(test)]
 mod tests {
     use std::net::{IpAddr, Ipv4Addr};
+    use diesel::SqliteConnection;
+    use rstest::*;
 
-    use crate::init_pool;
-    use crate::repository::common::{GameFactory, SimulationBuilder, run_migrations};
+    use crate::repository::common::{GameFactory, SimulationBuilder, pool};
     use crate::repository::{BetRepo, GameRepo, SimulationRepo};
     use application::repository::{IBetRepo, IGameRepo, ISimulationRepo};
     use domain::{
@@ -127,11 +128,8 @@ mod tests {
         value_object::{Amount, Event, MIN_BALANCE_AMOUNT, MIN_BET_AMOUNT, Winner},
     };
 
-    #[test]
-    fn insert_bet() {
-        let pool = init_pool();
-        run_migrations(&mut pool.get().unwrap());
-
+    #[rstest]
+    fn insert_bet(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
         let bet_repo = BetRepo::new(pool.clone());
         let bet_id = bet_repo.next_id();
         let sim_repo = SimulationRepo::new(pool.clone());
@@ -159,11 +157,8 @@ mod tests {
         assert!(res.is_ok());
     }
 
-    #[test]
-    fn min_coefficient_lose() {
-        let pool = init_pool();
-        run_migrations(&mut pool.get().unwrap());
-
+    #[rstest]
+    fn min_coefficient_lose(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
         let bet_repo = BetRepo::new(pool.clone());
         let sim_repo = SimulationRepo::new(pool.clone());
         let simulation = SimulationBuilder::new()
@@ -228,11 +223,8 @@ mod tests {
         assert_eq!(res, Some((2.30).try_into().unwrap()));
     }
 
-    #[test]
-    fn not_calculated_bets() {
-        let pool = init_pool();
-        run_migrations(&mut pool.get().unwrap());
-
+    #[rstest]
+    fn not_calculated_bets(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
         let bet_repo = BetRepo::new(pool.clone());
         let sim_repo = SimulationRepo::new(pool.clone());
         let simulation = SimulationBuilder::new()
