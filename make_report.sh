@@ -7,7 +7,7 @@ ALLURE_E2E_DIR="allure-results"
 
 run_migrations() {
     echo "=== Running database migrations ==="
-    cd crates/db && diesel migration run --all && cd ../..
+    cd crates/db && diesel migration redo --all && cd ../..
     echo "=== Migrations completed successfully ==="
     # cd crates/db && diesel migration redo --all && cd ../..
 }
