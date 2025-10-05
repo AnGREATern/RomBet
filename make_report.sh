@@ -6,39 +6,25 @@ ALLURE_HISTORY_DIR="allure-history"
 ALLURE_E2E_DIR="allure-results"
 
 run_migrations() {
-    echo "Running database migrations..."
-    echo "Current directory: $(pwd)"
-    echo "DATABASE_URL: ${DATABASE_URL}"
-    
-    # Check if we can connect to the database
     if [ -z "$DATABASE_URL" ]; then
         echo "ERROR: DATABASE_URL environment variable is not set"
         return 1
     fi
     
-    # Change to the db directory
     cd crates/db || { echo "ERROR: Failed to change to crates/db directory"; return 1; }
     
-    echo "Current directory after cd: $(pwd)"
-    echo "Database URL: $DATABASE_URL"
-    
-    # Test database connectivity
-    echo "Testing database connectivity..."
     if ! diesel database setup --database-url="$DATABASE_URL" 2>&1; then
         echo "ERROR: Failed to setup database"
         cd ../..
         return 1
     fi
     
-    # Run migrations with verbose output
-    echo "Running migrations..."
     if ! diesel migration redo --all --database-url="$DATABASE_URL" --verbose 2>&1; then
         echo "ERROR: Failed to run migrations"
         cd ../..
         return 1
     fi
     
-    echo "Migrations completed successfully"
     cd ../..
 }
 
