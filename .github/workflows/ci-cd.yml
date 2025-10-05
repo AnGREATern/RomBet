@@ -33,18 +33,9 @@ jobs:
   integration-tests:
     # needs: unit-tests
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: 83893
-          POSTGRES_DB: ppo
-        ports:
-          - 5432:5432
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # - name: Download unit tests artifacts
       #   uses: actions/download-artifact@v4
@@ -52,18 +43,8 @@ jobs:
       #     name: units-results
       #     path: ./
 
-      # - name: Setup Postgres
-      #   run: |
-      #     docker compose up -d postgres
-      #     sleep 10
-
-    #   - name: Run integration tests
-    #     run: |
-    #  #      docker compose up -d
-    #       # sleep 5
-    #       docker compose exec rombet sh -c "./make_report.sh -i"
-      - name: Run integration tests
-        run: docker compose run --rm rombet sh -c "./make_report.sh -i"
+      - name: Run integrations tests in Docker
+        run: docker compose run rombet sh -c "./make_report.sh -i"
       
       - name: Upload artifacts
         if: always()
@@ -74,7 +55,7 @@ jobs:
             test-results/
             allure-history/
             allure-report/
-
+            
       - name: Stop services
         if: always()
         run: docker compose down

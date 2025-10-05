@@ -30,11 +30,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: 
-      - sh
-      - -c
-      - |
-        ./make_report.sh -t
+    # command: 
+    #   - sh
+    #   - -c
+    #   - |
+    #     ./make_report.sh -t
     networks:
       - app-network
 
