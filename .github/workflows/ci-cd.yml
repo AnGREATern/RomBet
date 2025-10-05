@@ -13,8 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Run unit tests in Docker
-        run: docker compose run rombet sh -c "./make_report.sh -u"
+      - name: Setup Docker Compose
+        run: docker compose build
+
+      - name: Run unit tests
+        run: docker compose run --rm rombet sh -c "./make_report.sh -u"
         
       - name: Upload artifacts
         if: always()
@@ -24,7 +27,7 @@ jobs:
           path: |
             test-results/
             allure-history/
-            allure-report/      
+            allure-report/
 
       - name: Stop services
         if: always()
@@ -43,8 +46,11 @@ jobs:
           name: units-results
           path: ./
 
-      - name: Run integrations tests in Docker
-        run: docker compose run rombet sh -c "./make_report.sh -i"
+      - name: Setup Docker Compose
+        run: docker compose build
+
+      - name: Run integration tests
+        run: docker compose run --rm rombet sh -c "./make_report.sh -i"
       
       - name: Upload artifacts
         if: always()
@@ -73,8 +79,12 @@ jobs:
           name: integrations-results
           path: ./
 
-      - name: Run e2e tests in Docker
-        run: docker compose run rombet sh -c "./make_report.sh -e"
+      - name: Setup Docker Compose
+        run: docker compose build
+
+      - name: Run e2e tests
+        run: |
+          docker compose run --rm rombet sh -c "./make_report.sh -e"
 
       - name: Upload artifacts
         if: always()
