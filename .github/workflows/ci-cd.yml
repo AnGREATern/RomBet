@@ -7,41 +7,40 @@ on:
     branches: [ main ]
 
 jobs:
-  # unit-tests:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
-
-  #     - name: Run unit tests
-  #       run: docker compose run --rm rombet sh -c "./make_report.sh -u"
-        
-  #     - name: Upload artifacts
-  #       if: always()
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: units-results
-  #         path: |
-  #           test-results/
-  #           allure-history/
-  #           allure-report/
-
-  #     - name: Stop services
-  #       if: always()
-  #       run: docker compose down
-
-  integration-tests:
-    # needs: unit-tests
+  unit-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # - name: Download unit tests artifacts
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: units-results
-      #     path: ./
+      - name: Run unit tests in Docker
+        run: docker compose run rombet sh -c "./make_report.sh -u"
+        
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: units-results
+          path: |
+            test-results/
+            allure-history/
+            allure-report/      
+      - name: Stop services
+        if: always()
+        run: docker compose down
+
+  integration-tests:
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download unit tests artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: units-results
+          path: ./
 
       - name: Run integrations tests in Docker
         run: docker compose run rombet sh -c "./make_report.sh -i"
@@ -55,43 +54,35 @@ jobs:
             test-results/
             allure-history/
             allure-report/
-            
       - name: Stop services
         if: always()
         run: docker compose down
 
-  # e2e-tests:
-  #   needs: integration-tests
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
+  e2e-tests:
+    needs: integration-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Download integration tests artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: integrations-results
-  #         path: ./
+      - name: Download integration tests artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: integrations-results
+          path: ./
 
-  #     - name: Setup Postgres
-  #       run: |
-  #         docker compose up -d postgres
-  #         sleep 10
+      - name: Run e2e tests in Docker
+        run: docker compose run rombet sh -c "./make_report.sh -e"
 
-  #     - name: Run e2e tests
-  #       run: |
-  #         docker compose run --rm rombet sh -c "./make_report.sh -e"
-
-  #     - name: Upload artifacts
-  #       if: always()
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: e2e-results
-  #         path: |
-  #           test-results/
-  #           allure-history/
-  #           allure-report/
-
-  #     - name: Stop services
-  #       if: always()
-  #       run: docker compose down
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results
+          path: |
+            test-results/
+            allure-history/
+            allure-report/
+      - name: Stop services
+        if: always()
+        run: docker compose down
