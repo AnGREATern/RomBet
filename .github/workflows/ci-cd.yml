@@ -63,7 +63,7 @@ jobs:
     #       # sleep 5
     #       docker compose exec rombet sh -c "./make_report.sh -i"
       - name: Run integration tests
-        run: docker compose exec rombet sh -c "./make_report.sh -i"
+        run: docker compose run --rm rombet sh -c "./make_report.sh -i"
       
       - name: Upload artifacts
         if: always()
