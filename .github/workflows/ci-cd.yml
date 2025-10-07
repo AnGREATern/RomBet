@@ -36,11 +36,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download unit tests artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: units-results
-          path: ./
+      # - name: Download unit tests artifacts
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: units-results
+      #     path: ./
 
       - name: Run integrations tests in Docker
         run: docker compose run rombet sh -c "./make_report.sh -i"
@@ -65,11 +65,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download integration tests artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: integrations-results
-          path: ./
+      # - name: Download integration tests artifacts
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: integrations-results
+      #     path: ./
 
       - name: Run e2e tests in Docker
         run: docker compose run rombet sh -c "./make_report.sh -e"
