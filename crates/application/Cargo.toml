@@ -12,6 +12,7 @@ rand = "0.9.0"
 tracing = "0.1.41"
 
 [dev-dependencies]
+db              = { path = "../db"              }
 mockall = "0.13.1"
 rstest = "0.26.1"
 uuid = {version="1.16.0", features = ["v7"]}

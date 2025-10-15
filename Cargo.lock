@@ -94,6 +94,7 @@ name = "application"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "db",
  "domain",
  "mockall",
  "rand",

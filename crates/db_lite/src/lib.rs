@@ -11,7 +11,7 @@ pub type DBPool = Pool<ConnectionManager<SqliteConnection>>;
 
 pub fn init_pool() -> DBPool {
     dotenv().ok();
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let database_url = env::var("LC_DATABASE_URL").expect("LC_DATABASE_URL must be set");
 
     let manager = ConnectionManager::<SqliteConnection>::new(database_url);
     Pool::builder()

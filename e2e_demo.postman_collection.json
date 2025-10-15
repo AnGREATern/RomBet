@@ -1,0 +1,302 @@
+{
+	"info": {
+		"_postman_id": "e2e-betting-demo",
+		"name": "RomBet E2E Demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Start Simulation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response has required fields\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"    pm.expect(jsonData).to.have.property('balance');",
+							"    pm.expect(jsonData.balance).to.be.a('number');",
+							"});",
+							"const jsonData = pm.response.json();",
+							"pm.environment.set(\"simulation_id\", jsonData.id);",
+							"pm.environment.set(\"initial_balance\", jsonData.balance);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/start",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"start"
+					]
+				},
+				"description": "Start a new betting simulation. Returns simulation ID and initial balance."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Create Game Round",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response has required fields\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('round');",
+							"    pm.expect(jsonData).to.have.property('games');",
+							"    pm.expect(jsonData.round).to.be.a('number');",
+							"    pm.expect(jsonData.games).to.be.an('array');",
+							"});",
+							"const jsonData = pm.response.json();",
+							"if (jsonData.games.length > 0) {",
+							"    pm.environment.set(\"game_id\", jsonData.games[0].id.value);",
+							"    pm.environment.set(\"home_team_id\", jsonData.games[0].home_team.id.value);",
+							"    pm.environment.set(\"guest_team_id\", jsonData.games[0].guest_team.id.value);",
+							"    console.log(\"game_id: \" + jsonData.games[0].id.value);",
+							"    console.log(\"home_team_id: \" + jsonData.games[0].home_team.id.value);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/create_round",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"create_round"
+					]
+				},
+				"description": "Create a new round of games for betting. Returns the round number and list of games."
+			},
+			"response": []
+		},
+		{
+			"name": "3. Calculate Betting Coefficients",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response has required fields\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('events');",
+							"    pm.expect(jsonData).to.have.property('coefficients');",
+							"    pm.expect(jsonData.events).to.be.an('array');",
+							"    pm.expect(jsonData.coefficients).to.be.an('array');",
+							"});",
+							"const jsonData = pm.response.json();",
+							"if (jsonData.events.length > 0 && jsonData.coefficients.length > 0) {",
+							"    pm.environment.set(\"bet_coefficient\", jsonData.coefficients[0]);",
+							"    pm.environment.set(\"bet_amount\", 100);",
+							"    console.log(\"bet_coefficient: \" + jsonData.coefficients[0]);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"game_id\": { \"value\": \"{{game_id}}\" },\n  \"home_team_id\": { \"value\": \"{{home_team_id}}\" },\n  \"guest_team_id\": { \"value\": \"{{guest_team_id}}\" }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/calculate_coefficients",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"calculate_coefficients"
+					]
+				},
+				"description": "Calculate betting coefficients for a specific game. Returns available events and their coefficients."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Place Bet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Bet placed successfully\", function () {",
+							"    pm.expect(pm.response.code).to.eql(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"game\": {\n    \"id\": { \"value\": \"{{game_id}}\" },\n  \"simulation_id\": { \"value\": \"{{simulation_id}}\" },\n   \"home_team_id\": { \"value\": \"{{home_team_id}}\" },\n    \"guest_team_id\": { \"value\": \"{{guest_team_id}}\" },\n    \"round\": 1\n  },\n  \"event\": { \"WDL\": \"W1\" },\n  \"coefficient\": {{bet_coefficient}},\n  \"value\": {{bet_amount}}\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/make_bet",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"make_bet"
+					]
+				},
+				"description": "Place a bet on a specific event for a game. Requires game details, event, coefficient, and bet value."
+			},
+			"response": []
+		},
+		{
+			"name": "5. Randomize Round Results",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response has required fields\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('round');",
+							"    pm.expect(jsonData).to.have.property('games_stat');",
+							"    pm.expect(jsonData).to.have.property('profit');",
+							"    pm.expect(jsonData.round).to.be.a('number');",
+							"    pm.expect(jsonData.games_stat).to.be.an('array');",
+							"    pm.expect(jsonData.profit).to.be.a('number');",
+							"    pm.environment.set(\"profit\", jsonData.profit);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/randomize_round",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"randomize_round"
+					]
+				},
+				"description": "Randomize results for the current round and calculate bet outcomes. Returns game statistics and profit."
+			},
+			"response": []
+		},
+		{
+			"name": "6. Get Balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response has amount field\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('amount');",
+							"    pm.expect(jsonData.amount).to.be.a('number');",
+							"});",
+							"pm.test(\"Balance calculates correctly\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const initialBalance = parseFloat(pm.environment.get(\"initial_balance\"));",
+							"    const profit = parseFloat(pm.environment.get(\"profit\"));",
+							"    const bet_amount = parseFloat(pm.environment.get(\"bet_amount\"));",
+							"    pm.expect(initialBalance - bet_amount + profit).to.eql(jsonData.amount)",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/balance",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"balance"
+					]
+				},
+				"description": "Get current balance for the simulation."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://0.0.0.0:3000/api"
+		}
+	]
+}

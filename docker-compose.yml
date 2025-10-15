@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 83893
+      POSTGRES_DB: ppo
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ppo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  rombet:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://postgres:83893@postgres:5432/ppo
+      LC_DATABASE_URL: ":memory:"
+      ROM_BET_LOG_LEVEL: debug
+      ROM_BET_LOG_NAME: test.log
+      ROM_BET_SOCK: 0.0.0.0:3000
+    volumes:
+      - ./test-results:/app/test-results
+      - ./allure-report:/app/allure-report
+      - ./allure-history:/app/allure-history
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # command: 
+    #   - sh
+    #   - -c
+    #   - |
+    #     ./make_report.sh -t
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
