@@ -1,7 +1,7 @@
 -- Your SQL goes here
 CREATE TABLE Team (
     id UUID NOT NULL PRIMARY KEY,
-    name TEXT NOT NULL
+    name TEXT UNIQUE NOT NULL
 );
 
 INSERT INTO team (id, name) VALUES
