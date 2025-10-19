@@ -12,7 +12,6 @@ use std::net::SocketAddr;
 use std::path::Path;
 use std::{env, sync::Arc};
 use tokio::net::TcpListener;
-use tower_http::cors::{Any, CorsLayer};
 use tracing::info;
 
 use crate::api::{
@@ -22,6 +21,7 @@ use crate::api::{
     make_report::make_report,
     randomize_round::randomize_round,
     start::{restart, start},
+    v1::team::{all_teams, create_team, delete_team, get_team, update_team},
 };
 use infrastructure::{config, logger};
 use state::AppState;
@@ -34,12 +34,7 @@ pub async fn start_server() -> Result<()> {
     info!("Config applied");
     let app_state = Arc::new(AppState::try_from(config)?);
 
-    let cors = CorsLayer::new()
-        .allow_origin(Any)
-        .allow_methods(Any)
-        .allow_headers(Any);
-
-    let api_router = Router::new()
+    let old_api_router = Router::new()
         .route("/start", get(start))
         .route("/restart", post(restart))
         .route("/create_round", post(create_round))
@@ -48,10 +43,19 @@ pub async fn start_server() -> Result<()> {
         .route("/make_bet", post(make_bet))
         .route("/make_report", get(make_report))
         .route("/balance", get(balance))
-        .layer(cors)
+        .with_state(app_state.clone());
+
+    let v1_api_router = Router::new()
+        .route("/teams", get(all_teams).post(create_team))
+        .route(
+            "/teams/{id}",
+            get(get_team).put(update_team).delete(delete_team),
+        )
         .with_state(app_state);
 
-    let app = Router::new().nest("/api", api_router);
+    let app = Router::new()
+        .nest("/api", old_api_router)
+        .nest("/api/v1", v1_api_router);
 
     let addr = env::var("ROM_BET_SOCK")?;
     let listener = TcpListener::bind(addr).await?;

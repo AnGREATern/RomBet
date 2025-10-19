@@ -2,10 +2,10 @@ use anyhow::Result;
 use application::repository::ITeamRepo;
 use application::usecase::CreateTeam;
 use axum::Json;
-use axum::extract::{ConnectInfo, Path, State};
+use axum::extract::{Path, State};
+use axum::http::StatusCode;
 use domain::entity::Team;
 use serde::{Deserialize, Serialize};
-use std::net::SocketAddr;
 use std::sync::Arc;
 use tracing::debug;
 use uuid::Uuid;
@@ -34,12 +34,14 @@ pub struct CreateTeamRequest {
 pub async fn create_team(
     State(state): State<Arc<AppState>>,
     Json(req): Json<CreateTeamRequest>,
-) -> Result<(), FailureResponse> {
+) -> Result<StatusCode, FailureResponse> {
     debug!("Create a new team");
     let team_service = state.team_service();
-    team_service.add_team(req.name)?;
+    team_service
+        .add_team(req.name)
+        .map_err(|e| FailureResponse::unprocessable_entity(e, "TEAM_ALREADY_EXISTS"))?;
 
-    Ok(())
+    Ok(StatusCode::CREATED)
 }
 
 #[derive(Serialize)]
@@ -51,7 +53,9 @@ pub async fn get_team(
 ) -> Result<Json<TeamByIDResponse>, FailureResponse> {
     debug!("Get team by id");
     let repo = state.team_repo();
-    let team = repo.team_by_id(id.into())?;
+    let team = repo
+        .team_by_id(id.into())
+        .map_err(|e| FailureResponse::not_found(e, "TEAM_NOT_FOUND"))?;
 
     Ok(TeamByIDResponse(team).into())
 }
@@ -65,23 +69,24 @@ pub async fn update_team(
     State(state): State<Arc<AppState>>,
     Path(id): Path<Uuid>,
     Json(req): Json<UpdateTeamRequest>,
-) -> Result<Json<TeamByIDResponse>, FailureResponse> {
+) -> Result<StatusCode, FailureResponse> {
     debug!("Update team by id");
     let repo = state.team_repo();
     let team = Team::new(id.into(), req.name);
-    repo.update(team.clone())?;
+    repo.update(team)
+        .map_err(|e| FailureResponse::unprocessable_entity(e, ""))?;
 
-    Ok(TeamByIDResponse(team).into())
+    Ok(StatusCode::NO_CONTENT)
 }
 
 pub async fn delete_team(
     State(state): State<Arc<AppState>>,
     Path(id): Path<Uuid>,
-) -> Result<(), FailureResponse> {
+) -> Result<StatusCode, FailureResponse> {
     debug!("Delete team by id");
     let repo = state.team_repo();
-    repo.delete(id.into())?;
+    repo.delete(id.into())
+        .map_err(|e| FailureResponse::not_found(e, "TEAM_NOT_FOUND"))?;
 
-    Ok(())
+    Ok(StatusCode::NO_CONTENT)
 }
-

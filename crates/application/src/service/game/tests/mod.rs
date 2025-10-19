@@ -1,2 +1,2 @@
-mod mock;
 mod classic;
+mod mock;

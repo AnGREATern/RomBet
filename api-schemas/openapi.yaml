@@ -81,17 +81,6 @@ paths:
       responses:
         '201':
           description: Team created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: "team_123"
-                  name:
-                    type: string
-                    example: "Team A"
         '400':
           description: Invalid input
           content:
@@ -105,6 +94,19 @@ paths:
                   code:
                     type: integer
                     example: 400
+        '422':
+          description: This team already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "This team already exists"
+                  code:
+                    type: integer
+                    example: 422
         '500':
           description: Internal server error
           content:
@@ -214,19 +216,8 @@ paths:
                   example: "Team A"
               required: [name]
       responses:
-        '200':
+        '204':
           description: Team updated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: "team_123"
-                  name:
-                    type: string
-                    example: "Team A Updated"
         '400':
           description: Invalid input
           content:
@@ -240,8 +231,8 @@ paths:
                   code:
                     type: integer
                     example: 400
-        '404':
-          description: Team not found
+        '422':
+          description: Team not found or team with new name already exists
           content:
             application/json:
               schema:
@@ -252,7 +243,7 @@ paths:
                     example: "Team not found"
                   code:
                     type: integer
-                    example: 404
+                    example: 422
         '500':
           description: Internal server error
           content:
