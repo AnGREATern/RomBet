@@ -16,6 +16,7 @@ pub struct AppState {
     bet_service: BetService<BetRepo, GameRepo, GameStatRepo, SimulationRepo>,
     team_service: TeamService<TeamRepo>,
     team_repo: TeamRepo,
+    game_repo: GameRepo,
     setup_config: SetupConfig,
 }
 
@@ -66,12 +67,15 @@ impl TryFrom<AppConfig> for AppState {
 
         let team_repo = TeamRepo::new(pool.clone());
 
+        let game_repo = GameRepo::new(pool);
+
         Ok(Self {
             game_service,
             bet_service,
             sim_service,
             team_service,
             team_repo,
+            game_repo,
             setup_config,
         })
     }
@@ -94,6 +98,10 @@ impl AppState {
 
     pub fn team_repo(&self) -> &TeamRepo {
         &self.team_repo
+    }
+
+    pub fn game_repo(&self) -> &GameRepo {
+        &self.game_repo
     }
 
     pub fn team_service(&self) -> &TeamService<TeamRepo> {

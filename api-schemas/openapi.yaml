@@ -3,7 +3,7 @@ info:
   title: RomBet
   version: 1.0.0
 servers:
-  - url: //dummy.com/
+  - url: http:://localhost:3000
     description: Local development server
 
 paths:
@@ -577,6 +577,19 @@ paths:
                   code:
                     type: integer
                     example: 404
+        '422':
+          description: Unable to create new round while last didn't finished
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "UNABLE_CREATE_ROUND"
+                  code:
+                    type: integer
+                    example: 422
         '500':
           description: Internal server error
           content:
@@ -671,6 +684,19 @@ paths:
                   code:
                     type: integer
                     example: 404
+        '422':
+          description: Last round already randomized or doesn't exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "UNABLE_RANDOMIZE_ROUND"
+                  code:
+                    type: integer
+                    example: 422
         '500':
           description: Internal server error
           content:
@@ -750,7 +776,7 @@ paths:
                       description: To get real coefficient divide it by 100
                     example: [150, 200]
         '404':
-          description: Simulation not found for the given IP address
+          description: Game not found
           content:
             application/json:
               schema:
@@ -758,7 +784,7 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: "Simulation not found"
+                    example: "Game not found"
                   code:
                     type: integer
                     example: 404
@@ -857,7 +883,7 @@ paths:
                     type: integer
                     example: 400
         '404':
-          description: Simulation not found for the given IP address
+          description: Game not found
           content:
             application/json:
               schema:
@@ -865,7 +891,7 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: "Simulation not found"
+                    example: "Game not found"
                   code:
                     type: integer
                     example: 404

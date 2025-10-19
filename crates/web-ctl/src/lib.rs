@@ -21,6 +21,7 @@ use crate::api::{
     make_report::make_report,
     randomize_round::randomize_round,
     start::{restart, start},
+    v1,
     v1::team::{all_teams, create_team, delete_team, get_team, update_team},
 };
 use infrastructure::{config, logger};
@@ -51,6 +52,19 @@ pub async fn start_server() -> Result<()> {
             "/teams/{id}",
             get(get_team).put(update_team).delete(delete_team),
         )
+        .route(
+            "/simulation",
+            post(v1::simulation::start).patch(v1::simulation::restart),
+        )
+        .route("/simulation/balance", get(v1::simulation::balance))
+        .route("/simulation/report", get(v1::simulation::report))
+        .route("/round", post(v1::round::create_round))
+        .route("/round/results", post(v1::round::randomize_round))
+        .route(
+            "/game/{id}/coefficients",
+            get(v1::game::calculate_coefficients),
+        )
+        .route("/game/{id}/bet", post(v1::game::make_bet))
         .with_state(app_state);
 
     let app = Router::new()
