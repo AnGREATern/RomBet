@@ -35,7 +35,7 @@ pub async fn restart(
     debug!("Perform restart operation");
     let sim_service = state.simulation_service();
     let simulation = state.simulation(addr.ip())?;
-    sim_service.restart(simulation.id())?;
+    let simulation = sim_service.restart(simulation.id())?;
     let balance = f64::from(simulation.balance());
     let id = simulation.id().value().to_string();
     info!(balance, "Restart successful");

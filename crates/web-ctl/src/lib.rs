@@ -8,11 +8,11 @@ use axum::{
     routing::{get, post},
 };
 use dotenv::dotenv;
-use tower_http::cors::{Any, CorsLayer};
 use std::net::SocketAddr;
 use std::path::Path;
 use std::{env, sync::Arc};
 use tokio::net::TcpListener;
+use tower_http::cors::{Any, CorsLayer};
 use tracing::info;
 
 use crate::api::{

@@ -38,7 +38,7 @@ pub async fn restart(
     let simulation = state
         .simulation(addr.ip())
         .map_err(|e| FailureResponse::not_found(e, "SIMULATION_NOT_FOUND"))?;
-    sim_service
+    let simulation = sim_service
         .restart(simulation.id())
         .map_err(|e| FailureResponse::not_found(e, "SIMULATION_NOT_FOUND"))?;
     let balance = f64::from(simulation.balance());

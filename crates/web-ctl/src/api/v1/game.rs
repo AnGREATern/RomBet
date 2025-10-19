@@ -1,11 +1,10 @@
 use anyhow::Result;
 use application::repository::IGameRepo;
 use application::usecase::MakeBet;
-use axum::http::StatusCode;
 use axum::Json;
 use axum::extract::{Path, State};
-use domain::entity::Game;
-use domain::value_object::{Amount, Coefficient, Event, MIN_BALANCE_AMOUNT};
+use axum::http::StatusCode;
+use domain::value_object::{Amount, Coefficient, Event, MIN_BET_AMOUNT};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tracing::{debug, info};
@@ -61,11 +60,11 @@ pub async fn make_bet(
         .game_by_id(id.into())
         .map_err(|e| FailureResponse::not_found(e, "GAME_NOT_FOUND"))?;
     info!("Game selected");
-    let amount = Amount::new_with_casting(req.value, Some(MIN_BALANCE_AMOUNT))?;
+    let amount = Amount::new_with_casting(req.value, Some(MIN_BET_AMOUNT))?;
     debug!("Bet amount parsed");
-    info!("Bet made");
     let bet_service = state.bet_service();
     bet_service.make_bet(&game, amount, req.event, req.coefficient)?;
+    info!("Bet made");
 
     Ok(StatusCode::CREATED)
 }
