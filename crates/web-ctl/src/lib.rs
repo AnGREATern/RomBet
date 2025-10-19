@@ -8,6 +8,7 @@ use axum::{
     routing::{get, post},
 };
 use dotenv::dotenv;
+use tower_http::cors::{Any, CorsLayer};
 use std::net::SocketAddr;
 use std::path::Path;
 use std::{env, sync::Arc};
@@ -34,6 +35,11 @@ pub async fn start_server() -> Result<()> {
     let config = config::load_from_file(Path::new("config.toml"))?;
     info!("Config applied");
     let app_state = Arc::new(AppState::try_from(config)?);
+
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods(Any)
+        .allow_headers(Any);
 
     let old_api_router = Router::new()
         .route("/start", get(start))
@@ -69,7 +75,8 @@ pub async fn start_server() -> Result<()> {
 
     let app = Router::new()
         .nest("/api", old_api_router)
-        .nest("/api/v1", v1_api_router);
+        .nest("/api/v1", v1_api_router)
+        .layer(cors);
 
     let addr = env::var("ROM_BET_SOCK")?;
     let listener = TcpListener::bind(addr).await?;
