@@ -47,12 +47,12 @@ impl<B: IBetRepo, G: IGameRepo, GS: IGameStatRepo, S: ISimulationRepo> MakeBet
             None,
         );
         debug!("Initialize bet");
-        self.bet_repo.add(bet)?;
-        debug!("Bet added in bet_repo");
         let mut simulation = self.simulation_repo.simulation_by_id(simulation_id)?;
         debug!("Got simulation");
         simulation.make_bet(amount)?;
         debug!("Bet made");
+        self.bet_repo.add(bet)?;
+        debug!("Bet added in bet_repo");
         self.simulation_repo.update_by_id(simulation)?;
         debug!("Simulation updated in simulation_repo");
 

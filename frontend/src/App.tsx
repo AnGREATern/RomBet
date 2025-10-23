@@ -5,6 +5,7 @@ import { CreateRoundButton } from './components/CreateRoundButton';
 import { Balance } from './components/Balance';
 import { ReportModal } from './components/ReportModal';
 import { GameResults } from './components/GameResults';
+import { TeamsManagement } from './components/TeamsManagement';
 import { useApi } from './hooks/useApi';
 import { apiClient } from './api/client';
 import { Balance as BalanceType, BetStatistics, DisplayedGame, DisplayedGameStat } from './types';
@@ -19,9 +20,10 @@ function App() {
   const [report, setReport] = useState<BetStatistics | null>(null);
   const [showReport, setShowReport] = useState(false);
   const [currentRound, setCurrentRound] = useState(0);
+  const [showTeamsManagement, setShowTeamsManagement] = useState(false);
   const [lastRound, setLastRound] = useState(0);
   const [createState, setCurrentState] = useState(true);
-  
+
   const { loading, error, callApi, clearError } = useApi();
 
   useEffect(() => {
@@ -75,7 +77,7 @@ function App() {
   const handleRandomizeRound = async () => {
     if (createState) {
       alert("Раунд уже закончен. Будет создан новый раунд");
-    } 
+    }
     await callApi(async () => {
       const result = await apiClient.randomizeRound();
       if (result === null) {
@@ -104,8 +106,8 @@ function App() {
 
   return (
     <div className="app">
-      <Header onRestart={handleRestart} onShowReport={handleShowReport} />
-      
+      <Header onRestart={handleRestart} onShowReport={handleShowReport} onShowTeams={() => setShowTeamsManagement(true)} />
+
       {error && (
         <div className="error">
           {error}
@@ -126,7 +128,7 @@ function App() {
           <div className="content-header">
             <h2>Текущий раунд: {currentRound}</h2>
             {currentGames.length > 0 && (
-              <button 
+              <button
                 onClick={handleRandomizeRound}
                 className="btn btn-secondary"
               >
@@ -158,6 +160,11 @@ function App() {
         report={report}
         isOpen={showReport}
         onClose={() => setShowReport(false)}
+      />
+
+      <TeamsManagement
+        isOpen={showTeamsManagement}
+        onClose={() => setShowTeamsManagement(false)}
       />
     </div>
   );

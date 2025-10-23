@@ -8,8 +8,7 @@ publish = false
 members = [ 
   "crates/application", 
   "crates/cli", 
-  "crates/db", 
-  "crates/db_lite",
+  "crates/db",
   "crates/domain", 
   "crates/infrastructure", 
   "crates/web-ctl",

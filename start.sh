@@ -24,8 +24,8 @@ cleanup() {
         kill $REACT_PID 2>/dev/null
     fi
     
-    cp /test.log /start-"$(date +%Y%m%d-%H%M%S)".log 2>/dev/null
-    rm /test.log 2>/dev/null
+    cp ./test.log ./start-"$(date +%Y%m%d-%H%M%S)".log
+    rm ./test.log
 }
 trap cleanup SIGINT SIGTERM
 
@@ -38,7 +38,6 @@ if [ "$RUST_ONLY" = false ]; then
     echo "Start React frontend..."
     cd frontend && npm run dev &
     REACT_PID=$!
-    cd ..
 fi
 
 if [ "$RUST_ONLY" = false ]; then

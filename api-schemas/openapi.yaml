@@ -3,7 +3,7 @@ info:
   title: RomBet
   version: 1.0.0
 servers:
-  - url: //dummy.com/
+  - url: http://localhost:3000
     description: Local development server
 
 paths:
@@ -81,17 +81,6 @@ paths:
       responses:
         '201':
           description: Team created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: "team_123"
-                  name:
-                    type: string
-                    example: "Team A"
         '400':
           description: Invalid input
           content:
@@ -105,6 +94,19 @@ paths:
                   code:
                     type: integer
                     example: 400
+        '422':
+          description: This team already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "This team already exists"
+                  code:
+                    type: integer
+                    example: 422
         '500':
           description: Internal server error
           content:
@@ -214,19 +216,8 @@ paths:
                   example: "Team A"
               required: [name]
       responses:
-        '200':
+        '204':
           description: Team updated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: "team_123"
-                  name:
-                    type: string
-                    example: "Team A Updated"
         '400':
           description: Invalid input
           content:
@@ -240,8 +231,8 @@ paths:
                   code:
                     type: integer
                     example: 400
-        '404':
-          description: Team not found
+        '422':
+          description: Team not found or team with new name already exists
           content:
             application/json:
               schema:
@@ -252,7 +243,7 @@ paths:
                     example: "Team not found"
                   code:
                     type: integer
-                    example: 404
+                    example: 422
         '500':
           description: Internal server error
           content:
@@ -586,6 +577,19 @@ paths:
                   code:
                     type: integer
                     example: 404
+        '422':
+          description: Unable to create new round while last didn't finished
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "UNABLE_CREATE_ROUND"
+                  code:
+                    type: integer
+                    example: 422
         '500':
           description: Internal server error
           content:
@@ -680,6 +684,19 @@ paths:
                   code:
                     type: integer
                     example: 404
+        '422':
+          description: Last round already randomized or doesn't exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "UNABLE_RANDOMIZE_ROUND"
+                  code:
+                    type: integer
+                    example: 422
         '500':
           description: Internal server error
           content:
@@ -759,7 +776,7 @@ paths:
                       description: To get real coefficient divide it by 100
                     example: [150, 200]
         '404':
-          description: Simulation not found for the given IP address
+          description: Game not found
           content:
             application/json:
               schema:
@@ -767,7 +784,7 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: "Simulation not found"
+                    example: "Game not found"
                   code:
                     type: integer
                     example: 404
@@ -866,7 +883,7 @@ paths:
                     type: integer
                     example: 400
         '404':
-          description: Simulation not found for the given IP address
+          description: Game not found
           content:
             application/json:
               schema:
@@ -874,7 +891,7 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: "Simulation not found"
+                    example: "Game not found"
                   code:
                     type: integer
                     example: 404

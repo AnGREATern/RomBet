@@ -488,3 +488,20 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+.management-section {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.management-section .btn {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.management-section .btn:last-child {
+  margin-bottom: 0;
+}

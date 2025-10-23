@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use crate::value_object::Id;
 
-#[derive(PartialEq, PartialOrd, Eq, Ord, Serialize)]
+#[derive(PartialEq, PartialOrd, Eq, Ord, Clone, Serialize)]
 pub struct Team {
     id: Id<Team>,
     name: String,

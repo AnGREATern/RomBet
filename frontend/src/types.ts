@@ -17,6 +17,14 @@ export interface Team {
   name: string;
 }
 
+export interface CreateTeamRequest {
+  name: string;
+}
+
+export interface UpdateTeamRequest {
+  name: string;
+}
+
 export interface DisplayedGame {
   id: string;
   home_team: Team;

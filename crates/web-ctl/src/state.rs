@@ -6,7 +6,7 @@ use domain::entity::Simulation;
 use tracing::debug;
 
 use application::config::{AppConfig, SetupConfig};
-use application::service::{BetService, GameService, SimulationService};
+use application::service::{BetService, GameService, SimulationService, TeamService};
 use db::init_pool;
 use db::repository::{BetRepo, GameRepo, GameStatRepo, SimulationRepo, TeamRepo};
 
@@ -14,6 +14,9 @@ pub struct AppState {
     sim_service: SimulationService<GameRepo, TeamRepo, GameStatRepo, SimulationRepo>,
     game_service: GameService<GameRepo, GameStatRepo, TeamRepo>,
     bet_service: BetService<BetRepo, GameRepo, GameStatRepo, SimulationRepo>,
+    team_service: TeamService<TeamRepo>,
+    team_repo: TeamRepo,
+    game_repo: GameRepo,
     setup_config: SetupConfig,
 }
 
@@ -58,10 +61,21 @@ impl TryFrom<AppConfig> for AppState {
         );
         debug!("Simulation service started");
 
+        let team_repo = TeamRepo::new(pool.clone());
+        let team_service = TeamService::new(team_repo);
+        debug!("Team service started");
+
+        let team_repo = TeamRepo::new(pool.clone());
+
+        let game_repo = GameRepo::new(pool);
+
         Ok(Self {
             game_service,
             bet_service,
             sim_service,
+            team_service,
+            team_repo,
+            game_repo,
             setup_config,
         })
     }
@@ -80,6 +94,18 @@ impl AppState {
 
     pub fn bet_service(&self) -> &BetService<BetRepo, GameRepo, GameStatRepo, SimulationRepo> {
         &self.bet_service
+    }
+
+    pub fn team_repo(&self) -> &TeamRepo {
+        &self.team_repo
+    }
+
+    pub fn game_repo(&self) -> &GameRepo {
+        &self.game_repo
+    }
+
+    pub fn team_service(&self) -> &TeamService<TeamRepo> {
+        &self.team_service
     }
 
     pub fn simulation(&self, ip: IpAddr) -> Result<Simulation> {
