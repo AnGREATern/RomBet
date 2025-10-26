@@ -5,6 +5,7 @@ ALLURE_REPORT_DIR="allure-report"
 ALLURE_HISTORY_DIR="allure-history"
 ALLURE_E2E_DIR="allure-results"
 
+# run_migrations() for ci
 run_migrations() {
     if [ -z "$DATABASE_URL" ]; then
         echo "ERROR: DATABASE_URL environment variable is not set"
@@ -27,6 +28,11 @@ run_migrations() {
     
     cd ../..
 }
+
+# run_migrations() for local run
+# run_migrations() {
+#     cd crates/db && diesel migration redo --all && cd ../..
+# }
 
 run_units() {
     cargo +nightly test --all --no-fail-fast --lib -- --format=json -Z unstable-options --report-time | junitify -o "$ALLURE_RESULTS_DIR/"
