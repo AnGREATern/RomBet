@@ -116,9 +116,9 @@ impl IBetRepo for BetRepo {
 
 #[cfg(test)]
 mod tests {
-    use std::net::{IpAddr, Ipv4Addr};
     use diesel::SqliteConnection;
     use rstest::*;
+    use std::net::{IpAddr, Ipv4Addr};
 
     use crate::repository::common::{GameFactory, SimulationBuilder, pool};
     use crate::repository::{BetRepo, GameRepo, SimulationRepo};
@@ -158,7 +158,9 @@ mod tests {
     }
 
     #[rstest]
-    fn min_coefficient_lose(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
+    fn min_coefficient_lose(
+        pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>,
+    ) {
         let bet_repo = BetRepo::new(pool.clone());
         let sim_repo = SimulationRepo::new(pool.clone());
         let simulation = SimulationBuilder::new()
@@ -224,7 +226,9 @@ mod tests {
     }
 
     #[rstest]
-    fn not_calculated_bets(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
+    fn not_calculated_bets(
+        pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>,
+    ) {
         let bet_repo = BetRepo::new(pool.clone());
         let sim_repo = SimulationRepo::new(pool.clone());
         let simulation = SimulationBuilder::new()

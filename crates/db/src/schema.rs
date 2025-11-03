@@ -52,10 +52,4 @@ diesel::joinable!(bet -> simulation (simulation_id));
 diesel::joinable!(game -> simulation (simulation_id));
 diesel::joinable!(gamestat -> game (game_id));
 
-diesel::allow_tables_to_appear_in_same_query!(
-    bet,
-    game,
-    gamestat,
-    simulation,
-    team,
-);
+diesel::allow_tables_to_appear_in_same_query!(bet, game, gamestat, simulation, team,);

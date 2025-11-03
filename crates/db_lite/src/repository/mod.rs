@@ -15,13 +15,13 @@ mod common {
     use rstest::*;
     use std::net::{IpAddr, Ipv4Addr};
 
+    use crate::init_pool;
     use diesel::{RunQueryDsl, SqliteConnection};
     use domain::{
         entity::{Game, Simulation},
         value_object::{Amount, Id, MIN_BALANCE_AMOUNT},
     };
     use uuid::Uuid;
-    use crate::init_pool;
 
     #[fixture]
     pub fn pool() -> diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>> {
@@ -72,7 +72,7 @@ mod common {
         ))
         .execute(connection)
         .unwrap();
-        
+
         pool
     }
 

@@ -9,6 +9,7 @@ members = [
   "crates/application", 
   "crates/cli", 
   "crates/db",
+  "crates/db_lite",
   "crates/domain", 
   "crates/infrastructure", 
   "crates/web-ctl",

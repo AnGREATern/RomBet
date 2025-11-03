@@ -115,13 +115,13 @@ impl ISimulationRepo for SimulationRepo {
 
 #[cfg(test)]
 mod tests {
-    use std::net::{IpAddr, Ipv4Addr};
     use diesel::SqliteConnection;
     use rstest::*;
+    use std::net::{IpAddr, Ipv4Addr};
 
     use crate::repository::SimulationRepo;
-    use crate::repository::common::pool;
     use crate::repository::common::SimulationBuilder;
+    use crate::repository::common::pool;
     use application::repository::ISimulationRepo;
 
     #[rstest]
