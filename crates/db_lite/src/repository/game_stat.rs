@@ -112,9 +112,9 @@ impl IGameStatRepo for GameStatRepo {
 
 #[cfg(test)]
 mod tests {
-    use std::net::{IpAddr, Ipv4Addr};
     use diesel::SqliteConnection;
     use rstest::*;
+    use std::net::{IpAddr, Ipv4Addr};
 
     use crate::repository::common::{GameFactory, SimulationBuilder, pool};
     use crate::repository::{GameRepo, GameStatRepo, SimulationRepo};
@@ -125,7 +125,9 @@ mod tests {
     };
 
     #[rstest]
-    fn insert_game_stat(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
+    fn insert_game_stat(
+        pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>,
+    ) {
         let game_stat_repo = GameStatRepo::new(pool.clone());
         let sim_repo = SimulationRepo::new(pool.clone());
         let sim_id = sim_repo.next_id();
@@ -146,7 +148,9 @@ mod tests {
     }
 
     #[rstest]
-    fn score_by_game_id(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
+    fn score_by_game_id(
+        pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>,
+    ) {
         let game_stat_repo = GameStatRepo::new(pool.clone());
         let sim_repo = SimulationRepo::new(pool.clone());
         let simulation = SimulationBuilder::new().build();
@@ -167,7 +171,9 @@ mod tests {
     }
 
     #[rstest]
-    fn goals_by_game_id(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
+    fn goals_by_game_id(
+        pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>,
+    ) {
         let game_stat_repo = GameStatRepo::new(pool.clone());
         let sim_repo = SimulationRepo::new(pool.clone());
         let simulation = SimulationBuilder::new().build();

@@ -165,14 +165,16 @@ impl IGameRepo for GameRepo {
 
 #[cfg(test)]
 mod tests {
-    use diesel::SqliteConnection;
-    use rstest::*;
     use crate::repository::common::{GameFactory, SimulationBuilder, pool};
     use crate::repository::{GameRepo, SimulationRepo};
     use application::repository::{IGameRepo, ISimulationRepo};
+    use diesel::SqliteConnection;
+    use rstest::*;
 
     #[rstest]
-    fn game_by_id_found(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
+    fn game_by_id_found(
+        pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>,
+    ) {
         let game_repo = GameRepo::new(pool.clone());
         let sim_repo = SimulationRepo::new(pool.clone());
         let simulation = SimulationBuilder::new().build();
@@ -186,7 +188,9 @@ mod tests {
     }
 
     #[rstest]
-    fn game_by_id_not_found(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
+    fn game_by_id_not_found(
+        pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>,
+    ) {
         let game_repo = GameRepo::new(pool.clone());
         let sim_repo = SimulationRepo::new(pool.clone());
         let simulation = SimulationBuilder::new().build();

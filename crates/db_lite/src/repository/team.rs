@@ -13,6 +13,15 @@ impl From<TeamSqlite> for Team {
     }
 }
 
+impl From<Team> for TeamSqlite {
+    fn from(t: Team) -> Self {
+        Self {
+            id: t.id().value().to_string(),
+            name: t.name().to_string(),
+        }
+    }
+}
+
 pub struct TeamRepo {
     pool: DBPool,
 }
@@ -37,6 +46,57 @@ impl ITeamRepo for TeamRepo {
             .collect()
     }
 
+    fn all_teams(&self) -> Vec<Team> {
+        use crate::schema::Team::dsl::*;
+
+        let mut connection = self.pool.get().unwrap();
+        Team.select(TeamSqlite::as_select())
+            .load(&mut connection)
+            .ok()
+            .unwrap_or_default()
+            .into_iter()
+            .map(|t: TeamSqlite| t.into())
+            .collect()
+    }
+
+    fn add(&self, team: Team) -> Result<()> {
+        use crate::schema::Team as STeam;
+
+        let mut connection = self.pool.get()?;
+        let team = TeamSqlite::from(team);
+        diesel::insert_into(STeam::table)
+            .values(&team)
+            .execute(&mut connection)?;
+
+        Ok(())
+    }
+
+    fn update(&self, team: Team) -> Result<()> {
+        use crate::schema::Team::{
+            self,
+            dsl::{id, name},
+        };
+
+        let mut connection = self.pool.get()?;
+        diesel::update(Team::table)
+            .filter(id.eq(&team.id().value().to_string()))
+            .set(name.eq(team.name()))
+            .execute(&mut connection)?;
+
+        Ok(())
+    }
+
+    fn delete(&self, team_id: Id<Team>) -> Result<()> {
+        use crate::schema::Team::{dsl::id, table};
+
+        let mut connection = self.pool.get()?;
+        diesel::delete(table)
+            .filter(id.eq(team_id.value().to_string()))
+            .execute(&mut connection)?;
+
+        Ok(())
+    }
+
     fn team_by_id(&self, q_id: Id<Team>) -> Result<Team> {
         use crate::schema::Team::dsl::*;
 
@@ -49,18 +109,24 @@ impl ITeamRepo for TeamRepo {
 
         Ok(t)
     }
+
+    fn next_id(&self) -> Id<Team> {
+        Id::new()
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use diesel::SqliteConnection;
-    use rstest::*;
     use crate::repository::TeamRepo;
     use crate::repository::common::pool;
     use application::repository::ITeamRepo;
+    use diesel::SqliteConnection;
+    use rstest::*;
 
     #[rstest]
-    fn select_all_teams(pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>) {
+    fn select_all_teams(
+        pool: diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>,
+    ) {
         let repo = TeamRepo::new(pool.clone());
 
         let ids = repo.all_teams_id();
