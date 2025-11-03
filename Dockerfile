@@ -28,5 +28,9 @@ COPY crates ./crates
 COPY e2e_demo.postman_collection.json ./
 COPY make_report.sh ./
 COPY start.sh ./
+COPY target/debug/RomBet ./rombet
 
 RUN chmod +x make_report.sh
+RUN chmod +x start.sh
+
+EXPOSE 3000

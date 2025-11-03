@@ -5,7 +5,7 @@ set -e
 ITERATIONS=100
 RESULTS_DIR="results/$(date +%Y%m%d_%H%M%S)"
 K6_IMAGE="grafana/k6:latest"
-SERVICE_PORT=8080
+SERVICE_PORT=3000
 
 mkdir -p $RESULTS_DIR
 mkdir -p $RESULTS_DIR/raw
@@ -19,18 +19,7 @@ start_service() {
     local iteration=$1
     echo "Starting service container for iteration $iteration..."
     
-    # Build fresh image for each iteration to ensure clean state
-    docker build -t rombet-benchmark:$iteration .
-    
-    # Run container with isolated resources
-    docker run -d \
-        --name "benchmark-target-$iteration" \
-        --memory="512m" \
-        --cpus="1.0" \
-        -p $SERVICE_PORT:$SERVICE_PORT \
-        -e ROM_BET_SOCK="0.0.0.0:$SERVICE_PORT" \
-        rombet-benchmark:$iteration \
-        sh -c "./start.sh -r"
+    docker compose -p "benchmark-target-$iteration" run -d -p $SERVICE_PORT:$SERVICE_PORT rombet sh -c "cd crates/db && diesel migration run && cd ../.. && ./rombet"
     
     # Wait for service to be ready
     echo "Waiting for service to start..."

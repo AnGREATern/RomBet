@@ -23,6 +23,8 @@ services:
       ROM_BET_LOG_LEVEL: debug
       ROM_BET_LOG_NAME: test.log
       ROM_BET_SOCK: 0.0.0.0:3000
+    ports:
+      - "3000:3000"
     volumes:
       - ./test-results:/app/test-results
       - ./allure-report:/app/allure-report
