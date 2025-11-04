@@ -120,6 +120,6 @@ export default function () {
 export function handleSummary(data) {
     return {
         'stdout': JSON.stringify(data, null, 2),
-        'results/raw/summary.json': JSON.stringify(data, null, 2),
+        '/results/raw/summary.json': JSON.stringify(data, null, 2),
     };
 }

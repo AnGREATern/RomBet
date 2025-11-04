@@ -1,5 +1,6 @@
 mod api;
 mod error;
+mod metrics;
 mod state;
 
 use anyhow::Result;
@@ -7,6 +8,7 @@ use axum::{
     Router,
     routing::{get, post},
 };
+use axum_prometheus::PrometheusMetricLayerBuilder;
 use dotenv::dotenv;
 use std::net::SocketAddr;
 use std::path::Path;
@@ -15,15 +17,20 @@ use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer};
 use tracing::info;
 
-use crate::api::{
-    balance::balance,
-    create_round::create_round,
-    make_bet::{calculate_coefficients, make_bet},
-    make_report::make_report,
-    randomize_round::randomize_round,
-    start::{restart, start},
-    v1,
-    v1::team::{all_teams, create_team, delete_team, get_team, update_team},
+use crate::{
+    api::{
+        balance::balance,
+        create_round::create_round,
+        make_bet::{calculate_coefficients, make_bet},
+        make_report::make_report,
+        randomize_round::randomize_round,
+        start::{restart, start},
+        v1::{
+            self,
+            team::{all_teams, create_team, delete_team, get_team, update_team},
+        },
+    },
+    metrics::metrics_handler,
 };
 use infrastructure::{config, logger};
 use state::AppState;
@@ -35,6 +42,10 @@ pub async fn start_server() -> Result<()> {
     let config = config::load_from_file(Path::new("config.toml"))?;
     info!("Config applied");
     let app_state = Arc::new(AppState::try_from(config)?);
+
+    let (prometheus_layer, _metric_handle) = PrometheusMetricLayerBuilder::new()
+        .with_default_metrics()
+        .build_pair();
 
     let cors = CorsLayer::new()
         .allow_origin(Any)
@@ -74,8 +85,10 @@ pub async fn start_server() -> Result<()> {
         .with_state(app_state);
 
     let app = Router::new()
+        .route("/metrics", get(metrics_handler))
         .nest("/api", old_api_router)
         .nest("/api/v1", v1_api_router)
+        .layer(prometheus_layer)
         .layer(cors);
 
     let addr = env::var("ROM_BET_SOCK")?;

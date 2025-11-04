@@ -12,4 +12,5 @@ test_results
 allure-report
 allure-history
 allure-results
+benches-results
 .git

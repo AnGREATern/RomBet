@@ -5,13 +5,11 @@ import glob
 import os
 import argparse
 import matplotlib.pyplot as plt
-import seaborn as sns
 from pathlib import Path
 
 def load_k6_results(results_dir):
     """Загрузка и агрегация результатов k6"""
     all_data = []
-    iteration_stats = []
     
     # Process each iteration's k6 results
     for file_path in glob.glob(f"{results_dir}/raw/k6_results_*.json"):
