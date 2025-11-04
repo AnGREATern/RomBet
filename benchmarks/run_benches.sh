@@ -6,13 +6,48 @@ ITERATIONS=100
 RESULTS_DIR="benches-results"
 K6_IMAGE="grafana/k6:latest"
 SERVICE_PORT=3000
+MONITORING_STACK="benchmarks/docker-compose.monitoring.yml"
 
 mkdir -p $RESULTS_DIR
 mkdir -p $RESULTS_DIR/raw
 mkdir -p $RESULTS_DIR/summary
+mkdir -p $RESULTS_DIR/grafana-dashboards
 
 echo "Starting benchmark with $ITERATIONS iterations..."
 echo "Results will be stored in: $RESULTS_DIR"
+
+# Function to start monitoring stack
+start_monitoring_stack() {
+    echo "Starting monitoring stack (Prometheus + Grafana + Node Exporter)..."
+    docker compose -f $MONITORING_STACK up -d
+    
+    # Wait for services to be ready
+    echo "Waiting for monitoring services to start..."
+    for i in {1..30}; do
+        if curl -s http://localhost:9090/status >/dev/null 2>&1 && \
+           curl -s http://localhost:8000/api/health >/dev/null 2>&1; then
+            echo "Monitoring stack is ready!"
+            return 0
+        fi
+        echo "Monitoring services not ready yet, waiting... ($i/30)"
+        sleep 2
+    done
+    
+    echo "Monitoring stack failed to start in time"
+    return 1
+}
+
+# Function to stop monitoring stack
+stop_monitoring_stack() {
+    echo "Stopping monitoring stack..."
+    docker compose -f $MONITORING_STACK down
+}
+
+# Start monitoring stack
+if ! start_monitoring_stack; then
+    echo "Failed to start monitoring stack, exiting..."
+    exit 1
+fi
 
 # Function to start service in isolated container
 start_service() {
@@ -109,5 +144,8 @@ done
 
 echo "Aggregating results..."
 python3 aggregate_results.py --results-dir $RESULTS_DIR
+
+# Stop monitoring stack
+stop_monitoring_stack
 
 echo "Benchmark completed! Results in: $RESULTS_DIR"
