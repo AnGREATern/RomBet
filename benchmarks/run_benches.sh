@@ -5,7 +5,6 @@ set -e
 ITERATIONS=100
 RESULTS_DIR="benches-results"
 K6_IMAGE="grafana/k6:latest"
-SERVICE_PORT=3000
 MONITORING_STACK="benchmarks/docker-compose.monitoring.yml"
 
 mkdir -p $RESULTS_DIR
@@ -54,12 +53,18 @@ start_service() {
     local iteration=$1
     echo "Starting service container for iteration $iteration..."
     
-    docker compose -p "benchmark-target-$iteration" run -d -p $SERVICE_PORT:$SERVICE_PORT rombet sh -c "cd crates/db && diesel migration run && diesel migration redo --all && cd ../.. && ./rombet"
+    # Use docker run instead of docker compose run for better isolation
+    # Use dynamic port mapping to avoid conflicts
+    docker run -d \
+        --name "benchmark-target-$iteration" \
+        --network "app-network" \
+        rombet sh -c "cd crates/db && diesel migration run && cd ../.. && ./rombet"
     
     # Wait for service to be ready
     echo "Waiting for service to start..."
+    # Use container name for internal communication
     for ssi in {1..30}; do
-        if curl -s http://localhost:$SERVICE_PORT/api/v1/teams >/dev/null 2>&1; then
+        if docker exec "benchmark-target-$iteration" curl -s http://localhost:3000/api/v1/teams >/dev/null 2>&1; then
             echo "Service is ready!"
             return 0
         fi
@@ -83,8 +88,7 @@ stop_service() {
     docker stop "benchmark-target-$iteration" 2>/dev/null || true
     docker rm "benchmark-target-$iteration" 2>/dev/null || true
     
-    # Remove image to save space
-    docker rmi "rombet-benchmark:$iteration" 2>/dev/null || true
+    # Note: We don't remove images as they're reused across iterations
 }
 
 # Function to start resource monitoring
@@ -125,12 +129,15 @@ for i in $(seq 1 $ITERATIONS); do
     echo "Starting load test for iteration $i..."
     docker run --rm \
         --name "k6-benchmark-$i" \
-        --network "benchmark-target-${i}_app-network" \
+        --network "app-network" \
         -v "$(pwd)/benchmarks":/scripts \
         -v "$(pwd)/$RESULTS_DIR":/results \
-        -e BASE_URL="http://host.docker.internal:$SERVICE_PORT" \
+        -e BASE_URL="http://benchmark-target-$i:3000" \
         $K6_IMAGE run /scripts/benchmark_scenarios.js \
-        --out json="/results/raw/k6_results_$i.json"
+        --out json="/results/raw/k6_results_$i.json" \
+        --out experimental-prometheus-rw \
+        --tag testid="iteration-$i" \
+        --summary-export="/results/raw/k6_summary_$i.json"
     
     # Stop resource monitoring
     stop_resource_monitoring
@@ -145,7 +152,13 @@ done
 echo "Aggregating results..."
 python3 aggregate_results.py --results-dir $RESULTS_DIR
 
-# Stop monitoring stack
-stop_monitoring_stack
+# Keep monitoring stack running throughout all iterations
+# Only stop it at the end if specifically requested
+if [[ "$KEEP_MONITORING" != "true" ]]; then
+    echo "Stopping monitoring stack..."
+    stop_monitoring_stack
+else
+    echo "Monitoring stack will remain running as requested."
+fi
 
 echo "Benchmark completed! Results in: $RESULTS_DIR"

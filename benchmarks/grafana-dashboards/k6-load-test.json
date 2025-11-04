@@ -1,163 +1,183 @@
 {
-  "dashboard": {
-    "id": null,
-    "title": "k6 Load Test Results",
-    "tags": ["k6", "load-testing"],
-    "timezone": "browser",
-    "schemaVersion": 16,
-    "version": 0,
-    "refresh": "5s",
-    "panels": [
-      {
-        "id": 1,
-        "type": "graph",
-        "title": "Requests Per Second",
-        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
-        "targets": [
-          {
-            "expr": "sum(rate(k6_http_reqs_total[5m]))",
-            "legendFormat": "RPS"
-          }
-        ],
-        "yaxes": [
-          {"format": "reqps", "label": "Requests/sec"},
-          {"format": "short"}
-        ]
-      },
-      {
-        "id": 2,
-        "type": "graph",
-        "title": "Response Time Percentiles",
-        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
-        "targets": [
-          {
-            "expr": "histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds_bucket[5m])) by (le))",
-            "legendFormat": "95th percentile"
-          },
-          {
-            "expr": "histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds_bucket[5m])) by (le))",
-            "legendFormat": "99th percentile"
-          },
-          {
-            "expr": "histogram_quantile(0.5, sum(rate(k6_http_req_duration_seconds_bucket[5m])) by (le))",
-            "legendFormat": "Median"
-          }
-        ],
-        "yaxes": [
-          {"format": "s", "label": "Response Time"},
-          {"format": "short"}
-        ]
-      },
-      {
-        "id": 3,
-        "type": "graph",
-        "title": "Error Rate",
-        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
-        "targets": [
-          {
-            "expr": "sum(rate(k6_http_req_failed_total[5m])) / sum(rate(k6_http_reqs_total[5m])) * 100",
-            "legendFormat": "Error Rate %"
-          }
-        ],
-        "yaxes": [
-          {"format": "percent", "label": "Error Rate"},
-          {"format": "short"}
-        ]
-      },
-      {
-        "id": 4,
-        "type": "graph",
-        "title": "Active Virtual Users",
-        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
-        "targets": [
-          {
-            "expr": "k6_vus",
-            "legendFormat": "Virtual Users"
-          }
-        ],
-        "yaxes": [
-          {"format": "short", "label": "Virtual Users"},
-          {"format": "short"}
-        ]
-      },
-      {
-        "id": 5,
-        "type": "stat",
-        "title": "Total Requests",
-        "gridPos": {"x": 0, "y": 16, "w": 6, "h": 4},
-        "targets": [
-          {
-            "expr": "sum(k6_http_reqs_total)",
-            "legendFormat": "Total Requests"
-          }
-        ],
-        "options": {
-          "reduceOptions": {
-            "calcs": ["lastNotNull"]
-          }
+  "id": null,
+  "title": "k6 Load Test Detailed Metrics",
+  "tags": ["k6", "load-testing", "performance", "http"],
+  "timezone": "browser",
+  "schemaVersion": 16,
+  "version": 0,
+  "refresh": "5s",
+  "description": "Comprehensive k6 load test results including request rates, response times, error rates, virtual users, and data transfer metrics with all required percentiles",
+  "panels": [
+    {
+      "id": 1,
+      "type": "graph",
+      "title": "Requests Per Second Over Time",
+      "description": "Total HTTP requests per second during the load test",
+      "gridPos": {"x": 0, "y": 0, "w": 12, "h": 9},
+      "targets": [
+        {
+          "expr": "sum(rate(k6_http_reqs_total[5m]))",
+          "legendFormat": "Requests per Second"
         }
-      },
-      {
-        "id": 6,
-        "type": "stat",
-        "title": "Failed Requests",
-        "gridPos": {"x": 6, "y": 16, "w": 6, "h": 4},
-        "targets": [
-          {
-            "expr": "sum(k6_http_req_failed_total)",
-            "legendFormat": "Failed Requests"
-          }
-        ],
-        "options": {
-          "reduceOptions": {
-            "calcs": ["lastNotNull"]
-          }
-        }
-      },
-      {
-        "id": 7,
-        "type": "stat",
-        "title": "Average Response Time",
-        "gridPos": {"x": 12, "y": 16, "w": 6, "h": 4},
-        "targets": [
-          {
-            "expr": "avg(k6_http_req_duration_avg)",
-            "legendFormat": "Avg Response Time"
-          }
-        ],
-        "options": {
-          "reduceOptions": {
-            "calcs": ["lastNotNull"]
-          }
+      ],
+      "yaxes": [
+        {"format": "reqps", "label": "Requests per second"},
+        {"format": "short"}
+      ],
+      "tooltip": {
+        "shared": true,
+        "sort": 2,
+        "value_type": "individual"
+      }
+    },
+    {
+      "id": 2,
+      "type": "graph",
+      "title": "Response Time Percentiles",
+      "description": "Detailed response time distribution showing all required percentiles",
+      "gridPos": {"x": 12, "y": 0, "w": 12, "h": 9},
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.5, sum(rate(k6_http_req_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "50th Percentile (Median)"
         },
-        "fieldConfig": {
-          "defaults": {
-            "unit": "s"
-          }
-        }
-      },
-      {
-        "id": 8,
-        "type": "stat",
-        "title": "Data Received",
-        "gridPos": {"x": 18, "y": 16, "w": 6, "h": 4},
-        "targets": [
-          {
-            "expr": "sum(k6_data_received_total)",
-            "legendFormat": "Data Received"
-          }
-        ],
-        "options": {
-          "reduceOptions": {
-            "calcs": ["lastNotNull"]
-          }
+        {
+          "expr": "histogram_quantile(0.75, sum(rate(k6_http_req_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "75th Percentile"
         },
-        "fieldConfig": {
-          "defaults": {
-            "unit": "bytes"
-          }
+        {
+          "expr": "histogram_quantile(0.9, sum(rate(k6_http_req_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "90th Percentile"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "95th Percentile"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "99th Percentile"
+        }
+      ],
+      "yaxes": [
+        {"format": "s", "label": "Response Time (seconds)"},
+        {"format": "short"}
+      ]
+    },
+    {
+      "id": 3,
+      "type": "graph",
+      "title": "Error Rate Percentage",
+      "description": "Percentage of failed HTTP requests over time",
+      "gridPos": {"x": 0, "y": 9, "w": 12, "h": 9},
+      "targets": [
+        {
+          "expr": "sum(rate(k6_http_req_failed_total[5m])) / sum(rate(k6_http_reqs_total[5m])) * 100",
+          "legendFormat": "Error Rate %"
+        }
+      ],
+      "yaxes": [
+        {"format": "percent", "label": "Error Rate (%)"},
+        {"format": "short"}
+      ]
+    },
+    {
+      "id": 4,
+      "type": "graph",
+      "title": "Active Virtual Users",
+      "description": "Number of concurrently active virtual users during the test",
+      "gridPos": {"x": 12, "y": 9, "w": 12, "h": 9},
+      "targets": [
+        {
+          "expr": "k6_vus",
+          "legendFormat": "Virtual Users"
+        }
+      ],
+      "yaxes": [
+        {"format": "short", "label": "Virtual Users"},
+        {"format": "short"}
+      ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Total HTTP Requests",
+      "description": "Cumulative count of all HTTP requests sent",
+      "gridPos": {"x": 0, "y": 18, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "sum(k6_http_reqs_total)",
+          "legendFormat": "Total Requests"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"]
         }
       }
-    ]
-  }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Failed HTTP Requests",
+      "description": "Count of failed HTTP requests",
+      "gridPos": {"x": 6, "y": 18, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "sum(k6_http_req_failed_total)",
+          "legendFormat": "Failed Requests"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"]
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Average Response Time",
+      "description": "Average HTTP response time across all requests",
+      "gridPos": {"x": 12, "y": 18, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "avg(k6_http_req_duration_avg)",
+          "legendFormat": "Avg Response Time"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Total Data Transferred",
+      "description": "Total amount of data received during the test",
+      "gridPos": {"x": 18, "y": 18, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "sum(k6_data_received_total)",
+          "legendFormat": "Data Received"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"]
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      }
+    }
+  ]
 }
