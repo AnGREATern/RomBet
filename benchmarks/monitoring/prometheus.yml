@@ -2,9 +2,8 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
-rule_files:
-  # - "first_rules.yml"
-  # - "second_rules.yml"
+remote_write:
+  - url: "http://host.docker.internal:9090/api/v1/write"
 
 scrape_configs:
   - job_name: 'prometheus'
@@ -16,15 +15,10 @@ scrape_configs:
       - targets: ['node-exporter:9100']
 
   - job_name: 'rombet-service'
-    # Use Docker service discovery for dynamically created containers
-    dockerswarm_sd_configs:
-      - host: unix:///var/run/docker.sock
-        role: tasks
-        port: 3000
+    # # Use Docker service discovery for dynamically created containers
+    # dockerswarm_sd_configs:
+    #   - host: unix:///var/run/docker.sock
+    #     role: tasks
+    #     port: 3000
     metrics_path: '/metrics'
-    scrape_interval: 5s
-
-  - job_name: 'k6'
-    static_configs:
-      - targets: ['k6:6565']
     scrape_interval: 5s

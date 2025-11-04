@@ -1,7 +1,3 @@
-networks:
-  app-network:
-    driver: bridge
-
 services:
   prometheus:
     image: prom/prometheus:latest
@@ -13,12 +9,11 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-remote-write-receiver'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/console_templates'
       - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
-    networks:
-      - app-network
 
   grafana:
     image: grafana/grafana:latest
@@ -33,8 +28,6 @@ services:
       - ./grafana-dashboards:/var/lib/grafana/dashboards
     depends_on:
       - prometheus
-    networks:
-      - app-network
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -49,8 +42,6 @@ services:
       - '--path.rootfs=/rootfs'
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    networks:
-      - app-network
 
 volumes:
   prometheus_data:

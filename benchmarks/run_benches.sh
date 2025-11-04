@@ -2,15 +2,16 @@
 
 set -e
 
-ITERATIONS=100
+ITERATIONS=1
 RESULTS_DIR="benches-results"
 K6_IMAGE="grafana/k6:latest"
 MONITORING_STACK="benchmarks/docker-compose.monitoring.yml"
+SERVICE_PORT=3000
 
+rm -rf $RESULTS_DIR
 mkdir -p $RESULTS_DIR
 mkdir -p $RESULTS_DIR/raw
 mkdir -p $RESULTS_DIR/summary
-mkdir -p $RESULTS_DIR/grafana-dashboards
 
 echo "Starting benchmark with $ITERATIONS iterations..."
 echo "Results will be stored in: $RESULTS_DIR"
@@ -53,12 +54,16 @@ start_service() {
     local iteration=$1
     echo "Starting service container for iteration $iteration..."
     
-    # Use docker run instead of docker compose run for better isolation
-    # Use dynamic port mapping to avoid conflicts
-    docker run -d \
+    docker compose \
+        -p "benchmark-target-$iteration" run -d \
         --name "benchmark-target-$iteration" \
-        --network "app-network" \
-        rombet sh -c "cd crates/db && diesel migration run && cd ../.. && ./rombet"
+        -p $SERVICE_PORT:$SERVICE_PORT \
+        rombet sh -c "cd crates/db && diesel migration run && diesel migration redo --all && cd ../.. && ./rombet"
+
+    # docker run -d \
+    #     --name "benchmark-target-$iteration" \
+    #     --network "app-network" \
+    #     rombet sh -c "cd crates/db && diesel migration run && cd ../.. && ./rombet"
     
     # Wait for service to be ready
     echo "Waiting for service to start..."
@@ -127,12 +132,13 @@ for i in $(seq 1 $ITERATIONS); do
     
     # Run load test
     echo "Starting load test for iteration $i..."
+    # --network "ppo_app-network"
     docker run --rm \
         --name "k6-benchmark-$i" \
-        --network "app-network" \
         -v "$(pwd)/benchmarks":/scripts \
         -v "$(pwd)/$RESULTS_DIR":/results \
-        -e BASE_URL="http://benchmark-target-$i:3000" \
+        -e BASE_URL="http://host.docker.internal:$SERVICE_PORT" \
+        -e K6_PROMETHEUS_RW_SERVER_URL="http://host.docker.internal:9090/api/v1/write" \
         $K6_IMAGE run /scripts/benchmark_scenarios.js \
         --out json="/results/raw/k6_results_$i.json" \
         --out experimental-prometheus-rw \
@@ -150,7 +156,7 @@ for i in $(seq 1 $ITERATIONS); do
 done
 
 echo "Aggregating results..."
-python3 aggregate_results.py --results-dir $RESULTS_DIR
+python3 benchmarks/aggregate_results.py --results-dir $RESULTS_DIR
 
 # Keep monitoring stack running throughout all iterations
 # Only stop it at the end if specifically requested
