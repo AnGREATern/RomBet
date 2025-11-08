@@ -3,10 +3,10 @@
   "title": "k6 Load Test Detailed Metrics",
   "tags": ["k6", "load-testing", "performance", "http"],
   "timezone": "browser",
-  "schemaVersion": 16,
-  "version": 0,
+  "schemaVersion": 37,
+  "version": 1,
   "refresh": "5s",
-  "description": "Comprehensive k6 load test results including request rates, response times, error rates, virtual users, and data transfer metrics with all required percentiles",
+  "description": "Comprehensive k6 load test results with full latency analysis: time series, percentiles, histogram, and required metrics (p50, p75, p90, p95, p99). All panels include meaningful data and proper labeling.",
   "panels": [
     {
       "id": 1,
@@ -16,13 +16,14 @@
       "gridPos": {"x": 0, "y": 0, "w": 12, "h": 9},
       "targets": [
         {
-          "expr": "sum(rate(k6_http_reqs_total[5m]))",
-          "legendFormat": "Requests per Second"
+          "expr": "sum(rate(k6_http_reqs_total[1m]))",
+          "legendFormat": "Requests per Second",
+          "refId": "A"
         }
       ],
       "yaxes": [
-        {"format": "reqps", "label": "Requests per second"},
-        {"format": "short"}
+        {"format": "reqps", "label": "Requests per second", "show": true},
+        {"format": "short", "show": true}
       ],
       "xaxis": {
         "show": true,
@@ -32,55 +33,65 @@
       "lines": true,
       "linewidth": 2,
       "fill": 1,
+      "fillGradient": 5,
       "grid": {
         "leftLogBase": 1,
-        "leftMax": null,
-        "leftMin": null,
-        "rightLogBase": 1,
-        "rightMax": null,
-        "rightMin": null,
-        "threshold1": null,
-        "threshold1Color": "rgba(216, 200, 27, 0.27)",
-        "threshold2": null,
-        "threshold2Color": "rgba(234, 112, 112, 0.22)"
+        "rightLogBase": 1
       },
       "tooltip": {
         "shared": true,
         "sort": 2,
         "value_type": "individual"
-      }
+      },
+      "aliasColors": {},
+      "dashLength": 10,
+      "dashes": false,
+      "minSpan": 1,
+      "nullPointMode": "null",
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "thresholds": [],
+      "timeRegions": []
     },
     {
       "id": 2,
       "type": "graph",
-      "title": "Response Time Percentiles",
-      "description": "Detailed response time distribution showing all required percentiles",
+      "title": "Response Time Percentiles Over Time",
+      "description": "Latency distribution over time at key percentiles: p50, p75, p90, p95, p99",
       "gridPos": {"x": 12, "y": 0, "w": 12, "h": 9},
       "targets": [
         {
-          "expr": "histogram_quantile(0.5, sum(rate(k6_http_req_duration_seconds_bucket[5m])) by (le))",
-          "legendFormat": "50th Percentile (Median)"
+          "expr": "histogram_quantile(0.5, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p50 (Median)",
+          "refId": "A"
         },
         {
-          "expr": "histogram_quantile(0.75, sum(rate(k6_http_req_duration_seconds_bucket[5m])) by (le))",
-          "legendFormat": "75th Percentile"
+          "expr": "histogram_quantile(0.75, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p75",
+          "refId": "B"
         },
         {
-          "expr": "histogram_quantile(0.9, sum(rate(k6_http_req_duration_seconds_bucket[5m])) by (le))",
-          "legendFormat": "90th Percentile"
+          "expr": "histogram_quantile(0.90, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p90",
+          "refId": "C"
         },
         {
-          "expr": "histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds_bucket[5m])) by (le))",
-          "legendFormat": "95th Percentile"
+          "expr": "histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p95",
+          "refId": "D"
         },
         {
-          "expr": "histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds_bucket[5m])) by (le))",
-          "legendFormat": "99th Percentile"
+          "expr": "histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p99",
+          "refId": "E"
         }
       ],
       "yaxes": [
-        {"format": "s", "label": "Response Time (seconds)"},
-        {"format": "short"}
+        {"format": "s", "label": "Response Time (seconds)", "show": true},
+        {"format": "short", "show": true}
       ],
       "xaxis": {
         "show": true,
@@ -90,54 +101,73 @@
       "lines": true,
       "linewidth": 2,
       "fill": 1,
+      "fillGradient": 5,
+      "stack": false,
+      "steppedLine": false,
+      "tooltip": {
+        "shared": true,
+        "sort": 2,
+        "value_type": "individual"
+      },
+      "aliasColors": {},
+      "dashLength": 10,
+      "dashes": false,
       "grid": {
         "leftLogBase": 1,
-        "leftMax": null,
-        "leftMin": null,
-        "rightLogBase": 1,
-        "rightMax": null,
-        "rightMin": null,
-        "threshold1": null,
-        "threshold1Color": "rgba(216, 200, 27, 0.27)",
-        "threshold2": null,
-        "threshold2Color": "rgba(234, 112, 112, 0.22)"
-      }
+        "rightLogBase": 1
+      },
+      "renderer": "flot"
     },
     {
       "id": 3,
-      "type": "graph",
-      "title": "Error Rate Percentage",
-      "description": "Percentage of failed HTTP requests over time",
+      "type": "histogram",
+      "title": "Response Time Distribution (Histogram)",
+      "description": "Distribution of HTTP response times across buckets (latency histogram)",
       "gridPos": {"x": 0, "y": 9, "w": 12, "h": 9},
       "targets": [
         {
-          "expr": "sum(rate(k6_http_req_failed_total[5m])) / sum(rate(k6_http_reqs_total[5m])) * 100",
-          "legendFormat": "Error Rate %"
+          "expr": "sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le)",
+          "refId": "A",
+          "format": "heatmap"
         }
       ],
       "yaxes": [
-        {"format": "percent", "label": "Error Rate (%)"},
-        {"format": "short"}
+        {"format": "short", "label": "Frequency", "show": true},
+        {"format": "short", "show": true}
       ],
       "xaxis": {
         "show": true,
-        "format": "time",
-        "label": "Time"
+        "format": "s",
+        "label": "Response Time (seconds)"
       },
-      "lines": true,
-      "linewidth": 2,
-      "fill": 1,
       "grid": {
         "leftLogBase": 1,
-        "leftMax": null,
-        "leftMin": null,
-        "rightLogBase": 1,
-        "rightMax": null,
-        "rightMin": null,
-        "threshold1": null,
-        "threshold1Color": "rgba(216, 200, 27, 0.27)",
-        "threshold2": null,
-        "threshold2Color": "rgba(234, 112, 112, 0.22)"
+        "rightLogBase": 1
+      },
+      "options": {
+        "calculate": false,
+        "colorMode": "opacity",
+        "exemplars": true,
+        "filterValues": 0.7,
+        "legend": {
+          "show": true
+        },
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": ["mean"],
+          "fields": "",
+          "values": false
+        },
+        "showLabels": false,
+        "showLegend": true,
+        "tooltip": {
+          "mode": "single"
+        },
+        "xField": "Le",
+        "yField": "Value"
+      },
+      "legend": {
+        "show": true
       }
     },
     {
@@ -149,12 +179,13 @@
       "targets": [
         {
           "expr": "k6_vus",
-          "legendFormat": "Virtual Users"
+          "legendFormat": "Virtual Users",
+          "refId": "A"
         }
       ],
       "yaxes": [
-        {"format": "short", "label": "Virtual Users"},
-        {"format": "short"}
+        {"format": "short", "label": "Virtual Users", "show": true},
+        {"format": "short", "show": true}
       ],
       "xaxis": {
         "show": true,
@@ -164,100 +195,247 @@
       "lines": true,
       "linewidth": 2,
       "fill": 1,
+      "fillGradient": 5,
+      "stack": false,
+      "steppedLine": false,
+      "tooltip": {
+        "shared": true,
+        "sort": 2,
+        "value_type": "individual"
+      },
+      "renderer": "flot",
       "grid": {
         "leftLogBase": 1,
-        "leftMax": null,
-        "leftMin": null,
-        "rightLogBase": 1,
-        "rightMax": null,
-        "rightMin": null,
-        "threshold1": null,
-        "threshold1Color": "rgba(216, 200, 27, 0.27)",
-        "threshold2": null,
-        "threshold2Color": "rgba(234, 112, 112, 0.22)"
+        "rightLogBase": 1
       }
     },
     {
       "id": 5,
-      "type": "stat",
-      "title": "Total HTTP Requests",
-      "description": "Cumulative count of all HTTP requests sent",
-      "gridPos": {"x": 0, "y": 18, "w": 6, "h": 4},
-      "targets": [
-        {
-          "expr": "sum(k6_http_reqs_total)",
-          "legendFormat": "Total Requests"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "calcs": ["lastNotNull"]
-        }
-      }
+      "type": "graph",
+      "title": "Error Rate Percentage",
+      "description": "Percentage of failed HTTP requests over time",
+      "gridPos": {"x": 0, "y": 18, "w": 12,  "h": 9
     },
-    {
-      "id": 6,
-      "type": "stat",
-      "title": "Failed HTTP Requests",
-      "description": "Count of failed HTTP requests",
-      "gridPos": {"x": 6, "y": 18, "w": 6, "h": 4},
-      "targets": [
-        {
-          "expr": "sum(k6_http_req_failed_total)",
-          "legendFormat": "Failed Requests"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "calcs": ["lastNotNull"]
-        }
+    "targets": [
+      {
+        "expr": "sum(rate(k6_http_req_failed_total[1m])) / sum(rate(k6_http_reqs_total[1m])) * 100",
+        "legendFormat": "Error Rate %",
+        "refId": "A"
       }
+    ],
+    "yaxes": [
+      {"format": "percent", "label": "Error Rate (%)", "show": true},
+      {"format": "short", "show": true}
+    ],
+    "xaxis": {
+      "show": true,
+      "format": "time",
+      "label": "Time"
     },
-    {
-      "id": 7,
-      "type": "stat",
-      "title": "Average Response Time",
-      "description": "Average HTTP response time across all requests",
-      "gridPos": {"x": 12, "y": 18, "w": 6, "h": 4},
-      "targets": [
-        {
-          "expr": "avg(k6_http_req_duration_avg)",
-          "legendFormat": "Avg Response Time"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "calcs": ["lastNotNull"]
-        }
+    "lines": true,
+    "linewidth": 2,
+    "fill": 1,
+    "fillGradient": 5,
+    "stack": false,
+    "steppedLine": false,
+    "tooltip": {
+      "shared": true,
+      "sort": 2,
+      "value_type": "individual"
+    },
+    "renderer": "flot",
+    "grid": {
+      "leftLogBase": 1,
+      "rightLogBase": 1
+    }
+  },
+  {
+    "id": 6,
+    "type": "stat",
+    "title": "Total HTTP Requests",
+    "description": "Cumulative count of all HTTP requests sent during the test",
+    "gridPos": {"x": 12, "y": 18, "w": 6, "h": 4},
+    "targets": [
+      {
+        "expr": "sum(k6_http_reqs_total)",
+        "refId": "A"
+      }
+    ],
+    "options": {
+      "reduceOptions": {
+        "calcs": ["lastNotNull"]
       },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "s"
-        }
-      }
+      "text": {},
+      "colorMode": "value",
+      "graphMode": "none"
     },
-    {
-      "id": 8,
-      "type": "stat",
-      "title": "Total Data Transferred",
-      "description": "Total amount of data received during the test",
-      "gridPos": {"x": 18, "y": 18, "w": 6, "h": 4},
-      "targets": [
-        {
-          "expr": "sum(k6_data_received_total)",
-          "legendFormat": "Data Received"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "calcs": ["lastNotNull"]
-        }
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "bytes"
+    "fieldConfig": {
+      "defaults": {
+        "unit": "none",
+        "decimals": 0,
+        "thresholds": {
+          "mode": "absolute",
+          "steps": [
+            {"value": 0, "color": "green"},
+            {"value": 10000, "color": "orange"},
+            {"value": 50000, "color": "red"}
+          ]
         }
       }
     }
-  ]
+  },
+  {
+    "id": 7,
+    "type": "stat",
+    "title": "Failed HTTP Requests",
+    "description": "Count of failed HTTP requests",
+    "gridPos": {"x": 18, "y": 18, "w": 6, "h": 4},
+    "targets": [
+      {
+        "expr": "sum(k6_http_req_failed_total)",
+        "refId": "A"
+      }
+    ],
+    "options": {
+      "reduceOptions": {
+        "calcs": ["lastNotNull"]
+      },
+      "text": {},
+      "colorMode": "value",
+      "graphMode": "none"
+    },
+    "fieldConfig": {
+      "defaults": {
+        "unit": "none",
+        "decimals": 0,
+        "thresholds": {
+          "mode": "absolute",
+          "steps": [
+            {"value": 0, "color": "green"},
+            {"value": 100, "color": "orange"},
+            {"value": 500, "color": "red"}
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": 8,
+    "type": "stat",
+    "title": "Average Response Time",
+    "description": "Average HTTP response time across all requests",
+    "gridPos": {"x": 12, "y": 22, "w": 6, "h": 4},
+    "targets": [
+      {
+        "expr": "avg(k6_http_req_duration_avg)",
+        "refId": "A"
+      }
+    ],
+    "options": {
+      "reduceOptions": {
+        "calcs": ["lastNotNull"]
+      },
+      "text": {},
+      "colorMode": "value",
+      "graphMode": "none"
+    },
+    "fieldConfig": {
+      "defaults": {
+        "unit": "s",
+        "decimals": 3,
+        "thresholds": {
+          "mode": "absolute",
+          "steps": [
+            {"value": 0, "color": "green"},
+            {"value": 0.5, "color": "orange"},
+            {"value": 1.0, "color": "red"}
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": 9,
+    "type": "stat",
+    "title": "Total Data Transferred",
+    "description": "Total amount of data received during the test",
+    "gridPos": {"x": 18, "y": 22, "w": 6, "h": 4},
+    "targets": [
+      {
+        "expr": "sum(k6_data_received_total)",
+        "refId": "A"
+      }
+    ],
+    "options": {
+      "reduceOptions": {
+        "calcs": ["lastNotNull"]
+      },
+      "text": {},
+      "colorMode": "value",
+      "graphMode": "none"
+    },
+    "fieldConfig": {
+      "defaults": {
+        "unit": "bytes",
+        "decimals": 1
+      }
+    }
+  },
+  {
+    "id": 10,
+    "type": "table",
+    "title": "Key Response Time Percentiles (Final)",
+    "description": "Final values of key latency percentiles: p50, p75, p90, p95, p99",
+    "gridPos": {"x": 0, "y": 27, "w": 12, "h": 8},
+    "targets": [
+      {
+        "expr": "histogram_quantile(0.5, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+        "refId": "p50",
+        "legendFormat": "p50"
+      },
+      {
+        "expr": "histogram_quantile(0.75, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+        "refId": "p75",
+        "legendFormat": "p75"
+      },
+      {
+        "expr": "histogram_quantile(0.90, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+        "refId": "p90",
+        "legendFormat": "p90"
+      },
+      {
+        "expr": "histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+        "refId": "p95",
+        "legendFormat": "p95"
+      },
+      {
+        "expr": "histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+        "refId": "p99",
+        "legendFormat": "p99"
+      }
+    ],
+    "pluginVersion": "8.5.16",
+    "fieldConfig": {
+      "defaults": {
+        "unit": "s",
+        "decimals": 3,
+        "thresholds": {
+          "mode": "absolute",
+          "steps": [
+            {"value": 0, "color": "green"},
+            {"value": 0.5, "color": "orange"},
+            {"value": 1.0, "color": "red"}
+          ]
+        }
+      },
+      "overrides": []
+    },
+    "options": {
+      "showHeader": true,
+      "displayMode": "color-text",
+      "align": "auto",
+      "cellPadding": 2
+    }
+  }
+]
 }
