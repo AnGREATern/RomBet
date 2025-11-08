@@ -24,6 +24,26 @@
         {"format": "percent", "label": "CPU Usage (%)", "min": 0, "max": 100},
         {"format": "short"}
       ],
+      "xaxis": {
+        "show": true,
+        "format": "time",
+        "label": "Time"
+      },
+      "lines": true,
+      "linewidth": 2,
+      "fill": 1,
+      "grid": {
+        "leftLogBase": 1,
+        "leftMax": null,
+        "leftMin": null,
+        "rightLogBase": 1,
+        "rightMax": null,
+        "rightMin": null,
+        "threshold1": null,
+        "threshold1Color": "rgba(216, 200, 27, 0.27)",
+        "threshold2": null,
+        "threshold2Color": "rgba(234, 112, 112, 0.22)"
+      },
       "tooltip": {
         "shared": true,
         "sort": 2,
@@ -49,7 +69,27 @@
       "yaxes": [
         {"format": "bytes", "label": "Memory"},
         {"format": "short"}
-      ]
+      ],
+      "xaxis": {
+        "show": true,
+        "format": "time",
+        "label": "Time"
+      },
+      "lines": true,
+      "linewidth": 2,
+      "fill": 1,
+      "grid": {
+        "leftLogBase": 1,
+        "leftMax": null,
+        "leftMin": null,
+        "rightLogBase": 1,
+        "rightMax": null,
+        "rightMin": null,
+        "threshold1": null,
+        "threshold1Color": "rgba(216, 200, 27, 0.27)",
+        "threshold2": null,
+        "threshold2Color": "rgba(234, 112, 112, 0.22)"
+      }
     },
     {
       "id": 3,
@@ -70,7 +110,27 @@
       "yaxes": [
         {"format": "Bps", "label": "Bytes per second"},
         {"format": "short"}
-      ]
+      ],
+      "xaxis": {
+        "show": true,
+        "format": "time",
+        "label": "Time"
+      },
+      "lines": true,
+      "linewidth": 2,
+      "fill": 1,
+      "grid": {
+        "leftLogBase": 1,
+        "leftMax": null,
+        "leftMin": null,
+        "rightLogBase": 1,
+        "rightMax": null,
+        "rightMin": null,
+        "threshold1": null,
+        "threshold1Color": "rgba(216, 200, 27, 0.27)",
+        "threshold2": null,
+        "threshold2Color": "rgba(234, 112, 112, 0.22)"
+      }
     },
     {
       "id": 4,
@@ -91,7 +151,27 @@
       "yaxes": [
         {"format": "Bps", "label": "Bytes per second"},
         {"format": "short"}
-      ]
+      ],
+      "xaxis": {
+        "show": true,
+        "format": "time",
+        "label": "Time"
+      },
+      "lines": true,
+      "linewidth": 2,
+      "fill": 1,
+      "grid": {
+        "leftLogBase": 1,
+        "leftMax": null,
+        "leftMin": null,
+        "rightLogBase": 1,
+        "rightMax": null,
+        "rightMin": null,
+        "threshold1": null,
+        "threshold1Color": "rgba(216, 200, 27, 0.27)",
+        "threshold2": null,
+        "threshold2Color": "rgba(234, 112, 112, 0.22)"
+      }
     },
     {
       "id": 5,
