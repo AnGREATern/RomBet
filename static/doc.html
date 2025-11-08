@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RomBet Documentation</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        body {
+            padding: 20px;
+            font-family: "Segoe UI", sans-serif;
+            color: #212529;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #333;
+            border-bottom: 1px solid #007bff;
+            padding-bottom: 5px;
+        }
+        .markdown-content {
+            line-height: 1.6;
+        }
+        .markdown-content p {
+            margin: 1em 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="output" class="markdown-content"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const response = await fetch('README.md');
+                if (!response.ok) throw new Error('Не удалось загрузить README.md');
+                const markdown = await response.text();
+                const html = marked.parse(markdown);
+                const output = document.getElementById('output');
+                output.innerHTML = html;
+                if (typeof renderMathInElement === 'function') {
+                    renderMathInElement(output, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ]
+                    });
+                }
+
+            } catch (err) {
+                document.getElementById('output').innerHTML = `
+                    <div style="color: red; padding: 15px; border: 1px solid red; background: #fdd; border-radius: 5px;">
+                        <strong>Ошибка:</strong> ${err.message}
+                    </div>
+                `;
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>

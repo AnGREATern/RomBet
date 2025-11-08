@@ -34,6 +34,9 @@ cargo build
 cargo run &
 RUST_PID=$!
 
+echo "Start Nginx server..."
+nginx -c /opt/homebrew/etc/nginx/nginx.conf
+
 if [ "$RUST_ONLY" = false ]; then
     echo "Start React frontend..."
     cd frontend && npm run dev &

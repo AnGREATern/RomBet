@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management - RomBet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .nav-links {
+            list-style: none;
+            padding: 0;
+        }
+        .nav-links li {
+            margin: 15px 0;
+        }
+        .nav-links a {
+            display: block;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 18px;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .nav-links a:hover {
+            background-color: #0056b3;
+        }
+        .description {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RomBet Management Dashboard</h1>
+        <ul class="nav-links">
+            <li>
+                <a href="/api/v1">Swagger</a>
+                <div class="description">View and test the REST API endpoints</div>
+            </li>
+            <li>
+                <a href="/legacy">Legacy Application Download</a>
+                <div class="description">Download the command-line version of RomBet</div>
+            </li>
+            <li>
+                <a href="/documentation">Readme</a>
+                <div class="description">View the project documentation and setup guide</div>
+            </li>
+            <li>
+                <a href="/">Main Page</a>
+                <div class="description">Return to the main welcome page</div>
+            </li>
+            <li>
+                <a href="/reserved">Reserved Page</a>
+                <div class="description">Access the reserved content area</div>
+            </li>
+            <li>
+                <a href="/admin">Database Administration</a>
+                <div class="description">Access the PostgreSQL database administration panel</div>
+            </li>
+            <li>
+                <a href="/status">Server Status</a>
+                <div class="description">View nginx server status information</div>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

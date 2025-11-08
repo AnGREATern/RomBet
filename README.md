@@ -1,6 +1,6 @@
 # RomBet
 ## Вид
-![MainPage](report/img/main_page.png)
+[<img src="report/img/main_page.png" width="900"/>](report/img/main_page.png)
 
 ## Идея проекта
 Эмуляция букмекерской конторы для ставок на спорт. Имеется некоторый набор команд и историю встреч между ними, по истории встреч считается коэффициенты на исходы матча. Пользователь делает ставки на матчи. По нажатии на кнопку "Рассчитать результат" генерируется результат матча на основе предыдущих встречах команд, рассчитываются ставки и выставляется новый тур матчей. Процесс повторяется.
@@ -34,10 +34,11 @@ FlashScore|-|Есть|-
 ![Use-Case - диаграмма](report/img/UCD.svg)
 
 ## ER-диаграмма сущностей
-![ER-диаграмма сущностей](report/img/ER.svg)
+[<img src="report/img/ER.svg" width="900"/>](report/img/ER.svg)
+
 
 ## Пользовательские сценарии
-![](report/img/us.svg)
+[<img src="report/img/us.svg" width="900"/>](report/img/us.svg)
 
 ### Модель вычисления коэффициентов исходов матчей
 
@@ -102,7 +103,7 @@ Web SPA
 Rust, TypeScript, React, PostgreSQL
 
 ## Верхнеуровневое разбиение на компоненты
-![CD](report/img/cd_2.svg)
+[<img src="report/img/cd_2.svg" width="900"/>](report/img/cd_2.svg)
 
 ## UML-диаграмма классов для компонента доступа к данным и компонента с бизнес-логикой
-![UML](report/img/UML.svg)
+[<img src="report/img/UML.svg" width="900"/>](report/img/UML.svg)

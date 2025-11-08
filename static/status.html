@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Status - RomBet</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        h1 {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        .status-header {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .status-content {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            border: 1px solid #e9ecef;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        .metric-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        .refresh-info {
+            text-align: center;
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+        .server-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 RomBet Server Status</h1>
+        
+        <div class="status-header">
+            <div class="server-icon">📊</div>
+            <h2>Nginx Server Statistics</h2>
+            <p>Real-time performance metrics</p>
+        </div>
+        
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="server-icon">🌐</div>
+                <div class="metric-value" id="active-connections">-</div>
+                <div class="metric-label">Active Connections</div>
+            </div>
+            <div class="metric-card">
+                <div class="server-icon">📥</div>
+                <div class="metric-value" id="accepts">-</div>
+                <div class="metric-label">Accepts</div>
+            </div>
+            <div class="metric-card">
+                <div class="server-icon">🔄</div>
+                <div class="metric-value" id="handled">-</div>
+                <div class="metric-label">Handled</div>
+            </div>
+            <div class="metric-card">
+                <div class="server-icon">👁️</div>
+                <div class="metric-value" id="requests">-</div>
+                <div class="metric-label">Requests</div>
+            </div>
+        </div>
+        
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="server-icon">📖</div>
+                <div class="metric-value" id="reading">-</div>
+                <div class="metric-label">Reading</div>
+            </div>
+            <div class="metric-card">
+                <div class="server-icon">📝</div>
+                <div class="metric-value" id="writing">-</div>
+                <div class="metric-label">Writing</div>
+            </div>
+            <div class="metric-card">
+                <div class="server-icon">⏱️</div>
+                <div class="metric-value" id="waiting">-</div>
+                <div class="metric-label">Waiting</div>
+            </div>
+        </div>
+        
+        <h3>Raw Status Data</h3>
+        <div class="status-content" id="status-content">
+            Loading server status...
+        </div>
+        
+        <div class="refresh-info">
+            <p>Status updates automatically every 5 seconds</p>
+            <p>Last updated: <span id="last-update">-</span></p>
+        </div>
+    </div>
+
+    <script>
+        function updateStatus() {
+            fetch('/nginx_status')
+                .then(response => response.text())
+                .then(data => {
+                    // Update raw status content
+                    document.getElementById('status-content').textContent = data;
+                    
+                    // Parse nginx status data
+                    const lines = data.trim().split('\n');
+                    if (lines.length >= 4) {
+                        // Active connections line
+                        const activeConnectionsLine = lines[0];
+                        const activeConnections = activeConnectionsLine.match(/(\d+)/)[1];
+                        document.getElementById('active-connections').textContent = activeConnections;
+                        
+                        // Server accepts handled requests line
+                        const serverLine = lines[2].trim();
+                        const serverStats = serverLine.split(/\s+/);
+                        document.getElementById('accepts').textContent = serverStats[0];
+                        document.getElementById('handled').textContent = serverStats[1];
+                        document.getElementById('requests').textContent = serverStats[2];
+                        
+                        // Reading/Writing/Waiting line
+                        const rwLine = lines[3].trim();
+                        const rwStats = rwLine.split(/\s+/);
+                        document.getElementById('reading').textContent = rwStats[1];
+                        document.getElementById('writing').textContent = rwStats[3];
+                        document.getElementById('waiting').textContent = rwStats[5];
+                    }
+                    
+                    // Update last refresh time
+                    document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+                })
+                .catch(error => {
+                    console.error('Error fetching status:', error);
+                    document.getElementById('status-content').textContent = 'Error loading server status: ' + error.message;
+                });
+        }
+        
+        // Initial load
+        updateStatus();
+        
+        // Refresh every 5 seconds
+        setInterval(updateStatus, 5000);
+    </script>
+</body>
+</html>
