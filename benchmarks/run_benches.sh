@@ -2,11 +2,12 @@
 
 set -e
 
-ITERATIONS=1
+ITERATIONS=100
 RESULTS_DIR="benches-results"
 K6_IMAGE="grafana/k6:latest"
 MONITORING_STACK="benchmarks/docker-compose.monitoring.yml"
 SERVICE_PORT=3000
+KEEP_MONITORING=true
 
 rm -rf $RESULTS_DIR
 mkdir -p $RESULTS_DIR
@@ -16,14 +17,17 @@ mkdir -p $RESULTS_DIR/summary
 echo "Starting benchmark with $ITERATIONS iterations..."
 echo "Results will be stored in: $RESULTS_DIR"
 
-# Function to start monitoring stack
 start_monitoring_stack() {
+    if curl -s http://localhost:9090/status >/dev/null 2>&1 && \
+        curl -s http://localhost:8000/api/health >/dev/null 2>&1; then
+        echo "Monitoring stack is ready!"
+        return 0
+    fi
     echo "Starting monitoring stack (Prometheus + Grafana + Node Exporter)..."
     docker compose -f $MONITORING_STACK up -d
     
-    # Wait for services to be ready
     echo "Waiting for monitoring services to start..."
-    for i in {1..30}; do
+    for i in {1..50}; do
         if curl -s http://localhost:9090/status >/dev/null 2>&1 && \
            curl -s http://localhost:8000/api/health >/dev/null 2>&1; then
             echo "Monitoring stack is ready!"
@@ -37,19 +41,16 @@ start_monitoring_stack() {
     return 1
 }
 
-# Function to stop monitoring stack
 stop_monitoring_stack() {
     echo "Stopping monitoring stack..."
     docker compose -f $MONITORING_STACK down
 }
 
-# Start monitoring stack
 if ! start_monitoring_stack; then
     echo "Failed to start monitoring stack, exiting..."
     exit 1
 fi
 
-# Function to start service in isolated container
 start_service() {
     local iteration=$1
     echo "Starting service container for iteration $iteration..."
@@ -60,14 +61,7 @@ start_service() {
         -p $SERVICE_PORT:$SERVICE_PORT \
         rombet sh -c "cd crates/db && diesel migration run && diesel migration redo --all && cd ../.. && ./rombet"
 
-    # docker run -d \
-    #     --name "benchmark-target-$iteration" \
-    #     --network "app-network" \
-    #     rombet sh -c "cd crates/db && diesel migration run && cd ../.. && ./rombet"
-    
-    # Wait for service to be ready
     echo "Waiting for service to start..."
-    # Use container name for internal communication
     for ssi in {1..30}; do
         if docker exec "benchmark-target-$iteration" curl -s http://localhost:3000/api/v1/teams >/dev/null 2>&1; then
             echo "Service is ready!"
@@ -81,7 +75,6 @@ start_service() {
     return 1
 }
 
-# Function to stop and cleanup service
 stop_service() {
     local iteration=$1
     echo "Stopping service container for iteration $iteration..."
@@ -89,14 +82,12 @@ stop_service() {
     # Collect container stats before stopping
     docker stats "benchmark-target-$iteration" --no-stream > "$RESULTS_DIR/raw/container_stats_$iteration.txt" 2>/dev/null || true
     
-    # Stop and remove container
     docker stop "benchmark-target-$iteration" 2>/dev/null || true
     docker rm "benchmark-target-$iteration" 2>/dev/null || true
-    
-    # Note: We don't remove images as they're reused across iterations
+    docker stop "benchmark-target-$iteration-postgres-1" 2>/dev/null || true
+    docker rm "benchmark-target-$iteration-postgres-1" 2>/dev/null || true
 }
 
-# Function to start resource monitoring
 start_resource_monitoring() {
     local iteration=$1
     echo "Starting resource monitoring for iteration $iteration..."
@@ -110,47 +101,38 @@ start_resource_monitoring() {
     NETWORK_PID=$!
 }
 
-# Function to stop resource monitoring
 stop_resource_monitoring() {
     echo "Stopping resource monitoring..."
     kill $RESOURCE_PID $NETWORK_PID 2>/dev/null || true
     wait $RESOURCE_PID $NETWORK_PID 2>/dev/null || true
 }
 
-# Main benchmark loop
 for i in $(seq 1 $ITERATIONS); do
     echo "=== Iteration $i/$ITERATIONS ==="
     
-    # Start service with clean state
     if ! start_service $i; then
         echo "Failed to start service for iteration $i, skipping..."
         continue
     fi
     
-    # Start resource monitoring
     start_resource_monitoring $i
     
-    # Run load test
     echo "Starting load test for iteration $i..."
-    # --network "ppo_app-network"
     docker run --rm \
         --name "k6-benchmark-$i" \
         -v "$(pwd)/benchmarks":/scripts \
         -v "$(pwd)/$RESULTS_DIR":/results \
         -e BASE_URL="http://host.docker.internal:$SERVICE_PORT" \
         -e K6_PROMETHEUS_RW_SERVER_URL="http://host.docker.internal:9090/api/v1/write" \
+        -e K6_PROMETHEUS_RW_TREND_STATS="p(50),p(75),p(90),p(95),p(99)" \
         $K6_IMAGE run /scripts/benchmark_scenarios.js \
         --out json="/results/raw/k6_results_$i.json" \
         --out experimental-prometheus-rw \
         --tag testid="iteration-$i" \
         --summary-export="/results/raw/k6_summary_$i.json"
     
-    # Stop resource monitoring
     stop_resource_monitoring
-    
-    # Stop service and cleanup
     stop_service $i
-    
     echo "Completed iteration $i"
     sleep 3
 done
@@ -158,8 +140,6 @@ done
 echo "Aggregating results..."
 python3 benchmarks/aggregate_results.py --results-dir $RESULTS_DIR
 
-# Keep monitoring stack running throughout all iterations
-# Only stop it at the end if specifically requested
 if [[ "$KEEP_MONITORING" != "true" ]]; then
     echo "Stopping monitoring stack..."
     stop_monitoring_stack

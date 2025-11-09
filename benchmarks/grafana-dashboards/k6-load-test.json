@@ -1,441 +1,584 @@
 {
-  "id": null,
-  "title": "k6 Load Test Detailed Metrics",
-  "tags": ["k6", "load-testing", "performance", "http"],
-  "timezone": "browser",
-  "schemaVersion": 37,
-  "version": 1,
-  "refresh": "5s",
-  "description": "Comprehensive k6 load test results with full latency analysis: time series, percentiles, histogram, and required metrics (p50, p75, p90, p95, p99). All panels include meaningful data and proper labeling.",
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Comprehensive k6 load test results including request rates, response times, error rates, virtual users, and data transfer metrics with all required percentiles",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": 2,
+  "links": [],
   "panels": [
     {
-      "id": 1,
-      "type": "graph",
-      "title": "Requests Per Second Over Time",
-      "description": "Total HTTP requests per second during the load test",
-      "gridPos": {"x": 0, "y": 0, "w": 12, "h": 9},
-      "targets": [
-        {
-          "expr": "sum(rate(k6_http_reqs_total[1m]))",
-          "legendFormat": "Requests per Second",
-          "refId": "A"
+      "datasource": {
+        "type": "prometheus",
+        "uid": "cf3jcz5zbvx1cb"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "ms",
+            "axisPlacement": "right",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
         }
-      ],
-      "yaxes": [
-        {"format": "reqps", "label": "Requests per second", "show": true},
-        {"format": "short", "show": true}
-      ],
-      "xaxis": {
-        "show": true,
-        "format": "time",
-        "label": "Time"
       },
-      "lines": true,
-      "linewidth": 2,
-      "fill": 1,
-      "fillGradient": 5,
-      "grid": {
-        "leftLogBase": 1,
-        "rightLogBase": 1
-      },
-      "tooltip": {
-        "shared": true,
-        "sort": 2,
-        "value_type": "individual"
-      },
-      "aliasColors": {},
-      "dashLength": 10,
-      "dashes": false,
-      "minSpan": 1,
-      "nullPointMode": "null",
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "thresholds": [],
-      "timeRegions": []
-    },
-    {
-      "id": 2,
-      "type": "graph",
-      "title": "Response Time Percentiles Over Time",
-      "description": "Latency distribution over time at key percentiles: p50, p75, p90, p95, p99",
-      "gridPos": {"x": 12, "y": 0, "w": 12, "h": 9},
+      "pluginVersion": "12.2.1",
       "targets": [
         {
-          "expr": "histogram_quantile(0.5, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
-          "legendFormat": "p50 (Median)",
+          "editorMode": "code",
+          "expr": "k6_http_req_duration_p50*1000",
+          "legendFormat": "p50",
+          "range": true,
           "refId": "A"
         },
         {
-          "expr": "histogram_quantile(0.75, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cf3jcz5zbvx1cb"
+          },
+          "editorMode": "code",
+          "expr": "k6_http_req_duration_p75*1000",
+          "hide": false,
+          "instant": false,
           "legendFormat": "p75",
+          "range": true,
           "refId": "B"
         },
         {
-          "expr": "histogram_quantile(0.90, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cf3jcz5zbvx1cb"
+          },
+          "editorMode": "code",
+          "expr": "k6_http_req_duration_p90*1000",
+          "hide": false,
+          "instant": false,
           "legendFormat": "p90",
+          "range": true,
           "refId": "C"
         },
         {
-          "expr": "histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cf3jcz5zbvx1cb"
+          },
+          "editorMode": "code",
+          "expr": "k6_http_req_duration_p95*1000",
+          "hide": false,
+          "instant": false,
           "legendFormat": "p95",
+          "range": true,
           "refId": "D"
         },
         {
-          "expr": "histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cf3jcz5zbvx1cb"
+          },
+          "editorMode": "code",
+          "expr": "k6_http_req_duration_p99*1000",
+          "hide": false,
+          "instant": false,
           "legendFormat": "p99",
+          "range": true,
           "refId": "E"
         }
       ],
-      "yaxes": [
-        {"format": "s", "label": "Response Time (seconds)", "show": true},
-        {"format": "short", "show": true}
-      ],
-      "xaxis": {
-        "show": true,
-        "format": "time",
-        "label": "Time"
-      },
-      "lines": true,
-      "linewidth": 2,
-      "fill": 1,
-      "fillGradient": 5,
-      "stack": false,
-      "steppedLine": false,
-      "tooltip": {
-        "shared": true,
-        "sort": 2,
-        "value_type": "individual"
-      },
-      "aliasColors": {},
-      "dashLength": 10,
-      "dashes": false,
-      "grid": {
-        "leftLogBase": 1,
-        "rightLogBase": 1
-      },
-      "renderer": "flot"
+      "title": "Request duration",
+      "type": "timeseries"
     },
     {
-      "id": 3,
-      "type": "histogram",
-      "title": "Response Time Distribution (Histogram)",
-      "description": "Distribution of HTTP response times across buckets (latency histogram)",
-      "gridPos": {"x": 0, "y": 9, "w": 12, "h": 9},
-      "targets": [
-        {
-          "expr": "sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le)",
-          "refId": "A",
-          "format": "heatmap"
-        }
-      ],
-      "yaxes": [
-        {"format": "short", "label": "Frequency", "show": true},
-        {"format": "short", "show": true}
-      ],
-      "xaxis": {
-        "show": true,
-        "format": "s",
-        "label": "Response Time (seconds)"
+      "datasource": {
+        "type": "prometheus",
+        "uid": "cf3jcz5zbvx1cb"
       },
-      "grid": {
-        "leftLogBase": 1,
-        "rightLogBase": 1
-      },
-      "options": {
-        "calculate": false,
-        "colorMode": "opacity",
-        "exemplars": true,
-        "filterValues": 0.7,
-        "legend": {
-          "show": true
+      "description": "Average HTTP response time across all requests",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
         },
-        "orientation": "vertical",
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": ["mean"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
-        "showLabels": false,
-        "showLegend": true,
-        "tooltip": {
-          "mode": "single"
-        },
-        "xField": "Le",
-        "yField": "Value"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "legend": {
-        "show": true
-      }
-    },
-    {
-      "id": 4,
-      "type": "graph",
-      "title": "Active Virtual Users",
-      "description": "Number of concurrently active virtual users during the test",
-      "gridPos": {"x": 12, "y": 9, "w": 12, "h": 9},
+      "pluginVersion": "12.2.1",
       "targets": [
         {
-          "expr": "k6_vus",
-          "legendFormat": "Virtual Users",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "bf34yaz1u0c8wd"
+          },
+          "editorMode": "code",
+          "expr": "k6_http_req_duration_p50",
+          "legendFormat": "Avg Response Time",
+          "range": true,
           "refId": "A"
         }
       ],
-      "yaxes": [
-        {"format": "short", "label": "Virtual Users", "show": true},
-        {"format": "short", "show": true}
-      ],
-      "xaxis": {
-        "show": true,
-        "format": "time",
-        "label": "Time"
-      },
-      "lines": true,
-      "linewidth": 2,
-      "fill": 1,
-      "fillGradient": 5,
-      "stack": false,
-      "steppedLine": false,
-      "tooltip": {
-        "shared": true,
-        "sort": 2,
-        "value_type": "individual"
-      },
-      "renderer": "flot",
-      "grid": {
-        "leftLogBase": 1,
-        "rightLogBase": 1
-      }
+      "title": "Average Response Time",
+      "type": "stat"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "cf3jcz5zbvx1cb"
+      },
+      "description": "Total amount of data received during the test",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "bf34yaz1u0c8wd"
+          },
+          "expr": "sum(k6_data_received_total)",
+          "legendFormat": "Data Received",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Data Transferred",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "cf3jcz5zbvx1cb"
+      },
+      "description": "Total HTTP requests per second during the load test",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "Requests per second",
+            "axisPlacement": "right",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "bf34yaz1u0c8wd"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "rate(k6_http_reqs_total[1m])",
+          "format": "time_series",
+          "instant": false,
+          "legendFormat": "Requests per Second",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cf3jcz5zbvx1cb"
+          },
+          "editorMode": "builder",
+          "expr": "k6_http_req_failed_rate",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Errors",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cf3jcz5zbvx1cb"
+          },
+          "editorMode": "code",
+          "expr": "rate(k6_http_reqs_total[1m])-k6_http_req_failed_rate",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "OK",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Requests Per Second Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "cf3jcz5zbvx1cb"
+      },
+      "description": "Cumulative count of all HTTP requests sent",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 17
+      },
       "id": 5,
-      "type": "graph",
-      "title": "Error Rate Percentage",
-      "description": "Percentage of failed HTTP requests over time",
-      "gridPos": {"x": 0, "y": 18, "w": 12,  "h": 9
-    },
-    "targets": [
-      {
-        "expr": "sum(rate(k6_http_req_failed_total[1m])) / sum(rate(k6_http_reqs_total[1m])) * 100",
-        "legendFormat": "Error Rate %",
-        "refId": "A"
-      }
-    ],
-    "yaxes": [
-      {"format": "percent", "label": "Error Rate (%)", "show": true},
-      {"format": "short", "show": true}
-    ],
-    "xaxis": {
-      "show": true,
-      "format": "time",
-      "label": "Time"
-    },
-    "lines": true,
-    "linewidth": 2,
-    "fill": 1,
-    "fillGradient": 5,
-    "stack": false,
-    "steppedLine": false,
-    "tooltip": {
-      "shared": true,
-      "sort": 2,
-      "value_type": "individual"
-    },
-    "renderer": "flot",
-    "grid": {
-      "leftLogBase": 1,
-      "rightLogBase": 1
-    }
-  },
-  {
-    "id": 6,
-    "type": "stat",
-    "title": "Total HTTP Requests",
-    "description": "Cumulative count of all HTTP requests sent during the test",
-    "gridPos": {"x": 12, "y": 18, "w": 6, "h": 4},
-    "targets": [
-      {
-        "expr": "sum(k6_http_reqs_total)",
-        "refId": "A"
-      }
-    ],
-    "options": {
-      "reduceOptions": {
-        "calcs": ["lastNotNull"]
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "text": {},
-      "colorMode": "value",
-      "graphMode": "none"
-    },
-    "fieldConfig": {
-      "defaults": {
-        "unit": "none",
-        "decimals": 0,
-        "thresholds": {
-          "mode": "absolute",
-          "steps": [
-            {"value": 0, "color": "green"},
-            {"value": 10000, "color": "orange"},
-            {"value": 50000, "color": "red"}
-          ]
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "bf34yaz1u0c8wd"
+          },
+          "expr": "sum(k6_http_reqs_total)",
+          "legendFormat": "Total Requests",
+          "refId": "A"
         }
-      }
-    }
-  },
-  {
-    "id": 7,
-    "type": "stat",
-    "title": "Failed HTTP Requests",
-    "description": "Count of failed HTTP requests",
-    "gridPos": {"x": 18, "y": 18, "w": 6, "h": 4},
-    "targets": [
-      {
-        "expr": "sum(k6_http_req_failed_total)",
-        "refId": "A"
-      }
-    ],
-    "options": {
-      "reduceOptions": {
-        "calcs": ["lastNotNull"]
-      },
-      "text": {},
-      "colorMode": "value",
-      "graphMode": "none"
+      ],
+      "title": "Total HTTP Requests",
+      "type": "stat"
     },
-    "fieldConfig": {
-      "defaults": {
-        "unit": "none",
-        "decimals": 0,
-        "thresholds": {
-          "mode": "absolute",
-          "steps": [
-            {"value": 0, "color": "green"},
-            {"value": 100, "color": "orange"},
-            {"value": 500, "color": "red"}
-          ]
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "cf3jcz5zbvx1cb"
+      },
+      "description": "Count of failed HTTP requests",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 17
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "bf34yaz1u0c8wd"
+          },
+          "editorMode": "code",
+          "expr": "k6_errors_rate*k6_total_requests_total",
+          "legendFormat": "Failed Requests",
+          "range": true,
+          "refId": "A"
         }
-      }
+      ],
+      "title": "Failed HTTP Requests",
+      "type": "stat"
     }
+  ],
+  "preload": false,
+  "refresh": "5s",
+  "schemaVersion": 42,
+  "tags": [
+    "k6",
+    "load-testing",
+    "performance",
+    "http"
+  ],
+  "templating": {
+    "list": []
   },
-  {
-    "id": 8,
-    "type": "stat",
-    "title": "Average Response Time",
-    "description": "Average HTTP response time across all requests",
-    "gridPos": {"x": 12, "y": 22, "w": 6, "h": 4},
-    "targets": [
-      {
-        "expr": "avg(k6_http_req_duration_avg)",
-        "refId": "A"
-      }
-    ],
-    "options": {
-      "reduceOptions": {
-        "calcs": ["lastNotNull"]
-      },
-      "text": {},
-      "colorMode": "value",
-      "graphMode": "none"
-    },
-    "fieldConfig": {
-      "defaults": {
-        "unit": "s",
-        "decimals": 3,
-        "thresholds": {
-          "mode": "absolute",
-          "steps": [
-            {"value": 0, "color": "green"},
-            {"value": 0.5, "color": "orange"},
-            {"value": 1.0, "color": "red"}
-          ]
-        }
-      }
-    }
-  },
-  {
-    "id": 9,
-    "type": "stat",
-    "title": "Total Data Transferred",
-    "description": "Total amount of data received during the test",
-    "gridPos": {"x": 18, "y": 22, "w": 6, "h": 4},
-    "targets": [
-      {
-        "expr": "sum(k6_data_received_total)",
-        "refId": "A"
-      }
-    ],
-    "options": {
-      "reduceOptions": {
-        "calcs": ["lastNotNull"]
-      },
-      "text": {},
-      "colorMode": "value",
-      "graphMode": "none"
-    },
-    "fieldConfig": {
-      "defaults": {
-        "unit": "bytes",
-        "decimals": 1
-      }
-    }
-  },
-  {
-    "id": 10,
-    "type": "table",
-    "title": "Key Response Time Percentiles (Final)",
-    "description": "Final values of key latency percentiles: p50, p75, p90, p95, p99",
-    "gridPos": {"x": 0, "y": 27, "w": 12, "h": 8},
-    "targets": [
-      {
-        "expr": "histogram_quantile(0.5, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
-        "refId": "p50",
-        "legendFormat": "p50"
-      },
-      {
-        "expr": "histogram_quantile(0.75, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
-        "refId": "p75",
-        "legendFormat": "p75"
-      },
-      {
-        "expr": "histogram_quantile(0.90, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
-        "refId": "p90",
-        "legendFormat": "p90"
-      },
-      {
-        "expr": "histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
-        "refId": "p95",
-        "legendFormat": "p95"
-      },
-      {
-        "expr": "histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds_bucket[1m])) by (le))",
-        "refId": "p99",
-        "legendFormat": "p99"
-      }
-    ],
-    "pluginVersion": "8.5.16",
-    "fieldConfig": {
-      "defaults": {
-        "unit": "s",
-        "decimals": 3,
-        "thresholds": {
-          "mode": "absolute",
-          "steps": [
-            {"value": 0, "color": "green"},
-            {"value": 0.5, "color": "orange"},
-            {"value": 1.0, "color": "red"}
-          ]
-        }
-      },
-      "overrides": []
-    },
-    "options": {
-      "showHeader": true,
-      "displayMode": "color-text",
-      "align": "auto",
-      "cellPadding": 2
-    }
-  }
-]
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "k6 Load Test Detailed Metrics",
+  "uid": "575b1083-6ca2-4e08-9f55-a6e4ab388531",
+  "version": 8
 }
