@@ -79,43 +79,20 @@ stop_service() {
     local iteration=$1
     echo "Stopping service container for iteration $iteration..."
     
-    # Collect container stats before stopping
     docker stats "benchmark-target-$iteration" --no-stream > "$RESULTS_DIR/raw/container_stats_$iteration.txt" 2>/dev/null || true
-    
     docker stop "benchmark-target-$iteration" 2>/dev/null || true
     docker rm "benchmark-target-$iteration" 2>/dev/null || true
     docker stop "benchmark-target-$iteration-postgres-1" 2>/dev/null || true
     docker rm "benchmark-target-$iteration-postgres-1" 2>/dev/null || true
 }
 
-start_resource_monitoring() {
-    local iteration=$1
-    echo "Starting resource monitoring for iteration $iteration..."
-    
-    # Start sysstat collection
-    sar -u -r -b 1 > "$RESULTS_DIR/raw/system_resources_$iteration.txt" 2>&1 &
-    RESOURCE_PID=$!
-    
-    # Start network monitoring
-    sar -n DEV 1 > "$RESULTS_DIR/raw/network_usage_$iteration.txt" 2>&1 &
-    NETWORK_PID=$!
-}
-
-stop_resource_monitoring() {
-    echo "Stopping resource monitoring..."
-    kill $RESOURCE_PID $NETWORK_PID 2>/dev/null || true
-    wait $RESOURCE_PID $NETWORK_PID 2>/dev/null || true
-}
-
 for i in $(seq 1 $ITERATIONS); do
     echo "=== Iteration $i/$ITERATIONS ==="
     
-    if ! start_service $i; then
+    if ! start_service "$i"; then
         echo "Failed to start service for iteration $i, skipping..."
         continue
     fi
-    
-    start_resource_monitoring $i
     
     echo "Starting load test for iteration $i..."
     docker run --rm \
@@ -131,8 +108,7 @@ for i in $(seq 1 $ITERATIONS); do
         --tag testid="iteration-$i" \
         --summary-export="/results/raw/k6_summary_$i.json"
     
-    stop_resource_monitoring
-    stop_service $i
+    stop_service "$i"
     echo "Completed iteration $i"
     sleep 3
 done

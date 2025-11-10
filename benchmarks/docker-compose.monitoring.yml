@@ -34,12 +34,9 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
+      - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
-    devices:
-      - /dev/kmsg
     privileged: true
     restart: unless-stopped
 
